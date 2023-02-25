@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('exam_papers', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('description');
+            $table->string('file');
             $table->timestamps();
         });
     }

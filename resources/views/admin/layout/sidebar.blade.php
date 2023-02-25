@@ -3,7 +3,7 @@
     <!-- Brand Logo -->
     <a href="/admin" class="brand-link">
       <img src="{{ asset('dist/img/logo.svg')}}" alt="Learn_to_Drive Logo" class="brand-image elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Admin Dashboard</span>
+      <span class="brand-text font-weight-light">Learn To Drive</span>
     </a>
 
     <!-- Sidebar -->
@@ -35,64 +35,56 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item menu-open">
-            <a href="/admin" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Dashboard
-                {{-- <i class="right fas fa-angle-left"></i> --}}
-              </p>
-            </a>
-            <a href="/admin/users" class="nav-link">
-                <i class="nav-icon fas fa-user-plus"></i>
+            <li class="nav-item">
+                <a href="/admin" class="nav-link {{ Request::is('admin') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-th-large"></i>
                 <p>
-                    Users
+                    Dashboard
                     {{-- <i class="right fas fa-angle-left"></i> --}}
                 </p>
-            </a>
-            <a href="/admin/traffic-signs" class="nav-link">
-                <i class="nav-icon fas fa-map-signs"></i>
-                <p>
-                    Traffic Signs
-                    {{-- <i class="right fas fa-angle-left"></i> --}}
-                </p>
-            </a>
-            <a href="/admin/exam-papers" class="nav-link">
-                <i class="nav-icon fas fa-file"></i>
-                <p>
-                    Exam Papers
-                    {{-- <i class="right fas fa-angle-left"></i> --}}
-                </p>
-            </a>
-            <a href="/admin/vision-tests" class="nav-link">
-                <i class="nav-icon fas fa-file"></i>
-                <p>
-                    Vision Tests
-                    {{-- <i class="right fas fa-angle-left"></i> --}}
-                </p>
-            </a>
+                </a>
+            </li>
 
-            {{-- <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="./index.html" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v1</p>
+            <li class="nav-item">
+                <a href="/admin/users" class="nav-link {{ Request::is('admin/users') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user-plus"></i>
+                    <p>
+                        Users
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="./index2.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v2</p>
+
+            <li class="nav-item">
+                <a href="/admin/traffic-signs" class="nav-link {{ Request::is('admin/traffic-signs') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-map-signs"></i>
+                    <p>
+                        Traffic Signs
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="./index3.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v3</p>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/exam-papers" class="nav-link {{ Request::is('admin/exam-papers') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file"></i>
+                    <p>
+                        Exam Papers
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
                 </a>
-              </li>
-            </ul> --}}
-          </li>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/vision-tests" class="nav-link {{ Request::is('admin/vision-tests') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file"></i>
+                    <p>
+                        Vision Tests
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
+                </a>
+            </li>
+
           {{-- <li class="nav-item">
             <a href="pages/widgets.html" class="nav-link">
               <i class="nav-icon fas fa-th"></i>

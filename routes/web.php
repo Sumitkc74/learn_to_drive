@@ -23,7 +23,7 @@ Route::get('/', function () {
 
 Route::view('admin','admin.dashboard');
 // Route::view('admin/users','admin.users.showUser');
-Route::view('admin/traffic-signs','admin.addTrafficSigns');
+// Route::view('admin/traffic-signs','admin.addTrafficSigns');
 // Route::view('admin/exam-papers','admin.addExamPapers');
 
 Auth::routes();

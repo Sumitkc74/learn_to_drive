@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Users')
+@section('title', 'Add User')
 
 @section('page-script')
     <style type='text/css'>
@@ -15,31 +15,43 @@
             <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">User Name :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="name" placeholder="Enter user name" required>
+                    <input type="text" class="form-control  @if($errors->has('name')) is-invalid @endif" name="name" placeholder="Enter user name" value="{{ old('name') }}">
+                    @if($errors->has('name'))
+                        <p class="text-danger">{{ $errors->first('name') }}</p>
+                    @endif
                 </div>
             </div>
             <div class="form-group row">
                 <label for="email" class="col-sm-2 col-form-label">Email :</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" name="email" placeholder="Enter user email" required>
+                    <input type="email" class="form-control  @if($errors->has('email')) is-invalid @endif" name="email" placeholder="Enter user email" value="{{ old('email') }}">
+                    @if($errors->has('email'))
+                        <p class="text-danger">{{ $errors->first('email') }}</p>
+                    @endif
                 </div>
             </div>
             <div class="form-group row">
                 <label for="phoneNumber" class="col-sm-2 col-form-label">Phone Number :</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="phoneNumber" placeholder="Enter user phone-number" required>
+                    <input type="text" class="form-control @if($errors->has('phoneNumber')) is-invalid @endif" name="phoneNumber" placeholder="Enter user phone-number" value="{{ old('phoneNumber') }}">
+                    @if($errors->has('phoneNumber'))
+                        <p class="text-danger">{{ $errors->first('phoneNumber') }}</p>
+                    @endif
                 </div>
             </div>
             <div class="form-group row">
                 <label for="password" class="col-sm-2 col-form-label">Password :</label>
                 <div class="col-sm-10">
-                    <input type="password" class="form-control" name="password" placeholder="Enter password" required>
+                    <input type="password" class="form-control @if($errors->has('password')) is-invalid @endif" name="password" placeholder="Enter password">
+                    @if($errors->has('password'))
+                        <p class="text-danger">{{ $errors->first('password') }}</p>
+                    @endif
                 </div>
             </div>
             <div class="form-group row">
                 <label for="role" class="col-sm-2 col-form-label">Role :</label>
                 <div class="col-sm-10">
-                    <select class="form-control" id="exampleFormControlSelect1" name="role" required>
+                    <select class="form-control" id="exampleFormControlSelect1" name="role">
                         <option value="User">User</option>
                         <option value="Admin">Admin</option>
                     </select>

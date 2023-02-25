@@ -20,3 +20,4 @@
   <link rel="stylesheet" href="{{ asset('plugins/summernote/summernote-bs4.min.css')}}">
   <!-- Toaster Notifications -->
   <link rel="stylesheet" href="{{ asset('plugins/css/toastr/toastr.min.css')}}">
+

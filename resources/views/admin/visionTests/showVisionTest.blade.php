@@ -19,7 +19,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                        <li class="breadcrumb-item active">Add Vision-Test</li>
+                        <li class="breadcrumb-item">Add Vision-Test</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -64,8 +64,8 @@
                             @foreach ($visionTests as $key=>$row)
                             <tr>
                                 <td>{{ $row->id }}</td>
-                                <td>{{ $row->name }}</td>
-                                <td>{{ $row->description }}</td>
+                                <td>{{ $row->number }}</td>
+                                {{-- <td>{{ $row->description }}</td> --}}
                                 <td>{{ $row->image }}</td>
                                 <td>
                                     <a href="{{ URL::to('/admin/edit-vision-test/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>

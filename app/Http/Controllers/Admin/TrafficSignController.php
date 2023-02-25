@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TrafficSign;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TrafficSignController extends Controller
 {
@@ -15,103 +15,69 @@ class TrafficSignController extends Controller
     }
 
 
-    //show users from database
+    //show traffic signs from database
     public function allTrafficSign()
     {
-        $trafficSigns = DB::table('traffic_signs') -> get();
+        $trafficSigns = TrafficSign::all();
 
         return view('admin.trafficSigns.showTrafficSign', compact('trafficSigns'));
     }
 
 
-    //show form to add user to database
+    //show form to add traffic sign to database
     public function addTrafficSign()
     {
         return view('admin.trafficSigns.addTrafficSign');
     }
 
 
-    //add user to database
+    //add traffic sign to database
     public function insertTrafficSign(Request $request)
     {
-        try{
-            $data = array();
-            $data['name'] = $request->name;
-            $data['description'] = $request->description;
-            $data['role'] = $request->role;
-            $data['created_at'] = date('Y-m-d H:i:s');
-            $data['updated_at'] = date('Y-m-d H:i:s');
+        $sanitized = $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'image' => 'required',
+        ]);
+        $sanitized['image'] = "demo";
 
-            $insert = DB::table('traffic_signs') -> insert($data);
-            if($insert){
-                // return view('admin.examPapers.showExamPaper');
-                // echo "Successful";
-                $notification=array(
-                    'messege'=>'User added successfully',
-                    'alert-type' => 'success'
-                );
-                return redirect()->route('allExamPaper')->with($notification);
-            }
-            else{
-                // echo "Something went wrong. Try Again!";
-                $notification=array(
-                    'messege'=>'Something went wrong. Try Again!',
-                    'alert-type' => 'error'
-                );
-                return redirect()->route('allTrafficSign')->with($notification);
-            }
-        }
-        catch(e){
-            return redirect()->route('allTrafficSign');
-        }
+        $traffic = TrafficSign::create($sanitized);
+
+        $traffic->addMedia($request->image)->toMediaCollection();
+
+        return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Added Successfully');
     }
 
 
-    //show form to edit user to database
+    //show form to edit traffic sign to database
     public function editTrafficSign($id)
     {
-        $edit = DB::table('traffic_signs')->where('id', $id)->first();
-        return view('admin.trafficSigns.editTrafficSign', compact('edit'));
+        $trafficSign = TrafficSign::find($id);
+
+        return view('admin.trafficSigns.editTrafficSign', compact('trafficSign'));
     }
 
 
-    //update user to database
+    //update traffic sign in database
     public function updateTrafficSign(Request $request, $id)
     {
-        try{
-            $data = array();
-            $data['name'] = $request->name;
-            $data['description'] = $request->description;
-            $data['role'] = $request->role;
-            // $data['created_at'] = date('Y-m-d H:i:s');
-            $data['updated_at'] = date('Y-m-d H:i:s');
+        $sanitized = $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'image' => 'required',
+        ]);
 
-            $update = DB::table('traffic_signs') ->where('id', $id)-> update($data);
-            if($update){
-                echo "User updated";
-                redirect()->route('allTrafficSign');
-            }
-            else{
-                echo "Something went wrong. Try Again!";
-                redirect()->route('allTrafficSign');
-            }
-        }
-        catch(e){
-            return redirect()->route('allTrafficSign');
-        }
+        $traffic = TrafficSign::find($id)->update($sanitized);
+
+        $traffic->addMedia($request->image)->toMediaCollection();
+
+        return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Updated Successfully');
     }
 
     //delete user from database
     public function deleteTrafficSign($id)
     {
-        $delete = DB::table('traffic_signs')->where('id', $id)->delete();
-        if($delete){
-            echo "User deleted successfully.";
-            redirect()->route('allTrafficSign');
-        }
-        else{
-            echo "Something went wrong.";
-            redirect()->route('allTrafficSign');
-        }
+        TrafficSign::find($id)->delete();
+        return redirect()->back();
     }
 }

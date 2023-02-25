@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Exam-Papers')
+@section('title', 'Traffic Signs')
 
 @section('page-script')
     <style type='text/css'>
@@ -8,8 +8,14 @@
     </style>
 @endsection
 
+
+@section('content_header')
+
+@endsection
+
 @section('content')
     <!-- Content Header (Page header) -->
+    @include('admin.layout.flash')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -19,7 +25,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                        <li class="breadcrumb-item active">Add Traffic-Signs</li>
+                        <li class="breadcrumb-item">Add Traffic-Signs</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -66,7 +72,7 @@
                                 <td>{{ $row->id }}</td>
                                 <td>{{ $row->name }}</td>
                                 <td>{{ $row->description }}</td>
-                                <td>{{ $row->image }}</td>
+                                <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                 <td>
                                     <a href="{{ URL::to('/admin/edit-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                     <a href="{{ URL::to('/admin/delete-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
@@ -79,7 +85,7 @@
                     <!-- /.card-body -->
                 </div>
             </div>
-            <a href="{{ URL::to('/admin/add-traffic-sign/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Exam Paper</a>
+            <a href="{{ URL::to('/admin/add-traffic-sign/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Traffic Sign</a>
         </div>
     </section>
 @endsection

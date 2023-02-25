@@ -10,7 +10,7 @@
 
 @section('content')
     <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/update-user/'.$edit->id) }}" method="post">
+        <form role="form" action="{{ URL::to('/admin/update-vision-test/'.$edit->id) }}" method="post"  enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">Vision Test Number :</label>

@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('vision_tests', function (Blueprint $table) {
             $table->id();
+            $table->string('number');
+            $table->string('image');
             $table->timestamps();
         });
     }
