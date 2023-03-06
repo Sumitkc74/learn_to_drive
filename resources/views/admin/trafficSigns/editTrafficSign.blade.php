@@ -39,7 +39,8 @@
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
-                    <label for="image" class="col-sm-2 col-form-label">Input Sign Image :</label>
+                    <label for="image" class="col-sm-2 col-form-label">Input Test Image :</label>
+                    <img src="{{ $trafficSign->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
                         <input type="file" name="image" class="@if($errors->has('image')) is-invalid @endif">
                         @if($errors->has('image'))

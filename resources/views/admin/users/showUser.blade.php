@@ -33,7 +33,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-10 card">
+                <div class="col card">
                     <!-- Card-header -->
                     <div class="card-header">
                         <h3 class="card-title">App Users</h3>
@@ -41,13 +41,13 @@
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 300px;">
                                 <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                                <div class="input-group-append">
+                                <div class="input-group-append"  style="padding-left: 10">
                                     <button type="submit" class="btn btn-default">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
 
-                                <a href="{{ URL::to('/admin/add-user/') }}" class="btn btn-sm btn-success">
+                                <a href="{{ URL::to('/admin/add-user/') }}" class="btn btn-sm btn-success" style="padding-left: 10">
                                     <i class="nav-icon fas fa-plus"></i>
                                     Add User
                                 </a>
@@ -96,6 +96,7 @@
 
 @section('page-script')
     <script type='text/javacript'>
+
 
     </script>
 @endsection

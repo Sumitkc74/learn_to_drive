@@ -14,7 +14,6 @@ class VisionTestController extends Controller
         $this->middleware('auth');
     }
 
-
     //show users from database
     public function allVisionTest()
     {
@@ -23,13 +22,11 @@ class VisionTestController extends Controller
         return view('admin.visionTests.showVisionTest', compact('visionTests'));
     }
 
-
     //show form to add user to database
     public function addVisionTest()
     {
         return view('admin.visionTests.addVisionTest');
     }
-
 
     //add user to database
     public function insertVisionTest(Request $request)
@@ -39,7 +36,6 @@ class VisionTestController extends Controller
             // 'description' => 'required',
             'image' => 'required',
         ]);
-
         // $sanitized['image'] = "demo";
 
         $visionTest = VisionTest::create($sanitized);
@@ -49,14 +45,12 @@ class VisionTestController extends Controller
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test added successfully');
     }
 
-
     //show form to edit user to database
     public function editVisionTest($id)
     {
-        $edit = VisionTest::find($id);
-        return view('admin.visionTests.editVisionTest', compact('edit'));
+        $visionTest = VisionTest::find($id);
+        return view('admin.visionTests.editVisionTest', compact('visionTest'));
     }
-
 
     //update user to database
     public function updateVisionTest(Request $request, $id)
@@ -69,33 +63,15 @@ class VisionTestController extends Controller
 
         // $sanitized['image'] = "demo";
 
-        $visionTest = VisionTest::find($id)->update($sanitized);
+        $visionTest = VisionTest::find($id);
+
+        $visionTest->update($sanitized);
+
+        $visionTest->clearMediaCollection();
 
         $visionTest->addMedia($request->image)->toMediaCollection();
 
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test updated successfully');
-
-        // try{
-        //     $data = array();
-        //     $data['name'] = $request->name;
-        //     $data['description'] = $request->description;
-        //     $data['role'] = $request->role;
-        //     // $data['created_at'] = date('Y-m-d H:i:s');
-        //     $data['updated_at'] = date('Y-m-d H:i:s');
-
-        //     $update = DB::table('vision_tests') ->where('id', $id)-> update($data);
-        //     if($update){
-        //         echo "User updated";
-        //         redirect()->route('allVisionTest');
-        //     }
-        //     else{
-        //         echo "Something went wrong. Try Again!";
-        //         redirect()->route('allVisionTest');
-        //     }
-        // }
-        // catch(e){
-        //     return redirect()->route('allVisionTest');
-        // }
     }
 
     //delete user from database

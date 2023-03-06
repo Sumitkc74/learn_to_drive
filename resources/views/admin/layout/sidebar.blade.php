@@ -85,6 +85,16 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="/admin/exam-information" class="nav-link {{ Request::is('admin/exam-information') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file"></i>
+                    <p>
+                        Exam Information
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
+                </a>
+            </li>
+
           {{-- <li class="nav-item">
             <a href="pages/widgets.html" class="nav-link">
               <i class="nav-icon fas fa-th"></i>

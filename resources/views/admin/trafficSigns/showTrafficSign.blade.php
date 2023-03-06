@@ -33,28 +33,30 @@
     </div>
     <!-- /.content-header -->
 
-
-      <!-- Main content -->
+    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-10 card">
                     <div class="card-header">
-                    <h3 class="card-title">Traffic-Signs</h3>
+                        <h3 class="card-title">Traffic-Signs</h3>
 
-                    <div class="card-tools">
-                        <div class="input-group input-group-sm" style="width: 150px;">
-                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 300px;">
+                            <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
 
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-default">
-                            <i class="fas fa-search"></i>
-                            </button>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+
+                            <a href="{{ URL::to('/admin/add-traffic-sign/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Traffic Sign</a>
+                            </div>
                         </div>
-                        </div>
-                    </div>
                     </div>
                     <!-- /.card-header -->
+
                     <div class="card-body table-responsive p-0">
                     <table class="table table-hover text-nowrap">
                         <thead>
@@ -85,7 +87,6 @@
                     <!-- /.card-body -->
                 </div>
             </div>
-            <a href="{{ URL::to('/admin/add-traffic-sign/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Traffic Sign</a>
         </div>
     </section>
 @endsection

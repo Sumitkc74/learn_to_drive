@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
-
 class AuthController extends Controller
 {
     private $token;
@@ -62,7 +61,7 @@ class AuthController extends Controller
         if($user){
             if (Hash::check($req->password, $user->password)) {
                 $this->token = $user->createToken('Personal Access Token')->plainTextToken;
-                $response = ['user' => $user, 'token' => $this->token];
+                $response = ['user' => $user, 'token' => $this->token, 'message' => 'User Login Successful'];
                 return response()->json($response, 200);
             }else{
                 return response()->json(['message' => 'Incorrect password'], 400);
@@ -96,7 +95,6 @@ class AuthController extends Controller
         }
         return response()->json(['message' => 'Incorrect Password'], 500);
     }
-
 
     // public function resetPassword(Request $req)
     // {
@@ -140,7 +138,6 @@ class AuthController extends Controller
         //     [
         //         'email' => $req -> email,
         //         'token' => $token,
-
         //     ],
         // );
 

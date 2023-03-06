@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ExamPaperController;
 use App\Http\Controllers\Admin\TrafficSignController;
+use App\Http\Controllers\Admin\ExamPaperController;
 use App\Http\Controllers\Admin\VisionTestController;
+use App\Http\Controllers\Admin\ExamInformationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,3 +58,10 @@ Route::post('/admin/insert-vision-test', [VisionTestController::class, 'insertVi
 Route::get('/admin/edit-vision-test/{id}', [VisionTestController::class, 'editVisionTest'])->name('editVisionTest');
 Route::post('/admin/update-vision-test/{id}', [VisionTestController::class, 'updateVisionTest'])->name('updateVisionTest');
 Route::get('/admin/delete-vision-test/{id}', [VisionTestController::class, 'deleteVisionTest'])->name('deleteVisionTest');
+
+Route::get('/admin/exam-information', [ExamInformationController::class, 'allExamInformation'])->name('allExamInformation');
+Route::get('/admin/add-exam-information', [ExamInformationController::class, 'addExamInformation'])->name('addExamInformation');
+Route::post('/admin/insert-exam-information', [ExamInformationController::class, 'insertExamInformation'])->name('insertExamInformation');
+Route::get('/admin/edit-exam-information/{id}', [ExamInformationController::class, 'editExamInformation'])->name('editExamInformation');
+Route::post('/admin/update-exam-information/{id}', [ExamInformationController::class, 'updateExamInformation'])->name('updateExamInformation');
+Route::get('/admin/delete-exam-information/{id}', [ExamInformationController::class, 'deleteExamInformation'])->name('deleteExamInformation');

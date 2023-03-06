@@ -16,7 +16,6 @@ class UserController extends Controller
         $this->middleware('auth');
     }
 
-
     //show users from database
     public function allUser()
     {
@@ -25,13 +24,11 @@ class UserController extends Controller
         return view('admin.users.showUser', compact('users'));
     }
 
-
     //show form to add user to database
     public function addUser()
     {
         return view('admin.users.addUser');
     }
-
 
     //add user to database
     public function insertUser(Request $request)
@@ -55,14 +52,12 @@ class UserController extends Controller
         return redirect()->to('/admin/users')->with('success','User Added Successfully');
     }
 
-
     //show form to edit user to database
     public function editUser($id)
     {
         $edit = User::find($id);
         return view('admin.users.editUser', compact('edit'));
     }
-
 
     //update user to database
     public function updateUser(Request $request, $id)
@@ -76,36 +71,9 @@ class UserController extends Controller
             // 'image' => 'required',
         ]);
 
-
         $user = User::find($id)->update($sanitized);
 
-
         return redirect()->to('/admin/users')->with('success','User Updated Successfully');
-
-        // try{
-        //     $data = array();
-        //     $data['name'] = $request->name;
-        //     $data['email'] = $request->email;
-        //     $data['phoneNumber'] = $request->phoneNumber;
-        //     $data['role'] = $request->role;
-        //     // $data['password'] = Hash::make($request->password);
-        //     // $data['created_at'] = date('Y-m-d H:i:s');
-        //     $data['updated_at'] = date('Y-m-d H:i:s');
-
-
-
-        //     $update = DB::table('users') ->where('id', $id)-> update($data);
-        //     if($update){
-        //         return redirect()->to('/admin/users')->with('success','User Updated Successfully');
-        //     }
-        //     else{
-        //         echo "Something went wrong. Try Again!";
-        //         redirect()->route('allUser');
-        //     }
-        // }
-        // catch(e){
-        //     return redirect()->route('allUser');
-        // }
     }
 
     //delete user from database
@@ -113,15 +81,5 @@ class UserController extends Controller
     {
         User::find($id)->delete();
         return redirect()->to('/admin/users')->with('success','User Deleted Successfully');
-
-        // $delete = DB::table('users')->where('id', $id)->delete();
-        // if($delete){
-        //     echo "User deleted successfully.";
-        //     redirect()->route('allUser');
-        // }
-        // else{
-        //     echo "Something went wrong.";
-        //     redirect()->route('allUser');
-        // }
     }
 }

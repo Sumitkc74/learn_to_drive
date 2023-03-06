@@ -15,12 +15,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Exam-papers</h1>
+                    <h1 class="m-0">Exam-Information</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                        <li class="breadcrumb-item">Add Exam-Paper</li>
+                        <li class="breadcrumb-item">Add Exam-Information</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -35,10 +35,10 @@
             <div class="row">
                 <div class="col-lg-10 card">
                     <div class="card-header">
-                    <h3 class="card-title">Exam Papers</h3>
+                    <h3 class="card-title">Exam Information</h3>
 
                     <div class="card-tools">
-                        <div class="input-group input-group-sm" style="width: 300px;">
+                        <div class="input-group input-group-sm" style="width: 400px;">
                         <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
 
                         <div class="input-group-append">
@@ -46,7 +46,7 @@
                             <i class="fas fa-search"></i>
                             </button>
                         </div>
-                        <a href="{{ URL::to('/admin/add-exam-paper/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Exam Paper</a>
+                        <a href="{{ URL::to('/admin/add-exam-information/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Exam Information</a>
                         </div>
                     </div>
                     </div>
@@ -56,22 +56,22 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Exam-paper</th>
+                            <th>Information Name</th>
                             <th>Description</th>
                             <th>File</th>
                             <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach ($examPapers as $key=>$row)
+                            @foreach ($examInformation as $key=>$row)
                             <tr>
                                 <td>{{ $row->id }}</td>
                                 <td>{{ $row->name }}</td>
                                 <td>{{ $row->description }}</td>
                                 <td><embed src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                 <td>
-                                    <a href="{{ URL::to('/admin/edit-exam-paper/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                                    <a href="{{ URL::to('/admin/delete-exam-paper/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                                    <a href="{{ URL::to('/admin/edit-exam-information/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                    <a href="{{ URL::to('/admin/delete-exam-information/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
                                 </td>
                             </tr>
                             @endforeach

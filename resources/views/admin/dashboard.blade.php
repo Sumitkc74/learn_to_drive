@@ -58,7 +58,7 @@
 
             </section>
             <!-- right col -->
-          </div>
+            </div>
           <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
       </section>

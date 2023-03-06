@@ -14,7 +14,6 @@ class TrafficSignController extends Controller
         $this->middleware('auth');
     }
 
-
     //show traffic signs from database
     public function allTrafficSign()
     {
@@ -23,13 +22,11 @@ class TrafficSignController extends Controller
         return view('admin.trafficSigns.showTrafficSign', compact('trafficSigns'));
     }
 
-
     //show form to add traffic sign to database
     public function addTrafficSign()
     {
         return view('admin.trafficSigns.addTrafficSign');
     }
-
 
     //add traffic sign to database
     public function insertTrafficSign(Request $request)
@@ -57,7 +54,6 @@ class TrafficSignController extends Controller
         return view('admin.trafficSigns.editTrafficSign', compact('trafficSign'));
     }
 
-
     //update traffic sign in database
     public function updateTrafficSign(Request $request, $id)
     {
@@ -67,7 +63,11 @@ class TrafficSignController extends Controller
             'image' => 'required',
         ]);
 
-        $traffic = TrafficSign::find($id)->update($sanitized);
+        $traffic = TrafficSign::find($id);
+
+        $traffic->update($sanitized);
+
+        $traffic->clearMediaCollection();
 
         $traffic->addMedia($request->image)->toMediaCollection();
 
