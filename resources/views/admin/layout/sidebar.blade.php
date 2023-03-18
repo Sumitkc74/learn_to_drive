@@ -77,7 +77,7 @@
 
             <li class="nav-item">
                 <a href="/admin/vision-tests" class="nav-link {{ Request::is('admin/vision-tests') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-file"></i>
+                    <i class="nav-icon fas fa-low-vision"></i>
                     <p>
                         Vision Tests
                         {{-- <i class="right fas fa-angle-left"></i> --}}
@@ -87,9 +87,19 @@
 
             <li class="nav-item">
                 <a href="/admin/exam-information" class="nav-link {{ Request::is('admin/exam-information') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-file"></i>
+                    <i class="nav-icon fas fa-info"></i>
                     <p>
                         Exam Information
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/questions" class="nav-link {{ Request::is('admin/questions') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-question"></i>
+                    <p>
+                        Questions
                         {{-- <i class="right fas fa-angle-left"></i> --}}
                     </p>
                 </a>

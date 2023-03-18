@@ -74,7 +74,7 @@ class TrafficSignController extends Controller
         return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Updated Successfully');
     }
 
-    //delete user from database
+    //delete user from databasec
     public function deleteTrafficSign($id)
     {
         TrafficSign::find($id)->delete();

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -19,8 +18,7 @@ class UserController extends Controller
     //show users from database
     public function allUser()
     {
-        $users = DB::table('users') -> get();
-
+        $users = User::all();
         return view('admin.users.showUser', compact('users'));
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\QuestionController;
 use App\Http\Controllers\API\TrafficSignController;
 use App\Http\Controllers\API\ExamPaperController;
 use App\Http\Controllers\API\VisionTestController;
@@ -36,3 +37,4 @@ Route::get('/trafficSign', [TrafficSignController::class, 'index']);
 Route::get('/examPaper', [ExamPaperController::class, 'index']);
 Route::get('/visionTest', [VisionTestController::class, 'index']);
 Route::get('/examInformation', [ExamInformationController::class, 'index']);
+Route::get('/question', [QuestionController::class, 'index']);

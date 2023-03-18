@@ -37,7 +37,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-10 card">
+                <div class="col card">
                     <div class="card-header">
                         <h3 class="card-title">Traffic-Signs</h3>
 

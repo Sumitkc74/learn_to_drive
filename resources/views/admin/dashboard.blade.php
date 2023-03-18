@@ -52,9 +52,9 @@
 
                 @include('admin.dashboard-components.calendar')
 
-                @include('admin.dashboard-components.map')
-
                 @include('admin.dashboard-components.sales-graph')
+
+                @include('admin.dashboard-components.map')
 
             </section>
             <!-- right col -->

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\TrafficSignController;
 use App\Http\Controllers\Admin\ExamPaperController;
 use App\Http\Controllers\Admin\VisionTestController;
 use App\Http\Controllers\Admin\ExamInformationController;
+use App\Http\Controllers\Admin\QuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,3 +66,10 @@ Route::post('/admin/insert-exam-information', [ExamInformationController::class,
 Route::get('/admin/edit-exam-information/{id}', [ExamInformationController::class, 'editExamInformation'])->name('editExamInformation');
 Route::post('/admin/update-exam-information/{id}', [ExamInformationController::class, 'updateExamInformation'])->name('updateExamInformation');
 Route::get('/admin/delete-exam-information/{id}', [ExamInformationController::class, 'deleteExamInformation'])->name('deleteExamInformation');
+
+Route::get('/admin/questions', [QuestionController::class, 'allQuestion'])->name('allQuestion');
+Route::get('/admin/add-question', [QuestionController::class, 'addQuestion'])->name('addQuestion');
+Route::post('/admin/insert-question', [QuestionController::class, 'insertQuestion'])->name('insertQuestion');
+Route::get('/admin/edit-question/{id}', [QuestionController::class, 'editQuestion'])->name('editQuestion');
+Route::post('/admin/update-question/{id}', [QuestionController::class, 'updateQuestion'])->name('updateQuestion');
+Route::get('/admin/delete-question/{id}', [QuestionController::class, 'deleteQuestion'])->name('deleteQuestion');
