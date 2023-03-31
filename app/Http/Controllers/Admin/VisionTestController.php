@@ -18,28 +18,25 @@ class VisionTestController extends Controller
     public function allVisionTest()
     {
         $visionTests = VisionTest::all();
-
-        return view('admin.visionTests.showVisionTest', compact('visionTests'));
+        return view('admin.crud.visionTests.showVisionTest', compact('visionTests'));
     }
 
     //show form to add user to database
     public function addVisionTest()
     {
-        return view('admin.visionTests.addVisionTest');
+        return view('admin.crud.visionTests.addVisionTest');
     }
 
     //add user to database
     public function insertVisionTest(Request $request)
     {
         $sanitized = $request->validate([
-            'number' => 'required',
-            // 'description' => 'required',
-            'image' => 'required',
+            'testNumber' => 'required',
+            'image' => 'required|image',
         ]);
         // $sanitized['image'] = "demo";
 
         $visionTest = VisionTest::create($sanitized);
-
         $visionTest->addMedia($request->image)->toMediaCollection();
 
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test added successfully');
@@ -49,28 +46,27 @@ class VisionTestController extends Controller
     public function editVisionTest($id)
     {
         $visionTest = VisionTest::find($id);
-        return view('admin.visionTests.editVisionTest', compact('visionTest'));
+        return view('admin.crud.visionTests.editVisionTest', compact('visionTest'));
     }
 
     //update user to database
     public function updateVisionTest(Request $request, $id)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            // 'description' => 'required',
-            'image' => 'required',
+            'testNumber' => 'required',
+            // 'image' => 'required|image',
         ]);
 
         // $sanitized['image'] = "demo";
 
         $visionTest = VisionTest::find($id);
 
+        if ($request -> hasFile('image') && $request->image != ''){
+            $visionTest->clearMediaCollection();
+            $visionTest->addMedia($request->image)->toMediaCollection();
+        }
+
         $visionTest->update($sanitized);
-
-        $visionTest->clearMediaCollection();
-
-        $visionTest->addMedia($request->image)->toMediaCollection();
-
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test updated successfully');
     }
 

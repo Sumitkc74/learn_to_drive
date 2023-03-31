@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ExamPaperController;
 use App\Http\Controllers\Admin\VisionTestController;
 use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
+use App\Http\Controllers\Admin\TutorialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,3 +74,10 @@ Route::post('/admin/insert-question', [QuestionController::class, 'insertQuestio
 Route::get('/admin/edit-question/{id}', [QuestionController::class, 'editQuestion'])->name('editQuestion');
 Route::post('/admin/update-question/{id}', [QuestionController::class, 'updateQuestion'])->name('updateQuestion');
 Route::get('/admin/delete-question/{id}', [QuestionController::class, 'deleteQuestion'])->name('deleteQuestion');
+
+Route::get('/admin/tutorials', [TutorialController::class, 'allTutorial'])->name('allTutorial');
+Route::get('/admin/add-tutorial', [TutorialController::class, 'addTutorial'])->name('addTutorial');
+Route::post('/admin/insert-tutorial', [TutorialController::class, 'insertTutorial'])->name('insertTutorial');
+Route::get('/admin/edit-tutorial/{id}', [TutorialController::class, 'editTutorial'])->name('editTutorial');
+Route::post('/admin/update-tutorial/{id}', [TutorialController::class, 'updateTutorial'])->name('updateTutorial');
+Route::get('/admin/delete-tutorial/{id}', [TutorialController::class, 'deleteTutorial'])->name('deleteTutorial');

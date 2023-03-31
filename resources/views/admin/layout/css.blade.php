@@ -21,3 +21,5 @@
   <!-- Toaster Notifications -->
   <link rel="stylesheet" href="{{ asset('plugins/css/toastr/toastr.min.css')}}">
 
+
+

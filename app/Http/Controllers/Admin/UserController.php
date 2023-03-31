@@ -19,13 +19,13 @@ class UserController extends Controller
     public function allUser()
     {
         $users = User::all();
-        return view('admin.users.showUser', compact('users'));
+        return view('admin.crud.users.showUser', compact('users'));
     }
 
     //show form to add user to database
     public function addUser()
     {
-        return view('admin.users.addUser');
+        return view('admin.crud.users.addUser');
     }
 
     //add user to database
@@ -54,7 +54,7 @@ class UserController extends Controller
     public function editUser($id)
     {
         $edit = User::find($id);
-        return view('admin.users.editUser', compact('edit'));
+        return view('admin.crud.users.editUser', compact('edit'));
     }
 
     //update user to database
@@ -69,7 +69,7 @@ class UserController extends Controller
             // 'image' => 'required',
         ]);
 
-        $user = User::find($id)->update($sanitized);
+        User::find($id)->update($sanitized);
 
         return redirect()->to('/admin/users')->with('success','User Updated Successfully');
     }

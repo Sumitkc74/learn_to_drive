@@ -12,7 +12,7 @@ class VisionTest extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
-        'number',
+        'testNumber',
         'image',
     ];
 }

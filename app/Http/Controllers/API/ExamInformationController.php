@@ -10,7 +10,7 @@ class ExamInformationController extends BaseController
     //
     public function index(){
         try {
-            $examInformation = ExamInformation::all();
+            $examInformation = ExamInformation::select('id','name','description')->with('media')->get();;
             return response()->json([
                 'status' => true,
                 'data' => ['examInformations' => $examInformation]

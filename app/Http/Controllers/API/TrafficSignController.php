@@ -14,7 +14,7 @@ class TrafficSignController extends BaseController
             $trafficSigns = TrafficSign::select('id','name','description')->with('media')->get();
             return response()->json(
                 [ 'status' => true,
-                    'data'=>   ['categories' => $trafficSigns]],200);
+                    'data'=>   ['trafficSigns' => $trafficSigns]],200);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

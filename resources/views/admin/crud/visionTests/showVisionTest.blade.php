@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Exam-Papers')
+@section('title', 'Vision-Tests')
 
 @section('page-script')
     <style type='text/css'>
@@ -60,7 +60,7 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Vision-Number</th>
+                                <th>Test-Number</th>
                                 {{-- <th>Description</th> --}}
                                 <th>Image</th>
                                 <th>Action</th>
@@ -70,7 +70,7 @@
                                 @foreach ($visionTests as $key=>$row)
                                 <tr>
                                     <td>{{ $row->id }}</td>
-                                    <td>{{ $row->number }}</td>
+                                    <td>{{ $row->testNumber }}</td>
                                     {{-- <td>{{ $row->description }}</td> --}}
                                     <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                     <td>

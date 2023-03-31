@@ -13,27 +13,21 @@
         <form role="form" action="{{ URL::to('/admin/update-vision-test/'.$visionTest->id) }}" method="post"  enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
-                <label for="name" class="col-sm-2 col-form-label">Vision Test Number :</label>
+                <label for="testNumber" class="col-sm-2 col-form-label">Test Number :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="name" placeholder="Enter vision-test number" required value="{{ $visionTest->number }}" >
+                    <input type="text" class="form-control  @if($errors->has('testNumber')) is-invalid @endif" name="testNumber" placeholder="Enter vision-test" value="{{ $visionTest->testNumber }}">
+                    @if($errors->has('testNumber'))
+                        <p class="text-danger">{{ $errors->first('testNumber') }}</p>
+                    @endif
                 </div>
             </div>
-            {{-- <div class="form-group row">
-                <label for="email" class="col-sm-2 col-form-label">Description :</label>
-                <div class="col-sm-10">
-                    <input type="email" class="form-control" name="email" placeholder="Enter vision-test description" required value="{{ $edit->email }}">
-                </div>
-            </div> --}}
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
-                    <label for="image" class="col-sm-2 col-form-label">Input Sign Image :</label>
+                    <label for="image" class="col-sm-2 col-form-label">Input Test Image :</label>
                     <img src="{{ $visionTest->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
-                        <input type="file" name="image" class="@if($errors->has('image')) is-invalid @endif">
-                        @if($errors->has('image'))
-                            <p class="text-danger">{{ $errors->first('image') }}</p>
-                        @endif
+                        <input type="file" name="image">
                     </div>
                 </div>
             </div>

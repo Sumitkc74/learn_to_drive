@@ -105,6 +105,16 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="/admin/tutorials" class="nav-link {{ Request::is('admin/tutorials') ? 'active' : '' }}">
+                    <i class="nav-icon fa-light fa-tv"></i>
+                    <p>
+                        Tutorials
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
+                </a>
+            </li>
+
           {{-- <li class="nav-item">
             <a href="pages/widgets.html" class="nav-link">
               <i class="nav-icon fas fa-th"></i>

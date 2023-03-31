@@ -14,11 +14,11 @@
         <form role="form" action="{{ URL::to('/admin/insert-vision-test') }}" method="post"  enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
-                <label for="number" class="col-sm-2 col-form-label">Test number :</label>
+                <label for="testNumber" class="col-sm-2 col-form-label">Test number :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('number')) is-invalid @endif" name="number" placeholder="Enter vision-test number">
-                    @if($errors->has('number'))
-                        <p class="text-danger">{{ $errors->first('number') }}</p>
+                    <input type="text" class="form-control @if($errors->has('testNumber')) is-invalid @endif" name="testNumber" placeholder="Enter vision-test number">
+                    @if($errors->has('testNumber'))
+                        <p class="text-danger">{{ $errors->first('testNumber') }}</p>
                     @endif
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <div class="col-sm-10">
                         <input type="file" name="image" class="@if($errors->has('image')) is-invalid @endif">
                         @if($errors->has('image'))
-                        <p class="text-danger">{{ $errors->first('image') }}</p>
+                            <p class="text-danger">{{ $errors->first('image') }}</p>
                         @endif
                     </div>
                 </div>

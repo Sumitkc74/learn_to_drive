@@ -10,11 +10,11 @@ class ExamPaperController extends BaseController
     //
     public function index(){
         try {
-            $examPapers = ExamPaper::all();
+            $examPapers = ExamPaper::select('id','name','description')->with('media')->get();
             return response()->json([
                 'status' => true,
                 'data' => ['examPapers' => $examPapers]
-                ], 201);
+                ], 200);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

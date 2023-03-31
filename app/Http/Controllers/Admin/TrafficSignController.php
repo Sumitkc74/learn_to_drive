@@ -18,14 +18,13 @@ class TrafficSignController extends Controller
     public function allTrafficSign()
     {
         $trafficSigns = TrafficSign::all();
-
-        return view('admin.trafficSigns.showTrafficSign', compact('trafficSigns'));
+        return view('admin.crud.trafficSigns.showTrafficSign', compact('trafficSigns'));
     }
 
     //show form to add traffic sign to database
     public function addTrafficSign()
     {
-        return view('admin.trafficSigns.addTrafficSign');
+        return view('admin.crud.trafficSigns.addTrafficSign');
     }
 
     //add traffic sign to database
@@ -34,12 +33,11 @@ class TrafficSignController extends Controller
         $sanitized = $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            'image' => 'required|image',
         ]);
         $sanitized['image'] = "demo";
 
         $traffic = TrafficSign::create($sanitized);
-
         $traffic->addMedia($request->image)->toMediaCollection();
 
         return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Added Successfully');
@@ -50,8 +48,7 @@ class TrafficSignController extends Controller
     public function editTrafficSign($id)
     {
         $trafficSign = TrafficSign::find($id);
-
-        return view('admin.trafficSigns.editTrafficSign', compact('trafficSign'));
+        return view('admin.crud.trafficSigns.editTrafficSign', compact('trafficSign'));
     }
 
     //update traffic sign in database
@@ -60,17 +57,17 @@ class TrafficSignController extends Controller
         $sanitized = $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            // 'image' => 'required|image',
         ]);
 
         $traffic = TrafficSign::find($id);
 
+        if ($request -> hasFile('image') && $request->image != ''){
+            $traffic->clearMediaCollection();
+            $traffic->addMedia($request->image)->toMediaCollection();
+        }
+
         $traffic->update($sanitized);
-
-        $traffic->clearMediaCollection();
-
-        $traffic->addMedia($request->image)->toMediaCollection();
-
         return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Updated Successfully');
     }
 
@@ -78,6 +75,6 @@ class TrafficSignController extends Controller
     public function deleteTrafficSign($id)
     {
         TrafficSign::find($id)->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success','Traffic Sign Deleted Successfully');
     }
 }

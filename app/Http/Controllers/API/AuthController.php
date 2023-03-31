@@ -57,7 +57,6 @@ class AuthController extends Controller
         //find email from users table
         $user = User::where('email', $req->email)->first();
 
-
         if($user){
             if (Hash::check($req->password, $user->password)) {
                 $this->token = $user->createToken('Personal Access Token')->plainTextToken;

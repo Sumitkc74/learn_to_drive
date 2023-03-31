@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Api\BaseController as BaseController;
-use App\Models\VisionTest;
+use App\Http\Controllers\Controller;
+use App\Models\Tutorial;
+use Illuminate\Http\Request;
 
-class VisionTestController extends BaseController
+class TutorialController extends Controller
 {
     //
     public function index(){
         try {
-            $visionTests = VisionTest::select('id','testNumber')->with('media')->get();
+            $tutorials = Tutorial::all();
             return response()->json([
                 'status' => true,
-                'data' => ['visionTests' => $visionTests]
+                'data' => ['tutorials' => $tutorials]
                 ], 200);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
