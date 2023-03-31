@@ -18,14 +18,13 @@ class QuestionController extends Controller
     public function allQuestion()
     {
         $questions = Question::all();
-
-        return view('admin.questions.showQuestion', compact('questions'));
+        return view('admin.crud.questions.showQuestion', compact('questions'));
     }
 
     //show form to add question to database
     public function addQuestion()
     {
-        return view('admin.questions.addQuestion');
+        return view('admin.crud.questions.addQuestion');
     }
 
     //function to add question to database
@@ -47,7 +46,7 @@ class QuestionController extends Controller
     public function editQuestion($id)
     {
         $edit = Question::find($id);
-        return view('admin.questions.editQuestion', compact('edit'));
+        return view('admin.crud.questions.editQuestion', compact('edit'));
     }
 
     //update question to database

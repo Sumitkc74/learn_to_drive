@@ -17,13 +17,13 @@ class ExamInformationController extends Controller
     public function allExamInformation()
     {
         $examInformation = ExamInformation::all();
-        return view('admin.examInformation.showExamInformation', compact('examInformation'));
+        return view('admin.crud.examInformation.showExamInformation', compact('examInformation'));
     }
 
     //show form to add user to database
     public function addExamInformation()
     {
-        return view('admin.examInformation.addExamInformation');
+        return view('admin.crud.examInformation.addExamInformation');
     }
 
     //add user to database
@@ -37,7 +37,6 @@ class ExamInformationController extends Controller
         $sanitized['file'] = "demo";
 
         $examInformation = ExamInformation::create($sanitized);
-
         $examInformation->addMedia($request->file)->toMediaCollection();
 
         return redirect()->to('/admin/exam-information')->with('success','Exam Information Added Successfully');
@@ -47,7 +46,7 @@ class ExamInformationController extends Controller
     public function editExamInformation($id)
     {
         $examInformation = ExamInformation::find($id);
-        return view('admin.examInformation.editExamInformation', compact('examInformation'));
+        return view('admin.crud.examInformation.editExamInformation', compact('examInformation'));
     }
 
     //update user to database
@@ -56,26 +55,26 @@ class ExamInformationController extends Controller
         $sanitized = $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'file' => 'required',
+            // 'file' => 'required',
         ]);
-        $sanitized['file'] = "demo";
+        // $sanitized['file'] = "demo";
 
         $examInformation = ExamInformation::find($id);
 
+        if ($request -> hasFile('file') && $request->image != ''){
+            $examInformation->clearMediaCollection();
+            $examInformation->addMedia($request->image)->toMediaCollection();
+        }
+
         $examInformation->update($sanitized);
-
-        $examInformation->clearMediaCollection();
-
-        $examInformation->addMedia($request->file)->toMediaCollection();
-
-        return redirect()->to('/admin/exam-information')->with('success','Exam Information Added Successfully');
+        return redirect()->to('/admin/exam-information')->with('success','Exam Information Updated Successfully');
     }
 
     //delete user from database
     public function deleteExamInformation($id)
     {
         ExamInformation::find($id)->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success','Exam Information Deleted Successfully');
     }
 }
 
