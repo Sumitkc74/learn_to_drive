@@ -13,11 +13,19 @@
         <form role="form" action="{{ URL::to('/admin/insert-exam-paper') }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
-                <label for="name" class="col-sm-2 col-form-label">Exam paper :</label>
+                <label for="name" class="col-sm-2 col-form-label">Exam paper Name :</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @if($errors->has('name')) is-invalid @endif"  name="name" placeholder="Enter exam-paper" value="{{ old('name') }}">
                 </div>
             </div>
+
+            <div class="form-group row">
+                <label for="nepaliName" class="col-sm-2 col-form-label">Nepali Name :</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control @if($errors->has('nepaliName')) is-invalid @endif"  name="nepaliName" placeholder="Enter exam-paper" value="{{ old('nepaliName') }}">
+                </div>
+            </div>
+
             <div class="form-group row">
                 <label for="description" class="col-sm-2 col-form-label">Description :</label>
                 <div class="col-sm-10">
@@ -27,11 +35,23 @@
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
-                    <label for="file" class="col-sm-2 col-form-label">Input Exam File :</label>
+                    <label for="englishFile" class="col-sm-2 col-form-label">English Exam File :</label>
                     <div class="col-sm-10">
-                        <input type="file" name="file" class="form-control @if($errors->has('file')) is-invalid @endif">
-                        @if($errors->has('name'))
-                            <p class="text-danger">{{ $errors->first('file') }}</p>
+                        <input type="file" name="englishFile" class="form-control @if($errors->has('englishFile')) is-invalid @endif">
+                        @if($errors->has('englishFile'))
+                            <p class="text-danger">{{ $errors->first('englishFile') }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="nepaliFile" class="col-sm-2 col-form-label">Nepali Exam File :</label>
+                    <div class="col-sm-10">
+                        <input type="file" name="nepaliFile" class="form-control @if($errors->has('nepaliFile')) is-invalid @endif">
+                        @if($errors->has('nepaliFile'))
+                            <p class="text-danger">{{ $errors->first('nepaliFile') }}</p>
                         @endif
                     </div>
                 </div>

@@ -32,13 +32,16 @@ class ExamPaperController extends Controller
     {
         $sanitized = $request->validate([
             'name' => 'required',
+            'nepaliName' => 'required',
             'description' => 'required',
-            'file' => 'required|mimes:pdf|max:10000',
+            'englishFile' => 'required|mimes:pdf|max:10000',
+            'nepaliFile' => 'required|mimes:pdf|max:10000',
         ]);
-        $sanitized['file'] = "demo";
+        // $sanitized['file'] = "demo";
 
         $examPaper = ExamPaper::create($sanitized);
-        $examPaper->addMedia($request->file)->toMediaCollection();
+        $examPaper->addMedia($request->englishFile)->toMediaCollection();
+        $examPaper->addMedia($request->nepaliFile)->toMediaCollection();
 
         return redirect()->to('/admin/exam-papers')->with('success','Exam Paper Added Successfully');
     }
@@ -62,10 +65,16 @@ class ExamPaperController extends Controller
 
         $examPaper = ExamPaper::find($id);
 
-        if ($request -> hasFile('file') && $request->image != ''){
+        if ($request -> hasFile('englishFile') && $request->image != ''){
             $examPaper->clearMediaCollection();
             $examPaper->addMedia($request->image)->toMediaCollection();
         }
+
+        if ($request -> hasFile('nepaliFile') && $request->image != ''){
+            $examPaper->clearMediaCollection();
+            $examPaper->addMedia($request->image)->toMediaCollection();
+        }
+
         $examPaper->update($sanitized);
         return redirect()->to('/admin/exam-papers')->with('success','Exam Paper Updated Successfully');
     }

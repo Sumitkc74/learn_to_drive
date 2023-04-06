@@ -39,7 +39,7 @@
                 <p>Exam Papers</p>
             </div>
             <div class="icon">
-                <i class="fas fa-file"></i>
+                <i class="fas fa-file-alt"></i>
             </div>
             <a href="/admin/exam-papers" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
@@ -56,11 +56,11 @@
             <div class="icon">
                 <i class="fas fa-low-vision"></i>
             </div>
-            <a href="/admin/users" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="/admin/vision-tests" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 
-    <!-- Users Box -->
+    <!-- Exan Information Box -->
     <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-primary">
@@ -71,24 +71,54 @@
             <div class="icon">
                 <i class="fas fa-info"></i>
             </div>
-            <a href="/admin/users" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="/admin/exam-information" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 
-        <!-- Users Box -->
-        <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-secondary">
-                <div class="inner">
-                    <h3> {{ \App\Models\Question::all()->count() }} </h3>
-                    <p>Exam Questions</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-question"></i>
-                </div>
-                <a href="/admin/users" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <!-- Questions Box -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3> {{ \App\Models\Question::all()->count() }} </h3>
+                <p>Exam Questions</p>
             </div>
+            <div class="icon">
+                <i class="fas fa-question"></i>
+            </div>
+            <a href="/admin/questions" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
+    </div>
+
+    <!-- Tutorials Box -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-dark">
+            <div class="inner">
+                <h3> {{ \App\Models\Tutorial::all()->count() }} </h3>
+                <p>Tutorials</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <a href="/admin/tutorials" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Notices Box -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-gradient-warning">
+            <div class="inner">
+                <h3> {{ \App\Models\Notice::all()->count() }} </h3>
+                <p>Notices</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <a href="/admin/notices" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
 
     {{-- <div class="col-lg-3 col-6">
         <!-- small box -->

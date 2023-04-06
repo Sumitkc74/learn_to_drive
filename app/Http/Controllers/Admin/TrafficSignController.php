@@ -32,6 +32,7 @@ class TrafficSignController extends Controller
     {
         $sanitized = $request->validate([
             'name' => 'required',
+            'nepaliSignName' => 'required',
             'description' => 'required',
             'image' => 'required|image',
         ]);
@@ -56,8 +57,8 @@ class TrafficSignController extends Controller
     {
         $sanitized = $request->validate([
             'name' => 'required',
+            'nepaliSignName' => 'required',
             'description' => 'required',
-            // 'image' => 'required|image',
         ]);
 
         $traffic = TrafficSign::find($id);

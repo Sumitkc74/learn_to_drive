@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\VisionTestController;
 use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TutorialController;
+use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +27,10 @@ Route::get('/', function () {
 });
 
 Route::view('admin','admin.dashboard');
-// Route::view('admin/users','admin.users.showUser');
-// Route::view('admin/traffic-signs','admin.addTrafficSigns');
-// Route::view('admin/exam-papers','admin.addExamPapers');
 
 Auth::routes();
+
+// Route::get('/admin', [HomeController::class, 'index'])->middleware('admin');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -81,3 +82,10 @@ Route::post('/admin/insert-tutorial', [TutorialController::class, 'insertTutoria
 Route::get('/admin/edit-tutorial/{id}', [TutorialController::class, 'editTutorial'])->name('editTutorial');
 Route::post('/admin/update-tutorial/{id}', [TutorialController::class, 'updateTutorial'])->name('updateTutorial');
 Route::get('/admin/delete-tutorial/{id}', [TutorialController::class, 'deleteTutorial'])->name('deleteTutorial');
+
+Route::get('/admin/notices', [NoticeController::class, 'allNotice'])->name('allNotice');
+Route::get('/admin/add-notice', [NoticeController::class, 'addNotice'])->name('addNotice');
+Route::post('/admin/insert-notice', [NoticeController::class, 'insertNotice'])->name('insertNotice');
+Route::get('/admin/edit-notice/{id}', [NoticeController::class, 'editNotice'])->name('editNotice');
+Route::post('/admin/update-notice/{id}', [NoticeController::class, 'updateNotice'])->name('updateNotice');
+Route::get('/admin/delete-notice/{id}', [NoticeController::class, 'deleteNotice'])->name('deleteNotice');

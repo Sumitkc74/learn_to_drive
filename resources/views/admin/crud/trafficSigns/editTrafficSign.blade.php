@@ -26,6 +26,16 @@
             </div>
 
             <div class="form-group row">
+                <label for="nepaliSignName" class="col-sm-2 col-form-label">Nepali Sign-Name :</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control  @if($errors->has('nepaliSignName')) is-invalid @endif" name="nepaliSignName" placeholder="Enter nepali sign-name" value="{{ $trafficSign->nepaliSignName }}">
+                    @if($errors->has('nepaliSignName'))
+                        <p class="text-danger">{{ $errors->first('nepaliSignName') }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label for="description" class="col-sm-2 col-form-label">Description :</label>
                 <div class="col-sm-10">
                     <textarea type="text" class="form-control @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter traffic-sign description">

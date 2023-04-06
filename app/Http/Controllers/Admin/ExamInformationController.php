@@ -31,13 +31,16 @@ class ExamInformationController extends Controller
     {
         $sanitized = $request->validate([
             'name' => 'required',
+            'nepaliName' => 'required',
             'description' => 'required',
-            'file' => 'required',
+            'englishFile' => 'required|mimes:pdf|max:10000',
+            'nepaliFile' => 'required|mimes:pdf|max:10000',
         ]);
         $sanitized['file'] = "demo";
 
         $examInformation = ExamInformation::create($sanitized);
-        $examInformation->addMedia($request->file)->toMediaCollection();
+        $examInformation->addMedia($request->englishFile)->toMediaCollection();
+        $examInformation->addMedia($request->nepaliFile)->toMediaCollection();
 
         return redirect()->to('/admin/exam-information')->with('success','Exam Information Added Successfully');
     }
@@ -54,6 +57,7 @@ class ExamInformationController extends Controller
     {
         $sanitized = $request->validate([
             'name' => 'required',
+            'nepaliName' => 'required',
             'description' => 'required',
             // 'file' => 'required',
         ]);
@@ -61,7 +65,12 @@ class ExamInformationController extends Controller
 
         $examInformation = ExamInformation::find($id);
 
-        if ($request -> hasFile('file') && $request->image != ''){
+        if ($request -> hasFile('englishFile') && $request->image != ''){
+            $examInformation->clearMediaCollection();
+            $examInformation->addMedia($request->image)->toMediaCollection();
+        }
+
+        if ($request -> hasFile('nepaliFile') && $request->image != ''){
             $examInformation->clearMediaCollection();
             $examInformation->addMedia($request->image)->toMediaCollection();
         }

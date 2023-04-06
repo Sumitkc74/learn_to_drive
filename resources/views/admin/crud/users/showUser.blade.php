@@ -40,7 +40,7 @@
 
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 300px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                                <input type="text" id="search" name="table_search" class="form-control float-right" placeholder="Search">
                                 <div class="input-group-append"  style="padding-left: 10">
                                     <button type="submit" class="btn btn-default">
                                         <i class="fas fa-search"></i>
@@ -96,7 +96,28 @@
 
 @section('page-script')
     <script type='text/javacript'>
+        $(document).ready(function(){
+            $('#search').keyup(function(){
+                searchTable($(this).val());
+            });
+        });
 
-
+        function searchTable(inputVal){
+            var table = $('.table');
+            table.find('tr').each(function(index, row){
+                var allCells = $(row).find('td');
+                if(allCells.length > 0){
+                    var found = false;
+                    allCells.each(function(index, td){
+                        var regExp = new RegExp(inputVal, 'i');
+                        if(regExp.test($(td).text())){
+                            found = true;
+                            return false;
+                        }
+                    });
+                    if(found == true)$(row).show();else $(row).hide();
+                }
+            });
+        }
     </script>
 @endsection

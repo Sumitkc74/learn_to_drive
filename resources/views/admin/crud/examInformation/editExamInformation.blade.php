@@ -20,6 +20,13 @@
             </div>
 
             <div class="form-group row">
+                <label for="nepaliName" class="col-sm-2 col-form-label">Nepali Title :</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control @if($errors->has('nepaliName')) is-invalid @endif" name="nepaliName" placeholder="Enter nepali name" value="{{ $examInformation->nepaliName }}" >
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label for="description" class="col-sm-2 col-form-label">Descriptioin :</label>
                 <div class="col-sm-10">
                     <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter exam-paper description">
@@ -30,10 +37,20 @@
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
-                    <label for="file" class="col-sm-2 col-form-label">Input Exam File :</label>
+                    <label for="englishFile" class="col-sm-2 col-form-label">English File :</label>
                     <embed src="{{ $examInformation->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
-                        <input type="file" name="file">
+                        <input type="file" name="englishFile">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="nepaliFile" class="col-sm-2 col-form-label">Nepali File :</label>
+                    <embed src="{{ $examInformation->getMedia()[1]->getUrl()  }}" height="200" width="200">
+                    <div class="col-sm-10">
+                        <input type="file" name="nepaliFile">
                     </div>
                 </div>
             </div>

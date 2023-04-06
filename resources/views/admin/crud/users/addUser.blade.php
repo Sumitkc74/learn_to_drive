@@ -53,6 +53,7 @@
                 <div class="col-sm-10">
                     <select class="form-control" id="exampleFormControlSelect1" name="role">
                         <option value="User">User</option>
+                        <option value="PremiumUser">Premium User</option>
                         <option value="Admin">Admin</option>
                     </select>
                 </div>

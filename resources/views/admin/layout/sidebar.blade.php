@@ -67,7 +67,7 @@
 
             <li class="nav-item">
                 <a href="/admin/exam-papers" class="nav-link {{ Request::is('admin/exam-papers') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-file"></i>
+                    <i class="nav-icon fas fa-file-alt"></i>
                     <p>
                         Exam Papers
                         {{-- <i class="right fas fa-angle-left"></i> --}}
@@ -107,9 +107,19 @@
 
             <li class="nav-item">
                 <a href="/admin/tutorials" class="nav-link {{ Request::is('admin/tutorials') ? 'active' : '' }}">
-                    <i class="nav-icon fa-light fa-tv"></i>
+                    <i class="nav-icon fas fa-desktop"></i>
                     <p>
                         Tutorials
+                        {{-- <i class="right fas fa-angle-left"></i> --}}
+                    </p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/notices" class="nav-link {{ Request::is('admin/notices') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-bell"></i>
+                    <p>
+                        Notices
                         {{-- <i class="right fas fa-angle-left"></i> --}}
                     </p>
                 </a>

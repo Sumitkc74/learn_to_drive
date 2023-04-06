@@ -10,7 +10,7 @@ class ExamPaperController extends BaseController
     //
     public function index(){
         try {
-            $examPapers = ExamPaper::select('id','name','description')->with('media')->get();
+            $examPapers = ExamPaper::select('id','name','nepaliName','description')->with('media')->get();
             return response()->json([
                 'status' => true,
                 'data' => ['examPapers' => $examPapers]

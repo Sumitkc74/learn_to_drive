@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Exam-Papers')
+@section('title', 'Notices')
 
 @section('page-script')
     <style type='text/css'>
@@ -15,12 +15,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Exam-papers</h1>
+                    <h1 class="m-0">Notices</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                        <li class="breadcrumb-item">Add Exam-Paper</li>
+                        <li class="breadcrumb-item">Add Notices</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -35,7 +35,7 @@
             <div class="row">
                 <div class="col card">
                     <div class="card-header">
-                    <h3 class="card-title">Exam Papers</h3>
+                    <h3 class="card-title">Notices</h3>
 
                     <div class="card-tools">
                         <div class="input-group input-group-sm" style="width: 300px;">
@@ -46,7 +46,7 @@
                             <i class="fas fa-search"></i>
                             </button>
                         </div>
-                        <a href="{{ URL::to('/admin/add-exam-paper/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Exam Paper</a>
+                        <a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success"><i class="nav-icon fas fa-plus"></i> Add Notice</a>
                         </div>
                     </div>
                     </div>
@@ -56,28 +56,20 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Exam-paper name</th>
-                            <th>Nepali name</th>
+                            <th>Title</th>
                             <th>Description</th>
-                            <th>English File</th>
-                            <th>Nepali File</th>
                             <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach ($examPapers as $key=>$row)
+                            @foreach ($notices as $key=>$row)
                             <tr>
                                 <td>{{ $row->id }}</td>
-                                <td>{{ $row->name }}</td>
-                                <td>{{ $row->nepaliName }}</td>
+                                <td>{{ $row->title }}</td>
                                 <td>{{ $row->description }}</td>
-                                <td><embed src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
-                                <td><embed src="{{ $row->getMedia()[1]->getUrl() }}" width="100px"></td>
-
-                                {{-- <td><embed src="{{ $row->getMedia('media_collection_name')[1]->getUrl() }}" width="100px"></td> --}}
                                 <td>
-                                    <a href="{{ URL::to('/admin/edit-exam-paper/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                                    <a href="{{ URL::to('/admin/delete-exam-paper/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                                    <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                    <a href="{{ URL::to('/admin/delete-notice/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
                                 </td>
                             </tr>
                             @endforeach

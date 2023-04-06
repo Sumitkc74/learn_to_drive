@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('exam_information', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('nepaliName');
             $table->string('description');
-            $table->string('file');
+            $table->string('englishFile');
+            $table->string('nepaliFile');
             $table->timestamps();
         });
     }

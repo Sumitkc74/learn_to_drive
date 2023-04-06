@@ -11,7 +11,7 @@ class TrafficSignController extends BaseController
     //
     public function index(){
         try {
-            $trafficSigns = TrafficSign::select('id','name','description')->with('media')->get();
+            $trafficSigns = TrafficSign::select('id','nepaliSignName','name','description')->with('media')->get();
             return response()->json(
                 [ 'status' => true,
                     'data'=>   ['trafficSigns' => $trafficSigns]],200);

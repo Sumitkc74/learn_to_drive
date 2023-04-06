@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('traffic_signs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('nepaliSignName');
             $table->string('description');
             $table->string('image');
             $table->timestamps();

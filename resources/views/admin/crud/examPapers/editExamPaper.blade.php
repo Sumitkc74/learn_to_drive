@@ -30,10 +30,20 @@
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
-                    <label for="file" class="col-sm-2 col-form-label">Input Exam File :</label>
+                    <label for="englishFile" class="col-sm-2 col-form-label">English Exam File :</label>
                     <embed src="{{ $examPaper->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
-                        <input type="file" name="file">
+                        <input type="file" name="englishFile">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="nepaliFile" class="col-sm-2 col-form-label">Nepali Exam File :</label>
+                    <embed src="{{ $examPaper->getMedia()[1]->getUrl()  }}" height="200" width="200">
+                    <div class="col-sm-10">
+                        <input type="file" name="nepaliFile">
                     </div>
                 </div>
             </div>

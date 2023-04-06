@@ -17,7 +17,9 @@ class ExamInformation extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
+        'nepaliName',
         'description',
-        'file',
+        'englishFile',
+        'nepaliFile',
     ];
 }
