@@ -63,10 +63,10 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Question</th>
-                                    <th>Option 1</th>
-                                    <th>Option 2</th>
-                                    <th>Option 3</th>
-                                    <th>Option 4</th>
+                                    <th>Option A</th>
+                                    <th>Option B</th>
+                                    <th>Option C</th>
+                                    <th>Option D</th>
                                     <th>Correct Option</th>
                                     <th>Action</th>
                                 </tr>

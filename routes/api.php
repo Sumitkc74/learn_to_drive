@@ -12,6 +12,7 @@ use App\Http\Controllers\API\NoticeController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserHistoryController;
+use App\Http\Controllers\API\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ Route::post('/auth/logout', [AuthController::class, 'logout']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/userHistory', [UserHistoryController::class, 'recordHistory']);
+Route::post('/payment', [PaymentController::class, 'payment']);
 
 // Route::group(['prefix' => '', 'middleware' => 'auth:api'], function () {
     Route::get('/trafficSign', [TrafficSignController::class, 'index']);

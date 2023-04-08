@@ -33,8 +33,10 @@ class NoticeController extends Controller
         $sanitized = $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'nepaliTitle' => 'required',
+            'nepaliDescription' => 'required',
+            'link' => 'nullable',
         ]);
-
         Notice::create($sanitized);
         return redirect()->to('/admin/notices')->with('success','Notice Added Successfully');
     }
@@ -52,8 +54,11 @@ class NoticeController extends Controller
         $sanitized = $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'nepaliTitle' => 'required',
+            'nepaliDescription' => 'required',
+            'link' => 'nullable',
         ]);
-
+        // $sanitized['link'] = $sanitized['link'] ?? '';
         Notice::find($id)->update($sanitized);
         return redirect()->to('/admin/notices')->with('success','Notice Updated successfully');
     }

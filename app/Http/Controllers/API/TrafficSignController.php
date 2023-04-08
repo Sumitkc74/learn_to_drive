@@ -20,17 +20,3 @@ class TrafficSignController extends BaseController
         }
     }
 }
-
-
-// public function allCategory(Request $request)
-// {
-//     try {
-//         $categories = Category::all();
-//         return response()->json([
-//             'status' => true,
-//             'data' => ['categories' => $categories]
-//         ], 201);
-//     } catch (\Exception $e) {
-//         return $this->sendError($e->getMessage());
-//     }
-// }

@@ -37,6 +37,9 @@ class NoticeController extends Controller
                     'id' => $notice->id,
                     'title' => $notice->title,
                     'description' => $notice->description,
+                    'nepaliTitle' => $notice->nepaliTitle,
+                    'nepaliDescription' => $notice->nepaliDescription,
+                    'link' => $notice->link,
                     'updated_at' => Carbon::parse(
                         $notice->updated_at
                     )->toDateTimeString()

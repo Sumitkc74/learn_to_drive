@@ -25,7 +25,7 @@
 
             <!-- Option 1 -->
             <div class="form-group row">
-                <label for="option1" class="col-sm-2 col-form-label">Option 1 :</label>
+                <label for="option1" class="col-sm-2 col-form-label">Option A :</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @if($errors->has('option1')) is-invalid @endif" name="option1" placeholder="Enter Option 1" value="{{ $edit->option1 }}">
                     @if($errors->has('option1'))
@@ -36,7 +36,7 @@
 
             <!-- Option 2 -->
             <div class="form-group row">
-                <label for="option2" class="col-sm-2 col-form-label">Option 2 :</label>
+                <label for="option2" class="col-sm-2 col-form-label">Option B :</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @if($errors->has('option2')) is-invalid @endif" name="option2" placeholder="Enter option 2" value="{{ $edit->option2 }}">
                     @if($errors->has('option2'))
@@ -47,7 +47,7 @@
 
             <!-- Option 3 -->
             <div class="form-group row">
-                <label for="option3" class="col-sm-2 col-form-label">Option 3 :</label>
+                <label for="option3" class="col-sm-2 col-form-label">Option C :</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @if($errors->has('option3')) is-invalid @endif" name="option3" placeholder="Enter option 3" value="{{ $edit->option3 }}">
                     @if($errors->has('option3'))
@@ -58,7 +58,7 @@
 
             <!-- Option 4 -->
             <div class="form-group row">
-                <label for="option4" class="col-sm-2 col-form-label">Option 4 :</label>
+                <label for="option4" class="col-sm-2 col-form-label">Option D :</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @if($errors->has('option4')) is-invalid @endif" name="option4" placeholder="Enter option 4" value="{{ $edit->option4 }}">
                     @if($errors->has('option4'))
@@ -72,10 +72,10 @@
                 <label for="correctOption" class="col-sm-2 col-form-label">Correct Option :</label>
                 <div class="col-sm-10">
                     <select class="form-control" id="exampleFormControlSelect1" name="correctOption" required>
-                        <option value="1" {{ '1' == $edit->correctOption ? 'selected' : '' }}>Option 1</option>
-                        <option value="2" {{ '2' == $edit->correctOption ? 'selected' : '' }}>Option 2</option>
-                        <option value="3" {{ '3' == $edit->correctOption ? 'selected' : '' }}>Option 3</option>
-                        <option value="4" {{ '4' == $edit->correctOption ? 'selected' : '' }}>Option 4</option>
+                        <option value="A" {{ 'A' == $edit->correctOption ? 'selected' : '' }}>Option A</option>
+                        <option value="B" {{ 'B' == $edit->correctOption ? 'selected' : '' }}>Option B</option>
+                        <option value="C" {{ 'C' == $edit->correctOption ? 'selected' : '' }}>Option C</option>
+                        <option value="D" {{ 'D' == $edit->correctOption ? 'selected' : '' }}>Option D</option>
                     </select>
                 </div>
             </div>

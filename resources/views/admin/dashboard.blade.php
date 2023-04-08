@@ -36,7 +36,7 @@
           <!-- Main row -->
           <div class="row">
             <!-- Left col -->
-            <section class="col-lg-7 connectedSortable">
+            {{-- <section class="col-lg-7 connectedSortable">
 
                 <!-- TO DO List -->
                 @include('admin.dashboard-components.to-do-list')
@@ -56,7 +56,7 @@
 
                 @include('admin.dashboard-components.map')
 
-            </section>
+            </section> --}}
             <!-- right col -->
             </div>
           <!-- /.row (main row) -->

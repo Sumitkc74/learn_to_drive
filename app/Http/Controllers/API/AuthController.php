@@ -237,7 +237,7 @@ class AuthController extends BaseController
 
     public function logout(Request $request)
     {
-        User::find($request->user()->id)->token()->revoke();
+        User::where('id', $request->user_id)->token()->revoke();
         return response()->json([
             'status' => true,
             'message' => 'Successfully logged out'

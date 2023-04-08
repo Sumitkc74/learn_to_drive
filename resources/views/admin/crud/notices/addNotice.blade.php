@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Add Tutorial')
+@section('title', 'Add Notice')
 
 @section('page-script')
     <style type='text/css'>
@@ -28,6 +28,36 @@
                     <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter notice description">{{ old('description') }}</textarea>
                     @if($errors->has('description'))
                         <p class="text-danger">{{ $errors->first('description') }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="nepaliTitle" class="col-sm-2 col-form-label">Notice Title :</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control @if($errors->has('nepaliTitle')) is-invalid @endif"  name="nepaliTitle" placeholder="Enter nepali title" value="{{ old('nepaliTitle') }}">
+                    @if($errors->has('nepaliTitle'))
+                        <p class="text-danger">{{ $errors->first('nepaliTitle') }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="nepaliDescription" class="col-sm-2 col-form-label">Description :</label>
+                <div class="col-sm-10">
+                    <textarea type="text" class="form-control  @if($errors->has('nepaliDescription')) is-invalid @endif" rows="4" name="nepaliDescription" placeholder="Enter nepali description">{{ old('nepaliDescription') }}</textarea>
+                    @if($errors->has('nepaliDescription'))
+                        <p class="text-danger">{{ $errors->first('nepaliDescription') }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="link" class="col-sm-2 col-form-label">Notice Link :</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control @if($errors->has('link')) is-invalid @endif"  name="link" placeholder="Enter notice link" value="{{ old('link') ?? '' }}">
+                    @if($errors->has('link'))
+                        <p class="text-danger">{{ $errors->first('link') }}</p>
                     @endif
                 </div>
             </div>

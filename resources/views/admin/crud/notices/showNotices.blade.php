@@ -58,6 +58,9 @@
                             <th>ID</th>
                             <th>Title</th>
                             <th>Description</th>
+                            <th>Nepali Title</th>
+                            <th>Nepali Description</th>
+                            <th>Link</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -67,6 +70,9 @@
                                 <td>{{ $row->id }}</td>
                                 <td>{{ $row->title }}</td>
                                 <td>{{ $row->description }}</td>
+                                <td>{{ $row->nepaliTitle }}</td>
+                                <td>{{ $row->nepaliDescription }}</td>
+                                <td>{{ $row->link }}</td>
                                 <td>
                                     <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                     <a href="{{ URL::to('/admin/delete-notice/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>

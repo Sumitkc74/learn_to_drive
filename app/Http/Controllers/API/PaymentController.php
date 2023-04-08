@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Payment;
@@ -16,7 +17,6 @@ class PaymentController extends Controller
             'user_id' => 'required',
             'token' => 'required',
             'amount' => 'required',
-            'password' => 'required|string|min:6',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -25,18 +25,34 @@ class PaymentController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
+        $user = User::find($request->user_id);
+        if ($user->role != 'User') {
+            return response()->json(['status' => false, 'message' => 'User is already using premium'], 500);
+        }
+
         //create new payment in table
         $payment = Payment::create([
             'user_id' => $request->user_id,
-            'transaction_id' => $request->transaction_id,
+            'transaction_id' => $request->token,
             'amount' => $request->amount,
         ]);
 
-        // $user = auth()->user();
+        // $user = User::where('id', $request->user_id)->update(['role' => 'PremiumUser']);
+
+        $user->update(['role' => 'PremiumUser']);
+
+        $user = $user->only([
+            'id',
+            'name',
+            'email',
+            'phoneNumber',
+            'role',
+        ]);
 
         if ($payment->save()) {
             return response()->json([
                 'status' => true,
+                'data' => ['user' => $user],
                 'message' => 'Payment saved successfully',
             ], 200);
         } else {

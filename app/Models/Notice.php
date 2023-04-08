@@ -16,5 +16,8 @@ class Notice extends Model
     protected $fillable = [
         'title',
         'description',
+        'nepaliTitle',
+        'nepaliDescription',
+        'link',
     ];
 }
