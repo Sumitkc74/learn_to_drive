@@ -66,6 +66,7 @@
                                     <th>Email</th>
                                     <th>Phone Number</th>
                                     <th>Role</th>
+                                    <th>Profile Image</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -78,6 +79,7 @@
                                     <td>{{ $row->email }}</td>
                                     <td>{{ $row->phoneNumber }}</td>
                                     <td>{{ $row->role }}</td>
+                                    <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                     <td>
                                         <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                         <a href="{{ URL::to('/admin/delete-user/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>

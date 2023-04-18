@@ -44,6 +44,16 @@
                 </div>
             </div>
 
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="image" class="col-sm-2 col-form-label">Input Tutorial Image :</label>
+                    <img src="{{ $tutorial->getFirstMediaUrl() }}" height="200" width="200">
+                    <div class="col-sm-10">
+                        <input type="file" name="image">
+                    </div>
+                </div>
+            </div>
+
             <div class="card-footer">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

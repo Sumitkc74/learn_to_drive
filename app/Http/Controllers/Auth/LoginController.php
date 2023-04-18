@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -20,6 +22,22 @@ class LoginController extends Controller
     */
 
     use AuthenticatesUsers;
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            if ($user->role === 'Admin') {
+                return redirect()->intended($this->redirectTo);
+            } else {
+                Auth::logout();
+                return redirect()->back()->with('error', 'Invalid credentials');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Invalid credentials');
+        }
+    }
 
     /**
      * Where to redirect users after login.

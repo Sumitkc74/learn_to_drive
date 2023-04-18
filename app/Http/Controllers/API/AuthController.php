@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends BaseController
@@ -24,9 +26,6 @@ class AuthController extends BaseController
         $validator = Validator::make($request->all(), $rules);
 
         if($validator->fails()){
-            // $response['message'] = $validator->messages()->first();
-            // $response['status'] = false;
-            // return $response;
             return response()->json($validator->errors(), 400);
         }
 
@@ -37,8 +36,12 @@ class AuthController extends BaseController
             'phoneNumber' => $request->phoneNumber,
             'password' =>Hash::make($request->password),
             'email_verified_at' => Carbon::now(),
-            'role' => 'User'
+            'role' => 'User',
+            'profileImage' => 'image',
         ]);
+
+
+        // $user->addMedia('/public/dist/image.jpg')->toMediaCollection('avatar');
 
         $token = $user->createToken('Personal Access Token');
         $text= $token->plainTextToken;
@@ -50,6 +53,7 @@ class AuthController extends BaseController
             'email',
             'phoneNumber',
             'role',
+            'profileImage',
         ]);
         $token = [
             'access_token' => $text,
@@ -63,10 +67,6 @@ class AuthController extends BaseController
             'message' => 'User Registered Successfully.',
             'data' => ['user' => $user, 'token' => $token,]
         ]);
-
-        // $this->token = $user->createToken('Personal Access Token')->plainTextToken;
-        // $response = ['user' => $user, 'token' => $this->token];
-        // return response()->json($response, 200);
     }
 
     public function login(Request $request) {
@@ -113,6 +113,7 @@ class AuthController extends BaseController
             'email',
             'phoneNumber',
             'role',
+            'profileImage',
         ]);
         $token = [
             'access_token' => $text,
@@ -167,7 +168,8 @@ class AuthController extends BaseController
         $rules = [
             'email' => 'required',
             'name' => 'required|string',
-            'phoneNumber' => 'required|numeric'
+            'phoneNumber' => 'required|numeric',
+            'profileImage' => 'required',
         ];
         $validator = Validator::make($request->all(), $rules);
 
@@ -177,9 +179,9 @@ class AuthController extends BaseController
         try {
             $user->Update($request->only('name', 'email', 'phoneNumber'));
 
-            if ($request->hasFile('profile_image') && $request->profile_image != '') {
+            if ($request->hasFile('profileImage') && $request->profileImage != '') {
                 $user->clearMediaCollection();
-                $user->addMedia($request->image)->toMediaCollection();
+                $user->addMedia($request->profileImage)->toMediaCollection();
             }
         } catch (\Exception $e) {
             return response()->json(['message' => 'Could not update the profile'], 500);
@@ -215,9 +217,6 @@ class AuthController extends BaseController
 
         //     return response()->json(['message' => 'No user found'], 400);
 
-
-
-
         // $user = User::where('email', $req->email)->first();
 
         // if($user){
@@ -232,12 +231,14 @@ class AuthController extends BaseController
         //         'token' => $token,
         //     ],
         // );
-
     // }
 
     public function logout(Request $request)
     {
-        User::where('id', $request->user_id)->token()->revoke();
+        // $user = auth()->user()->token()->revoke();
+        // User::where('id', $request->user_id)->token()->revoke();
+        Session::flush();
+        Auth::logout();
         return response()->json([
             'status' => true,
             'message' => 'Successfully logged out'

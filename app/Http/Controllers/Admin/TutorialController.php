@@ -36,7 +36,9 @@ class TutorialController extends Controller
             'videoLink' => 'required',
         ]);
 
-        Tutorial::create($sanitized);
+        $tutorial = Tutorial::create($sanitized);
+        $tutorial->addMedia($request->image)->toMediaCollection();
+
         return redirect()->to('/admin/tutorials')->with('success','Tutorial Added Successfully');
     }
 

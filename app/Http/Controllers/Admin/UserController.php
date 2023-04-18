@@ -37,15 +37,13 @@ class UserController extends Controller
             'phoneNumber' => 'required|digits:10',
             'role' => 'required',
             'password' => 'required',
-            // 'image' => 'required',
+            'profileImage' => 'required',
         ]);
-        // $sanitized['image'] = "demo";
-
+        $sanitized['profileImage'] = "demo";
         $sanitized['password'] = Hash::make($sanitized['password']);
 
         $user = User::create($sanitized);
-
-        // $user->addMedia($request->image)->toMediaCollection();
+        $user->addMedia($request->profileImage)->toMediaCollection();
 
         return redirect()->to('/admin/users')->with('success','User Added Successfully');
     }
@@ -65,11 +63,16 @@ class UserController extends Controller
             'email' => 'required',
             'phoneNumber' => 'required|digits:10',
             'role' => 'required',
-            // 'password' => 'required',
-            // 'image' => 'required',
         ]);
 
-        User::find($id)->update($sanitized);
+        $user = User::find($id);
+
+        if ($request -> hasFile('profileImage') && $request->profileImage != ''){
+            $user->clearMediaCollection();
+            $user->addMedia($request->profileImage)->toMediaCollection();
+        }
+
+        $user->update($sanitized);
 
         return redirect()->to('/admin/users')->with('success','User Updated Successfully');
     }

@@ -10,7 +10,7 @@
 
 @section('content')
     <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/update-user/'.$edit->id) }}" method="post">
+        <form role="form" action="{{ URL::to('/admin/update-user/'.$edit->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             <!-- User Name -->
             <div class="form-group row">
@@ -65,6 +65,16 @@
                         <option value="PremiumUser" {{ 'PremiumUser' == $edit->role ? 'selected' : '' }}>Premium User</option>
                         <option value="Admin" {{ 'Admin' == $edit->role ? 'selected' : '' }}>Admin</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="profileImage" class="col-sm-2 col-form-label">Input Profile Image :</label>
+                    <img src="{{ $edit->getFirstMediaUrl() }}" height="200" width="200">
+                    <div class="col-sm-10">
+                        <input type="file" name="profileImage">
+                    </div>
                 </div>
             </div>
             <!-- /.card-body -->

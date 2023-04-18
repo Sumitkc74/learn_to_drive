@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('phoneNumber');
             $table->string('role');
+            $table->string('profileImage');
             $table->timestamps();
         });
     }

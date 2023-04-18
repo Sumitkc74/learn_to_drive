@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('attempted_questions');
-            $table->string('optionA');
-            $table->string('optionB');
-            $table->string('optionC');
-            $table->string('optionD');
-            $table->string('correct_options');
-            $table->string('selected_options');
+            $table->longText('attempted_questions');
+            $table->longText('optionA');
+            $table->longText('optionB');
+            $table->longText('optionC');
+            $table->longText('optionD');
+            $table->longText('correct_options');
+            $table->longText('selected_options');
             $table->timestamps();
         });
     }

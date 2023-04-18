@@ -11,7 +11,7 @@ class TutorialController extends Controller
     //
     public function index(){
         try {
-            $tutorials = Tutorial::all();
+            $tutorials = Tutorial::select('id','title','description','videoLink')->with('media')->get();
             return response()->json([
                 'status' => true,
                 'data' => ['tutorials' => $tutorials]

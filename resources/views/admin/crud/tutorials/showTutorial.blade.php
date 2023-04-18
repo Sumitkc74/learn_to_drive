@@ -59,6 +59,7 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Video Link</th>
+                            <th>Image</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -69,6 +70,7 @@
                                 <td>{{ $row->title }}</td>
                                 <td>{{ $row->description }}</td>
                                 <td>{{ $row->videoLink }}</td>
+                                <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                 <td>
                                     <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                     <a href="{{ URL::to('/admin/delete-tutorial/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>

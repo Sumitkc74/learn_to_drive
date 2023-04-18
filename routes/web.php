@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 
 /*
@@ -29,6 +30,8 @@ Route::get('/', function () {
 Route::view('admin','admin.dashboard');
 
 Auth::routes();
+
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 // Route::get('/admin', [HomeController::class, 'index'])->middleware('admin');
 

@@ -10,7 +10,7 @@
 
 @section('content')
     <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/insert-user') }}" method="post">
+        <form role="form" action="{{ URL::to('/admin/insert-user') }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">User Name :</label>
@@ -56,6 +56,18 @@
                         <option value="PremiumUser">Premium User</option>
                         <option value="Admin">Admin</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 input-group">
+                    <label for="profileImage" class="col-sm-2 col-form-label">Input Profile Image :</label>
+                    <div class="col-sm-10">
+                        <input type="file" name="profileImage" class="@if($errors->has('profileImage')) is-invalid @endif">
+                        @if($errors->has('profileImage'))
+                        <p class="text-danger">{{ $errors->first('profileImage') }}</p>
+                        @endif
+                    </div>
                 </div>
             </div>
                 {{-- <div class="form-group">
