@@ -22,13 +22,6 @@
                     @endif
                 </div>
             </div>
-            {{-- <div class="form-group row">
-                <label for="description" class="col-sm-2 col-form-label">Description :</label>
-                <div class="col-sm-10">
-                    <textarea type="text" class="form-control" rows="4" name="description" placeholder="Enter vision-test description" required></textarea>
-                </div>
-            </div> --}}
-
 
             <div class="form-group row">
                 <div class="col-sm-10 input-group">

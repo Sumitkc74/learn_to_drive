@@ -73,8 +73,6 @@
                                 <td>{{ $row->description }}</td>
                                 <td><embed src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                 <td><embed src="{{ $row->getMedia()[1]->getUrl() }}" width="100px"></td>
-
-                                {{-- <td><embed src="{{ $row->getMedia('media_collection_name')[1]->getUrl() }}" width="100px"></td> --}}
                                 <td>
                                     <a href="{{ URL::to('/admin/edit-exam-paper/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                     <a href="{{ URL::to('/admin/delete-exam-paper/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>

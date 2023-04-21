@@ -35,29 +35,6 @@
           @include('admin.dashboard-components.stat-boxes')
           <!-- Main row -->
           <div class="row">
-            <!-- Left col -->
-            {{-- <section class="col-lg-7 connectedSortable">
-
-                <!-- TO DO List -->
-                @include('admin.dashboard-components.to-do-list')
-
-                <!-- Total downloads chart -->
-                @include('admin.dashboard-components.downloads-chart')
-
-            </section>
-            <!-- /.Left col -->
-
-            <!-- right col (We are only adding the ID to make the widgets sortable)-->
-            <section class="col-lg-5 connectedSortable">
-
-                @include('admin.dashboard-components.calendar')
-
-                @include('admin.dashboard-components.sales-graph')
-
-                @include('admin.dashboard-components.map')
-
-            </section> --}}
-            <!-- right col -->
             </div>
           <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->

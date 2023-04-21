@@ -53,10 +53,6 @@
                     <img src="{{ $trafficSign->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
                         <input type="file" name="image">
-                        {{-- class="@if($errors->has('image')) is-invalid @endif"
-                        @if($errors->has('image'))
-                            <p class="text-danger">{{ $errors->first('image') }}</p>
-                        @endif --}}
                     </div>
                 </div>
             </div>
