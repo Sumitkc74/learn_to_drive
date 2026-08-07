@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,19 +19,25 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    protected $redirectTo = '/admin';
+
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
 
     public function login(Request $request)
     {
-        $this->validateLogin($request);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-        $credentials = $request->only('email', 'password');
-
-        if ($this->attemptLogin($request)) {
-            $user = $this->guard()->user();
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
 
             if ($user->role !== 'Admin') {
-                $this->guard()->logout();
+                Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
@@ -45,15 +49,19 @@ class LoginController extends Controller
             return redirect()->intended('/admin');
         }
 
-        return $this->sendFailedLoginResponse($request);
+        return back()->withErrors([
+            'email' => 'These credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
+    }
 
     /**
      * Create a new controller instance.
@@ -62,6 +70,6 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest')->only(['showLoginForm', 'login']);
     }
 }
