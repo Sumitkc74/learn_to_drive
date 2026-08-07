@@ -37,6 +37,8 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::get('/admin/profile-settings', [UserController::class, 'profileSettings'])->name('profileSettings');
+Route::post('/admin/profile-settings/update', [UserController::class, 'updateProfileSettings'])->name('updateProfileSettings');
 Route::get('/admin/users', [UserController::class, 'allUser'])->name('allUser');
 Route::get('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
 Route::post('/admin/insert-user', [UserController::class, 'insertUser'])->name('insertUser');

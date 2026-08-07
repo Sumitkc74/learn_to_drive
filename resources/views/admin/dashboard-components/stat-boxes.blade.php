@@ -1,168 +1,67 @@
-<div class="row">
+<div class="ltd-stats">
 
-    <!-- Users Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3> {{ \App\Models\User::all()->count() }} </h3>
-                <p>User Registrations</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-person-add"></i>
-            </div>
-            <a href="/admin/users" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/users" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-user-plus"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\User::count() }}</div>
+            <div class="ltd-stat-card__label">User Registrations</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Users Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3> {{ \App\Models\TrafficSign::all()->count() }} </h3>
-                <p>Traffic Signs</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-map-signs"></i>
-            </div>
-            <a href="/admin/traffic-signs" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/traffic-signs" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-map-signs"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\TrafficSign::count() }}</div>
+            <div class="ltd-stat-card__label">Traffic Signs</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Users Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3> {{ \App\Models\ExamPaper::all()->count() }} </h3>
-                <p>Exam Papers</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <a href="/admin/exam-papers" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/exam-papers" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-file-alt"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\ExamPaper::count() }}</div>
+            <div class="ltd-stat-card__label">Exam Papers</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Users Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3> {{ \App\Models\VisionTest::all()->count() }} </h3>
-                <p>Vision Tests</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-low-vision"></i>
-            </div>
-            <a href="/admin/vision-tests" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/vision-tests" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-low-vision"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\VisionTest::count() }}</div>
+            <div class="ltd-stat-card__label">Vision Tests</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Exan Information Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-primary">
-            <div class="inner">
-                <h3> {{ \App\Models\ExamInformation::all()->count() }} </h3>
-                <p>Exam Information</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-info"></i>
-            </div>
-            <a href="/admin/exam-information" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/exam-information" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-info"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\ExamInformation::count() }}</div>
+            <div class="ltd-stat-card__label">Exam Information</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Questions Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-secondary">
-            <div class="inner">
-                <h3> {{ \App\Models\Question::all()->count() }} </h3>
-                <p>Exam Questions</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-question"></i>
-            </div>
-            <a href="/admin/questions" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/questions" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-question"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\Question::count() }}</div>
+            <div class="ltd-stat-card__label">Exam Questions</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Tutorials Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-dark">
-            <div class="inner">
-                <h3> {{ \App\Models\Tutorial::all()->count() }} </h3>
-                <p>Tutorials</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-desktop"></i>
-            </div>
-            <a href="/admin/tutorials" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/tutorials" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-desktop"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\Tutorial::count() }}</div>
+            <div class="ltd-stat-card__label">Tutorials</div>
         </div>
-    </div>
+    </a>
 
-    <!-- Notices Box -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-gradient-warning">
-            <div class="inner">
-                <h3> {{ \App\Models\Notice::all()->count() }} </h3>
-                <p>Notices</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            <a href="/admin/notices" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    <a href="/admin/notices" class="ltd-stat-card">
+        <div class="ltd-stat-card__icon"><i class="fas fa-bell"></i></div>
+        <div>
+            <div class="ltd-stat-card__value">{{ \App\Models\Notice::count() }}</div>
+            <div class="ltd-stat-card__label">Notices</div>
         </div>
-    </div>
+    </a>
 
-    {{-- <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3>150</h3>
-                <p>File Downloads</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-download"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-
-    <!-- ./col -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
-                <p>Bounce Rate</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
-
-    <!-- ./col -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3>65</h3>
-                <p>Unique Visitors</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-pie-graph"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-        </div>
-    <!-- ./col -->
-  </div> --}}
-  <!-- /.row -->
+</div>

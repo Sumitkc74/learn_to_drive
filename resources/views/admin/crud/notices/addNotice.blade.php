@@ -9,61 +9,50 @@
 @endsection
 
 @section('content')
-    <div class="card-body">
+    @include('admin.layout.flash')
+    <div class="ltd-page-header">
+        <div>
+            <span class="ltd-page-header__eyebrow">Admin Panel</span>
+            <h1>Add Notice</h1>
+        </div>
+    </div>
+
+    <div class="ltd-panel">
         <form role="form" action="{{ URL::to('/admin/insert-notice') }}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="form-group row">
-                <label for="title" class="col-sm-2 col-form-label">Notice Title :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('title')) is-invalid @endif"  name="title" placeholder="Enter notice title" value="{{ old('title') }}">
-                    @if($errors->has('title'))
-                        <p class="text-danger">{{ $errors->first('title') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="title">Notice Title</label>
+                <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" placeholder="Enter notice title" value="{{ old('title') }}">
+                @error('title')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="description" class="col-sm-2 col-form-label">Description :</label>
-                <div class="col-sm-10">
-                    <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter notice description">{{ old('description') }}</textarea>
-                    @if($errors->has('description'))
-                        <p class="text-danger">{{ $errors->first('description') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control @error('description') is-invalid @enderror" rows="4" name="description" placeholder="Enter notice description">{{ old('description') }}</textarea>
+                @error('description')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="nepaliTitle" class="col-sm-2 col-form-label">Notice Title :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('nepaliTitle')) is-invalid @endif"  name="nepaliTitle" placeholder="Enter nepali title" value="{{ old('nepaliTitle') }}">
-                    @if($errors->has('nepaliTitle'))
-                        <p class="text-danger">{{ $errors->first('nepaliTitle') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="nepaliTitle">Nepali Title</label>
+                <input type="text" class="form-control @error('nepaliTitle') is-invalid @enderror" name="nepaliTitle" placeholder="Enter nepali title" value="{{ old('nepaliTitle') }}">
+                @error('nepaliTitle')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="nepaliDescription" class="col-sm-2 col-form-label">Description :</label>
-                <div class="col-sm-10">
-                    <textarea type="text" class="form-control  @if($errors->has('nepaliDescription')) is-invalid @endif" rows="4" name="nepaliDescription" placeholder="Enter nepali description">{{ old('nepaliDescription') }}</textarea>
-                    @if($errors->has('nepaliDescription'))
-                        <p class="text-danger">{{ $errors->first('nepaliDescription') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="nepaliDescription">Nepali Description</label>
+                <textarea class="form-control @error('nepaliDescription') is-invalid @enderror" rows="4" name="nepaliDescription" placeholder="Enter nepali description">{{ old('nepaliDescription') }}</textarea>
+                @error('nepaliDescription')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="link" class="col-sm-2 col-form-label">Notice Link :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('link')) is-invalid @endif"  name="link" placeholder="Enter notice link" value="{{ old('link') ?? '' }}">
-                    @if($errors->has('link'))
-                        <p class="text-danger">{{ $errors->first('link') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="link">Notice Link</label>
+                <input type="text" class="form-control @error('link') is-invalid @enderror" name="link" placeholder="Enter notice link" value="{{ old('link') ?? '' }}">
+                @error('link')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="card-footer">
+            <div class="mt-4">
                 <button type="submit" class="btn btn-primary">Submit</button>
+                <a href="/admin" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>

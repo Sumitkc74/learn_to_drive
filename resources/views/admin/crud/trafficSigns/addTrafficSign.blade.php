@@ -9,57 +9,44 @@
 @endsection
 
 @section('content')
-    <div class="card-header">
+    @include('admin.layout.flash')
+    <div class="ltd-page-header">
+        <div>
+            <span class="ltd-page-header__eyebrow">Admin Panel</span>
+            <h1>Add Traffic Sign</h1>
+        </div>
     </div>
-    <div class="card-body">
+
+    <div class="ltd-panel">
         <form role="form" action="{{ URL::to('/admin/insert-traffic-sign') }}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="form-group row">
-                <label for="name" class="col-sm-2 col-form-label">Traffic Sign :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control  @if($errors->has('name')) is-invalid @endif" name="name" placeholder="Enter traffic-sign" value="{{ old('name') }}">
-                    @if($errors->has('name'))
-                        <p class="text-danger">{{ $errors->first('name') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="name">Traffic Sign</label>
+                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter traffic-sign" value="{{ old('name') }}">
+                @error('name')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="nepaliSignName" class="col-sm-2 col-form-label">Nepali Sign-Name :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control  @if($errors->has('nepaliSignName')) is-invalid @endif" name="nepaliSignName" placeholder="Enter nepali name" value="{{ old('nepaliSignName') }}">
-                    @if($errors->has('nepaliSignName'))
-                        <p class="text-danger">{{ $errors->first('nepaliSignName') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="nepaliSignName">Nepali Sign Name</label>
+                <input type="text" class="form-control @error('nepaliSignName') is-invalid @enderror" name="nepaliSignName" placeholder="Enter nepali name" value="{{ old('nepaliSignName') }}">
+                @error('nepaliSignName')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <label for="description" class="col-sm-2 col-form-label">Description :</label>
-                <div class="col-sm-10">
-                    <textarea type="text" class="form-control @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter traffic-sign description">
-                        {{ old('description') }}
-                    </textarea>
-                        @if($errors->has('description'))
-                    <p class="text-danger">{{ $errors->first('description') }}</p>
-                    @endif
-                </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control @error('description') is-invalid @enderror" rows="4" name="description" placeholder="Enter traffic-sign description">{{ old('description') }}</textarea>
+                @error('description')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group row">
-                <div class="col-sm-10 input-group">
-                    <label for="image" class="col-sm-2 col-form-label">Input Sign Image :</label>
-                    <div class="col-sm-10">
-                        <input type="file" name="image" class="@if($errors->has('image')) is-invalid @endif">
-                        @if($errors->has('image'))
-                        <p class="text-danger">{{ $errors->first('image') }}</p>
-                        @endif
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="image">Sign Image</label>
+                <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror">
+                @error('image')<p class="text-danger mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="card-footer">
+            <div class="mt-4">
                 <button type="submit" class="btn btn-primary">Add</button>
+                <a href="/admin" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>
