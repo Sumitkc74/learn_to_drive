@@ -112,6 +112,17 @@
             color: #c82333;
         }
 
+        .ltd-verify-action {
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: var(--yellow-dark);
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
         .ltd-profile-list {
             border-top: 1px solid var(--border);
         }
@@ -250,6 +261,12 @@
                                 <i class="fas {{ $user->email_verified_at ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i>
                                 {{ $user->email_verified_at ? 'Verified' : 'Not verified' }}
                             </span>
+                            @unless($user->email_verified_at)
+                                <form action="{{ route('verification.send') }}" method="POST">
+                                    @csrf
+                                    <button class="ltd-verify-action" type="submit">Verify now</button>
+                                </form>
+                            @endunless
                         </span>
                     </div>
                     <button class="ltd-profile-edit" type="button" data-toggle="modal" data-target="#emailModal"
@@ -262,7 +279,17 @@
                     <span class="ltd-profile-item__icon"><i class="fas fa-phone"></i></span>
                     <div>
                         <span class="ltd-profile-item__label">Phone Number</span>
-                        <span class="ltd-profile-item__value">{{ $user->phoneNumber }}</span>
+                        <span class="ltd-profile-item__value">
+                            {{ $user->phoneNumber }}
+                            <span class="ltd-verification-badge {{ $user->phone_verified_at ? 'is-verified' : 'is-unverified' }}">
+                                <i class="fas {{ $user->phone_verified_at ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i>
+                                {{ $user->phone_verified_at ? 'Verified' : 'Not verified' }}
+                            </span>
+                            @unless($user->phone_verified_at)
+                                <button class="ltd-verify-action" type="button" data-toggle="modal"
+                                    data-target="#phoneVerificationModal">Verify now</button>
+                            @endunless
+                        </span>
                     </div>
                     <button class="ltd-profile-edit" type="button" data-toggle="modal" data-target="#phoneModal"
                         aria-label="Edit phone number" title="Edit phone number">
@@ -283,6 +310,7 @@
     @include('admin.profile-modals.email')
     @include('admin.profile-modals.phone')
     @include('admin.profile-modals.password')
+    @include('admin.profile-modals.phone-verification')
 @endsection
 
 @section('page-script')
@@ -305,6 +333,10 @@
             $('#phoneModal').modal('show');
         @elseif($errors->has('current_password') || $errors->has('password'))
             $('#passwordModal').modal('show');
+        @endif
+
+        @if(session('open_phone_verification') || $errors->has('code'))
+            $('#phoneVerificationModal').modal('show');
         @endif
     </script>
 @endsection

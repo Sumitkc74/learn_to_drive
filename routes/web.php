@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\Admin\ProfileVerificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -51,6 +52,14 @@ Route::patch('/admin/profile-settings/email', [UserController::class, 'updatePro
 Route::patch('/admin/profile-settings/phone', [UserController::class, 'updateProfilePhone'])->name('profile.phone.update');
 Route::patch('/admin/profile-settings/password', [UserController::class, 'updateProfilePassword'])->name('profile.password.update');
 Route::patch('/admin/profile-settings/image', [UserController::class, 'updateProfileImage'])->name('profile.image.update');
+Route::post('/admin/profile-settings/email/verification-notification', [ProfileVerificationController::class, 'sendEmail'])
+    ->middleware('throttle:6,1')->name('verification.send');
+Route::get('/admin/profile-settings/email/verify/{id}/{hash}', [ProfileVerificationController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+Route::post('/admin/profile-settings/phone/verification-code', [ProfileVerificationController::class, 'sendPhone'])
+    ->middleware('throttle:3,10')->name('profile.phone.verification.send');
+Route::post('/admin/profile-settings/phone/verify', [ProfileVerificationController::class, 'verifyPhone'])
+    ->middleware('throttle:6,1')->name('profile.phone.verification.verify');
 Route::get('/admin/users', [UserController::class, 'allUser'])->name('allUser');
 Route::get('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
 Route::post('/admin/insert-user', [UserController::class, 'insertUser'])->name('insertUser');

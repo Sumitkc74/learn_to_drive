@@ -101,7 +101,13 @@ class UserController extends Controller
         $data = $request->validate([
             'phoneNumber' => ['required', 'digits:10'],
         ]);
-        $user->update($data);
+        if ($user->phoneNumber !== $data['phoneNumber']) {
+            $user->phoneNumber = $data['phoneNumber'];
+            $user->phone_verified_at = null;
+            $user->phone_verification_code = null;
+            $user->phone_verification_expires_at = null;
+            $user->save();
+        }
 
         return back()->with('success', 'Phone number updated successfully.');
     }
