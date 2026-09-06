@@ -4,127 +4,188 @@
 
 @section('page-style')
     <style>
-        .ltd-profile-summary {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            padding: 1.5rem;
-            margin-bottom: 1.25rem;
-            background: linear-gradient(135deg, var(--charcoal-deep), var(--charcoal));
-            color: #fff;
-            border-radius: 16px;
+        .ltd-profile-card {
+            max-width: 760px;
+            margin: 0 auto;
+            overflow: hidden;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(16, 24, 40, 0.08);
         }
 
-        .ltd-profile-avatar {
-            width: 84px;
-            height: 84px;
-            border-radius: 50%;
-            border: 3px solid var(--yellow);
-            background: var(--surface);
-            color: var(--charcoal-deep);
+        .ltd-profile-card__cover {
+            height: 110px;
+            background: linear-gradient(135deg, var(--charcoal-deep), var(--charcoal));
+        }
+
+        .ltd-profile-card__body {
+            padding: 0 2rem 2rem;
+        }
+
+        .ltd-avatar-form {
+            width: 112px;
+            margin: -56px auto 1rem;
+        }
+
+        .ltd-avatar-button {
+            position: relative;
+            width: 112px;
+            height: 112px;
             display: grid;
             place-items: center;
-            flex-shrink: 0;
             overflow: hidden;
-            font-size: 1.75rem;
+            padding: 0;
+            border: 4px solid var(--surface);
+            border-radius: 50%;
+            background: var(--yellow);
+            color: var(--charcoal-deep);
+            font-size: 2rem;
             font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
         }
 
-        .ltd-profile-avatar img {
+        .ltd-avatar-button img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .ltd-profile-summary h2 {
+        .ltd-avatar-button__edit {
+            position: absolute;
+            right: 3px;
+            bottom: 3px;
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border: 2px solid var(--surface);
+            border-radius: 50%;
+            background: var(--charcoal-deep);
+            color: var(--yellow);
+            font-size: 0.78rem;
+        }
+
+        .ltd-avatar-help {
+            margin: 0.5rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.74rem;
+            text-align: center;
+        }
+
+        .ltd-profile-card__heading {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .ltd-profile-card__heading h2 {
             margin: 0 0 0.25rem;
-            font-size: 1.35rem;
+            color: var(--text);
+            font-size: 1.45rem;
             font-weight: 800;
         }
 
-        .ltd-profile-summary p {
-            margin: 0;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .ltd-profile-badge {
+        .ltd-role-badge,
+        .ltd-verification-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            margin-top: 0.65rem;
-            padding: 0.3rem 0.65rem;
+            padding: 0.32rem 0.65rem;
             border-radius: 999px;
-            background: rgba(255, 222, 23, 0.16);
-            color: var(--yellow);
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             font-weight: 800;
         }
 
-        .ltd-settings-grid {
+        .ltd-role-badge {
+            background: rgba(255, 222, 23, 0.2);
+            color: var(--yellow-dark);
+        }
+
+        .ltd-verification-badge.is-verified {
+            background: rgba(40, 167, 69, 0.12);
+            color: #218838;
+        }
+
+        .ltd-verification-badge.is-unverified {
+            background: rgba(220, 53, 69, 0.1);
+            color: #c82333;
+        }
+
+        .ltd-profile-list {
+            border-top: 1px solid var(--border);
+        }
+
+        .ltd-profile-item {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1rem;
-        }
-
-        .ltd-setting-card {
-            padding: 1.25rem;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-        }
-
-        .ltd-setting-card--wide {
-            grid-column: 1 / -1;
-        }
-
-        .ltd-setting-card__header {
-            display: flex;
-            align-items: flex-start;
+            grid-template-columns: 42px minmax(0, 1fr) auto;
+            align-items: center;
             gap: 0.8rem;
-            margin-bottom: 1rem;
+            min-height: 78px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .ltd-setting-card__icon {
-            width: 40px;
-            height: 40px;
+        .ltd-profile-item__icon {
+            width: 38px;
+            height: 38px;
             display: grid;
             place-items: center;
-            flex-shrink: 0;
             border-radius: 10px;
+            background: var(--bg);
+            color: var(--yellow-dark);
+        }
+
+        .ltd-profile-item__label {
+            display: block;
+            margin-bottom: 0.12rem;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .ltd-profile-item__value {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            color: var(--text);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .ltd-profile-edit {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--text-muted);
+        }
+
+        .ltd-profile-edit:hover {
+            border-color: var(--yellow);
             background: var(--yellow);
             color: var(--charcoal-deep);
         }
 
-        .ltd-setting-card h3 {
-            margin: 0 0 0.15rem;
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--text);
+        .ltd-password-action {
+            padding-top: 1.25rem;
+            text-align: center;
         }
 
-        .ltd-setting-card p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 0.82rem;
-        }
-
-        .ltd-setting-card__action {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
-        }
-
-        @media (max-width: 760px) {
-            .ltd-settings-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 576px) {
+            .ltd-profile-card__body {
+                padding-right: 1.15rem;
+                padding-left: 1.15rem;
             }
 
-            .ltd-setting-card--wide {
-                grid-column: auto;
-            }
-
-            .ltd-profile-summary {
-                align-items: flex-start;
+            .ltd-profile-item {
+                grid-template-columns: 36px minmax(0, 1fr) 34px;
             }
         }
     </style>
@@ -138,147 +199,112 @@
         </div>
     </div>
 
-    <section class="ltd-profile-summary" aria-label="Admin profile overview">
-        <div class="ltd-profile-avatar">
-            @if($user->getFirstMediaUrl())
-                <img src="{{ $user->getFirstMediaUrl() }}" alt="{{ $user->name }} profile photo">
-            @else
-                {{ strtoupper(substr($user->name, 0, 1)) }}
-            @endif
-        </div>
-        <div>
-            <h2>{{ $user->name }}</h2>
-            <p>{{ $user->email }} &middot; {{ $user->phoneNumber }}</p>
-            <span class="ltd-profile-badge">
-                <i class="fas fa-user-shield" aria-hidden="true"></i>
-                {{ $user->role }}
-            </span>
-            <span class="ltd-profile-badge">
-                <i class="fas {{ $user->email_verified_at ? 'fa-check-circle' : 'fa-exclamation-circle' }}" aria-hidden="true"></i>
-                {{ $user->email_verified_at ? 'Email verified' : 'Email not verified' }}
-            </span>
+    <section class="ltd-profile-card" aria-labelledby="profile-card-title">
+        <div class="ltd-profile-card__cover"></div>
+        <div class="ltd-profile-card__body">
+            <form id="avatarForm" class="ltd-avatar-form" action="{{ route('profile.image.update') }}"
+                method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PATCH')
+                <button id="avatarButton" class="ltd-avatar-button" type="button" aria-label="Change profile photo">
+                    @if($user->getFirstMediaUrl())
+                        <img src="{{ $user->getFirstMediaUrl() }}" alt="{{ $user->name }} profile photo">
+                    @else
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    @endif
+                    <span class="ltd-avatar-button__edit"><i class="fas fa-camera" aria-hidden="true"></i></span>
+                </button>
+                <input id="profileImage" class="d-none" type="file" name="profileImage"
+                    accept=".jpg,.jpeg,.png,.webp">
+                <p class="ltd-avatar-help">Select the avatar to change your photo</p>
+                @error('profileImage')<p class="text-danger small text-center mb-0">{{ $message }}</p>@enderror
+            </form>
+
+            <div class="ltd-profile-card__heading">
+                <h2 id="profile-card-title">{{ $user->name }}</h2>
+                <span class="ltd-role-badge">
+                    <i class="fas fa-user-shield" aria-hidden="true"></i> {{ $user->role }}
+                </span>
+            </div>
+
+            <div class="ltd-profile-list">
+                <div class="ltd-profile-item">
+                    <span class="ltd-profile-item__icon"><i class="fas fa-user"></i></span>
+                    <div>
+                        <span class="ltd-profile-item__label">Full Name</span>
+                        <span class="ltd-profile-item__value">{{ $user->name }}</span>
+                    </div>
+                    <button class="ltd-profile-edit" type="button" data-toggle="modal" data-target="#nameModal"
+                        aria-label="Edit full name" title="Edit full name">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+
+                <div class="ltd-profile-item">
+                    <span class="ltd-profile-item__icon"><i class="fas fa-envelope"></i></span>
+                    <div>
+                        <span class="ltd-profile-item__label">Email Address</span>
+                        <span class="ltd-profile-item__value">
+                            {{ $user->email }}
+                            <span class="ltd-verification-badge {{ $user->email_verified_at ? 'is-verified' : 'is-unverified' }}">
+                                <i class="fas {{ $user->email_verified_at ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i>
+                                {{ $user->email_verified_at ? 'Verified' : 'Not verified' }}
+                            </span>
+                        </span>
+                    </div>
+                    <button class="ltd-profile-edit" type="button" data-toggle="modal" data-target="#emailModal"
+                        aria-label="Edit email address" title="Edit email address">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+
+                <div class="ltd-profile-item">
+                    <span class="ltd-profile-item__icon"><i class="fas fa-phone"></i></span>
+                    <div>
+                        <span class="ltd-profile-item__label">Phone Number</span>
+                        <span class="ltd-profile-item__value">{{ $user->phoneNumber }}</span>
+                    </div>
+                    <button class="ltd-profile-edit" type="button" data-toggle="modal" data-target="#phoneModal"
+                        aria-label="Edit phone number" title="Edit phone number">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ltd-password-action">
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#passwordModal">
+                    <i class="fas fa-lock mr-2"></i>Change Password
+                </button>
+            </div>
         </div>
     </section>
 
-    <div class="ltd-settings-grid">
-        <section class="ltd-setting-card">
-            <div class="ltd-setting-card__header">
-                <span class="ltd-setting-card__icon"><i class="fas fa-camera"></i></span>
-                <div>
-                    <h3>Profile Photo</h3>
-                    <p>JPEG, PNG or WebP, up to 2 MB.</p>
-                </div>
-            </div>
-            <form action="{{ route('profile.image.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PATCH')
-                <input type="file" name="profileImage" accept=".jpg,.jpeg,.png,.webp"
-                    class="form-control @error('profileImage') is-invalid @enderror" required>
-                @error('profileImage')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <div class="ltd-setting-card__action">
-                    <button type="submit" class="btn btn-primary">Update Photo</button>
-                </div>
-            </form>
-        </section>
+    @include('admin.profile-modals.name')
+    @include('admin.profile-modals.email')
+    @include('admin.profile-modals.phone')
+    @include('admin.profile-modals.password')
+@endsection
 
-        <section class="ltd-setting-card">
-            <div class="ltd-setting-card__header">
-                <span class="ltd-setting-card__icon"><i class="fas fa-user"></i></span>
-                <div>
-                    <h3>Full Name</h3>
-                    <p>Change the name displayed in the admin panel.</p>
-                </div>
-            </div>
-            <form action="{{ route('profile.name.update') }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <label for="name" class="form-label">Full Name</label>
-                <input id="name" type="text" name="name" value="{{ old('name', $user->name) }}"
-                    class="form-control @error('name') is-invalid @enderror" required>
-                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <div class="ltd-setting-card__action">
-                    <button type="submit" class="btn btn-primary">Update Name</button>
-                </div>
-            </form>
-        </section>
+@section('page-script')
+    <script>
+        document.getElementById('avatarButton')?.addEventListener('click', function () {
+            document.getElementById('profileImage')?.click();
+        });
 
-        <section class="ltd-setting-card">
-            <div class="ltd-setting-card__header">
-                <span class="ltd-setting-card__icon"><i class="fas fa-envelope"></i></span>
-                <div>
-                    <h3>Email Address</h3>
-                    <p>Changing the email marks the new address as unverified.</p>
-                </div>
-            </div>
-            <form action="{{ route('profile.email.update') }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <label for="email" class="form-label">Email Address</label>
-                <input id="email" type="email" name="email" value="{{ old('email', $user->email) }}"
-                    class="form-control @error('email') is-invalid @enderror" required>
-                @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <div class="ltd-setting-card__action">
-                    <button type="submit" class="btn btn-primary">Update Email</button>
-                </div>
-            </form>
-        </section>
+        document.getElementById('profileImage')?.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                document.getElementById('avatarForm')?.submit();
+            }
+        });
 
-        <section class="ltd-setting-card">
-            <div class="ltd-setting-card__header">
-                <span class="ltd-setting-card__icon"><i class="fas fa-phone"></i></span>
-                <div>
-                    <h3>Phone Number</h3>
-                    <p>Use a 10-digit phone number.</p>
-                </div>
-            </div>
-            <form action="{{ route('profile.phone.update') }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input id="phoneNumber" type="tel" name="phoneNumber" value="{{ old('phoneNumber', $user->phoneNumber) }}"
-                    inputmode="numeric" maxlength="10"
-                    class="form-control @error('phoneNumber') is-invalid @enderror" required>
-                @error('phoneNumber')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <div class="ltd-setting-card__action">
-                    <button type="submit" class="btn btn-primary">Update Phone</button>
-                </div>
-            </form>
-        </section>
-
-        <section class="ltd-setting-card ltd-setting-card--wide">
-            <div class="ltd-setting-card__header">
-                <span class="ltd-setting-card__icon"><i class="fas fa-lock"></i></span>
-                <div>
-                    <h3>Password</h3>
-                    <p>Confirm your current password before setting a new one.</p>
-                </div>
-            </div>
-            <form action="{{ route('profile.password.update') }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
-                        <input id="current_password" type="password" name="current_password"
-                            class="form-control @error('current_password') is-invalid @enderror" autocomplete="current-password" required>
-                        @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="password" class="form-label">New Password</label>
-                        <input id="password" type="password" name="password"
-                            class="form-control @error('password') is-invalid @enderror" autocomplete="new-password" required>
-                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
-                        <input id="password_confirmation" type="password" name="password_confirmation"
-                            class="form-control" autocomplete="new-password" required>
-                    </div>
-                </div>
-                <div class="ltd-setting-card__action">
-                    <button type="submit" class="btn btn-primary">Update Password</button>
-                </div>
-            </form>
-        </section>
-    </div>
+        @if($errors->has('name'))
+            $('#nameModal').modal('show');
+        @elseif($errors->has('email'))
+            $('#emailModal').modal('show');
+        @elseif($errors->has('phoneNumber'))
+            $('#phoneModal').modal('show');
+        @elseif($errors->has('current_password') || $errors->has('password'))
+            $('#passwordModal').modal('show');
+        @endif
+    </script>
 @endsection

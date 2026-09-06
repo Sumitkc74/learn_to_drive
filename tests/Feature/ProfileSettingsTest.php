@@ -19,17 +19,21 @@ class ProfileSettingsTest extends TestCase
         ]);
     }
 
-    public function test_profile_page_displays_individual_setting_cards(): void
+    public function test_profile_page_displays_one_card_with_inline_edit_controls(): void
     {
-        $user = User::factory()->create(['role' => 'Admin']);
+        $user = User::factory()->unverified()->create(['role' => 'Admin']);
 
         $this->actingAs($user)->get('/admin/profile-settings')
             ->assertOk()
-            ->assertSee('Profile Photo')
+            ->assertSee('ltd-profile-card', false)
             ->assertSee('Full Name')
             ->assertSee('Email Address')
             ->assertSee('Phone Number')
-            ->assertSee('Password');
+            ->assertSee('Not verified')
+            ->assertSee('data-target="#nameModal"', false)
+            ->assertSee('data-target="#emailModal"', false)
+            ->assertSee('data-target="#phoneModal"', false)
+            ->assertSee('data-target="#passwordModal"', false);
     }
 
     public function test_admin_can_update_each_profile_value_independently(): void
