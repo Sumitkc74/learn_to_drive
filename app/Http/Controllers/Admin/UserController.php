@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -68,32 +68,69 @@ class UserController extends Controller
         return view('admin.profile-settings', compact('user'));
     }
 
-    public function updateProfileSettings(Request $request)
+    public function updateProfileName(Request $request)
     {
         $user = auth()->user();
-
-        if (!$user) {
-            return redirect()->route('login');
-        }
-
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+        ]);
+        $user->update($data);
+
+        return back()->with('success', 'Name updated successfully.');
+    }
+
+    public function updateProfileEmail(Request $request)
+    {
+        $user = auth()->user();
+        $data = $request->validate([
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phoneNumber' => ['required', 'digits:10'],
-            'password' => ['nullable', 'string', 'min:6'],
         ]);
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->phoneNumber = $data['phoneNumber'];
-
-        if (!empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
+        if ($user->email !== $data['email']) {
+            $user->email = $data['email'];
+            $user->email_verified_at = null;
+            $user->save();
         }
 
-        $user->save();
+        return back()->with('success', 'Email address updated successfully.');
+    }
 
-        return redirect()->to('/admin/profile-settings')->with('success', 'Profile Updated Successfully');
+    public function updateProfilePhone(Request $request)
+    {
+        $user = auth()->user();
+        $data = $request->validate([
+            'phoneNumber' => ['required', 'digits:10'],
+        ]);
+        $user->update($data);
+
+        return back()->with('success', 'Phone number updated successfully.');
+    }
+
+    public function updateProfilePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'current_password:web'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        auth()->user()->update([
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
+    }
+
+    public function updateProfileImage(Request $request)
+    {
+        $data = $request->validate([
+            'profileImage' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ]);
+
+        $user = auth()->user();
+        $user->clearMediaCollection();
+        $user->addMedia($data['profileImage'])->toMediaCollection();
+
+        return back()->with('success', 'Profile photo updated successfully.');
     }
 
     //show form to edit user to database

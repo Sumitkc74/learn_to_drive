@@ -46,7 +46,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::view('admin', 'admin.dashboard');
 
 Route::get('/admin/profile-settings', [UserController::class, 'profileSettings'])->name('profileSettings');
-Route::post('/admin/profile-settings/update', [UserController::class, 'updateProfileSettings'])->name('updateProfileSettings');
+Route::patch('/admin/profile-settings/name', [UserController::class, 'updateProfileName'])->name('profile.name.update');
+Route::patch('/admin/profile-settings/email', [UserController::class, 'updateProfileEmail'])->name('profile.email.update');
+Route::patch('/admin/profile-settings/phone', [UserController::class, 'updateProfilePhone'])->name('profile.phone.update');
+Route::patch('/admin/profile-settings/password', [UserController::class, 'updateProfilePassword'])->name('profile.password.update');
+Route::patch('/admin/profile-settings/image', [UserController::class, 'updateProfileImage'])->name('profile.image.update');
 Route::get('/admin/users', [UserController::class, 'allUser'])->name('allUser');
 Route::get('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
 Route::post('/admin/insert-user', [UserController::class, 'insertUser'])->name('insertUser');
