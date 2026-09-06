@@ -483,6 +483,97 @@ body.ltd-body {
     color: var(--text);
 }
 
+/* ---------- Data tables ---------- */
+.ltd-body .table-responsive {
+    border-radius: 10px;
+    background: var(--surface);
+}
+
+.ltd-body .table {
+    margin-bottom: 0;
+    color: var(--text);
+    background: transparent;
+}
+
+.ltd-body .table thead th {
+    border-top: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-secondary);
+    color: var(--text);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+}
+
+.ltd-body .table tbody td {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.ltd-body .table tbody tr:first-child td {
+    border-top: 0;
+}
+
+.ltd-body .table-hover tbody tr:hover,
+.ltd-body .table-hover tbody tr:hover td {
+    color: var(--text);
+    background: var(--surface-secondary);
+}
+
+.ltd-body .table .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.ltd-body .table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.ltd-body .table-responsive::-webkit-scrollbar-track {
+    background: var(--surface-secondary);
+}
+
+.ltd-body .table-responsive::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+}
+
+/* Bootstrap controls and legacy cards used around older table pages. */
+.ltd-body .ltd-panel .form-control,
+.ltd-body .content .card .form-control {
+    border-color: var(--border);
+    background: var(--surface-secondary);
+    color: var(--text);
+}
+
+.ltd-body .ltd-panel .form-control::placeholder,
+.ltd-body .content .card .form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.ltd-body .ltd-panel .form-control:focus,
+.ltd-body .content .card .form-control:focus {
+    border-color: var(--yellow-dark);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 0 0 0.15rem rgba(255, 222, 23, 0.16);
+}
+
+.ltd-body .input-group-text,
+.ltd-body .content .card,
+.ltd-body .content .card-header,
+.ltd-body .content .card-body {
+    border-color: var(--border);
+    background: var(--surface);
+    color: var(--text);
+}
+
+.ltd-body .content .card-header {
+    border-bottom-color: var(--border);
+}
+
 /* ---------- Add-item forms ---------- */
 .ltd-form-shell {
     max-width: 920px;
