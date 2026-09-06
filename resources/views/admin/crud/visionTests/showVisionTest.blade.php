@@ -74,7 +74,11 @@
                                     <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                                     <td>
                                         <a href="{{ URL::to('/admin/edit-vision-test/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                                        <a href="{{ URL::to('/admin/delete-vision-test/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                                        <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this vision test?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach

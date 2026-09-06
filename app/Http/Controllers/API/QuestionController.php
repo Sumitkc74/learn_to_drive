@@ -15,7 +15,7 @@ class QuestionController extends Controller
             return response()->json([
                 'status' => true,
                 'data' => ['questions' => $questions]
-                ], 201);
+                ], 200);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

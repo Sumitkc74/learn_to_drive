@@ -52,7 +52,11 @@
                         <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <a href="{{ URL::to('/admin/delete-tutorial/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                            <form action="{{ route('deleteTutorial', $row->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this tutorial?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

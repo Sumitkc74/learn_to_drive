@@ -54,7 +54,11 @@
                         <td><embed src="{{ $row->getMedia()[1]->getUrl() }}" width="100px"></td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-exam-information/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <a href="{{ URL::to('/admin/delete-exam-information/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                            <form action="{{ route('deleteExamInformation', $row->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this exam information?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

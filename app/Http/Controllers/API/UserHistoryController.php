@@ -14,7 +14,6 @@ class UserHistoryController extends Controller
     public function recordHistory(Request $request){
         //validate
         $rules = [
-            'user_id' => 'required',
             'attempted_questions' => 'required',
             'optionA' => 'required',
             'optionB'  => 'required',
@@ -33,7 +32,7 @@ class UserHistoryController extends Controller
 
         //create new user in table
         UserHistory::create([
-            'user_id' => $request->user_id,
+            'user_id' => $request->user()->id,
             'attempted_questions' => $request->attempted_questions,
             'optionA' => $request->optionA,
             'optionB'  => $request->optionB,
@@ -49,9 +48,12 @@ class UserHistoryController extends Controller
         ]);
     }
 
-    public function displayHistory(){
+    public function displayHistory(Request $request){
         try {
-            $userHistories = UserHistory::all()->map(function($userHistory) {
+            $userHistories = UserHistory::where('user_id', $request->user()->id)
+                ->latest()
+                ->get()
+                ->map(function($userHistory) {
                 return [
                     'id' => $userHistory->id,
                     'user_id' => $userHistory->user_id,

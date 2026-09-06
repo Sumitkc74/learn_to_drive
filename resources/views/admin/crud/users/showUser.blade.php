@@ -65,7 +65,11 @@
                                 <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             @endif
                             @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
-                                <a href="{{ URL::to('/admin/delete-user/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                                <form action="{{ route('deleteUser', $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
                             @endif
                         </td>
                     </tr>

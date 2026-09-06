@@ -7,10 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends BaseController
 {
@@ -18,9 +17,9 @@ class AuthController extends BaseController
         //validate
         $rules = [
             'name' => 'required|string',
-            'email' => 'required|string|unique:users',
-            'phoneNumber' => 'required|string|min:10|max:10',
-            'password' => 'required|string|min:6',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phoneNumber' => 'required|digits:10',
+            'password' => ['required', 'confirmed', Password::min(8)],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -35,7 +34,6 @@ class AuthController extends BaseController
             'email' => $request->email,
             'phoneNumber' => $request->phoneNumber,
             'password' =>Hash::make($request->password),
-            'email_verified_at' => Carbon::now(),
             'role' => 'User',
             'profileImage' => 'image',
         ]);
@@ -43,9 +41,9 @@ class AuthController extends BaseController
 
         // $user->addMedia('/public/dist/image.jpg')->toMediaCollection('avatar');
 
-        $token = $user->createToken('Personal Access Token');
+        $expiresAt = Carbon::now()->addMonths(3);
+        $token = $user->createToken('Personal Access Token', ['*'], $expiresAt);
         $text= $token->plainTextToken;
-        $token->expires_at = Carbon::now()->addMonths(3);
 
         $user = $user->only([
             'id',
@@ -59,7 +57,7 @@ class AuthController extends BaseController
             'access_token' => $text,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
-                $token->expires_at
+                $expiresAt
             )->toDateTimeString()
         ];
         return response()->json([
@@ -72,7 +70,7 @@ class AuthController extends BaseController
     public function login(Request $request) {
         //validate
         $rules = [
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required|string'
         ];
         $validator = Validator::make($request->all(), $rules);
@@ -83,18 +81,14 @@ class AuthController extends BaseController
             return $response;
         }
 
-        //find email from users table
         $user = User::where('email', $request->email)->first();
 
-        if(!$user){
-            return response()->json(['message' => 'Incorrect email'], 400);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
         }
 
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Incorrect password'], 400);
-        }
-
-        $token = $user->createToken('Personal Access Token');
+        $expiresAt = Carbon::now()->addMonths(3);
+        $token = $user->createToken('Personal Access Token', ['*'], $expiresAt);
         $text= $token->plainTextToken;
 
         // $response = ['user' => $user, 'token' => $token, 'message' => 'User Login Successful'];
@@ -105,7 +99,6 @@ class AuthController extends BaseController
         // $tokenResult = $user->createToken('Personal Access Token');
         // $token = $tokenResult->token->plainTextToken;
         // if ($request->remember_me)
-        $token->expires_at = Carbon::now()->addMonths(3);
         // $token->save();
         $user = $user->only([
             'id',
@@ -119,7 +112,7 @@ class AuthController extends BaseController
             'access_token' => $text,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
-                $token->expires_at
+                $expiresAt
             )->toDateTimeString()
         ];
 
@@ -133,18 +126,18 @@ class AuthController extends BaseController
 
     public function changePassword(Request $request) {
         //validate
-        $rules = [
-            'email' => 'required',
-            'password' => 'required|string',
-            'new_password' => 'required|string'
-        ];
-        $request->validate($rules);
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'confirmed', Password::min(8)],
+        ]);
 
-        //find password from users table
-        $user = User::where('email', $request->email)->first();
+        $user = $request->user();
 
-        if(!$user && Hash::check($request->password, $user->password)) {
-            return response()->json(['status' => false, 'message' => 'Incorrect Current Password'], 500);
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'The current password is incorrect.',
+            ], 422);
         }
 
         $user->password = Hash::make($request->new_password);
@@ -154,7 +147,6 @@ class AuthController extends BaseController
             return response()->json([
                 'status' => true,
                 'message' => 'Password updated successfully',
-                'data' => $user
             ], 200);
         } else {
             return response()->json(['status' => false, 'message' => 'Error occured! Please try again'], 500);
@@ -235,10 +227,8 @@ class AuthController extends BaseController
 
     public function logout(Request $request)
     {
-        // $user = auth()->user()->token()->revoke();
-        // User::where('id', $request->user_id)->token()->revoke();
-        Session::flush();
-        Auth::logout();
+        $request->user()->currentAccessToken()?->delete();
+
         return response()->json([
             'status' => true,
             'message' => 'Successfully logged out'
