@@ -218,11 +218,7 @@
                 @csrf
                 @method('PATCH')
                 <button id="avatarButton" class="ltd-avatar-button" type="button" aria-label="Change profile photo">
-                    @if($user->getFirstMediaUrl())
-                        <img src="{{ $user->getFirstMediaUrl() }}" alt="{{ $user->name }} profile photo">
-                    @else
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                    @endif
+                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }} profile photo">
                     <span class="ltd-avatar-button__edit"><i class="fas fa-camera" aria-hidden="true"></i></span>
                 </button>
                 <input id="profileImage" class="d-none" type="file" name="profileImage"

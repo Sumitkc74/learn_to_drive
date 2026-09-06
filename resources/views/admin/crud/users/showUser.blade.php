@@ -59,7 +59,7 @@
                         <td>{{ $row->email }}</td>
                         <td>{{ $row->phoneNumber }}</td>
                         <td>{{ $row->role }}</td>
-                        <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
                         <td>
                             @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
                                 <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>

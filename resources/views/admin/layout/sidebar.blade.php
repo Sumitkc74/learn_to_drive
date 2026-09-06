@@ -12,7 +12,7 @@
     @endphp
 
     <div class="ltd-sidebar__user">
-        <img src="{{ asset('dist/img/avatar.png') }}" alt="{{ $sidebarUserName }}">
+        <img src="{{ $sidebarUser?->avatar_url ?? asset('dist/img/avatar.png') }}" alt="{{ $sidebarUserName }} profile photo">
         <div>
             <span class="ltd-sidebar__user-name">{{ $sidebarUserName }}</span>
             <small>{{ $sidebarUserRole }}</small>

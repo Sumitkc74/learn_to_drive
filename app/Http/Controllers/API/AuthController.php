@@ -35,7 +35,7 @@ class AuthController extends BaseController
             'phoneNumber' => $request->phoneNumber,
             'password' =>Hash::make($request->password),
             'role' => 'User',
-            'profileImage' => 'image',
+            'profileImage' => 'dist/img/avatar.png',
         ]);
 
 

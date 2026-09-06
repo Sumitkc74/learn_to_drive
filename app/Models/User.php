@@ -51,4 +51,9 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'phone_verified_at' => 'datetime',
         'phone_verification_expires_at' => 'datetime',
     ];
+
+    public function getAvatarUrlAttribute(): string
+    {
+        return $this->getFirstMediaUrl() ?: asset('dist/img/avatar.png');
+    }
 }

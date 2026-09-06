@@ -40,18 +40,13 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
             'profileImage' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
-        $sanitized['profileImage'] = 'demo';
+        $sanitized['profileImage'] = 'dist/img/avatar.png';
         $sanitized['password'] = Hash::make($sanitized['password']);
 
         $user = User::create($sanitized);
 
         if ($request->hasFile('profileImage') && $request->profileImage != '') {
             $user->addMedia($request->profileImage)->toMediaCollection();
-        } else {
-            $seedAdmin = User::where('email', 'admin@admin.com')->first();
-            if ($seedAdmin && $seedAdmin->getFirstMediaUrl()) {
-                $user->addMediaFromUrl($seedAdmin->getFirstMediaUrl())->toMediaCollection();
-            }
         }
 
         return redirect()->to('/admin/users')->with('success','User Added Successfully');

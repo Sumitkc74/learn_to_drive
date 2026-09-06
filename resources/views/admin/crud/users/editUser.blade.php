@@ -71,7 +71,7 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="profileImage" class="col-sm-2 col-form-label">Input Profile Image :</label>
-                    <img src="{{ $edit->getFirstMediaUrl() }}" height="200" width="200">
+                    <img src="{{ $edit->avatar_url }}" alt="{{ $edit->name }} profile photo" height="200" width="200">
                     <div class="col-sm-10">
                         <input type="file" name="profileImage">
                     </div>

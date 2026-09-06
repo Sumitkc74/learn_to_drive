@@ -66,4 +66,24 @@ class AdminAddItemPagesTest extends TestCase
             ->assertRedirect(route('addUser'))
             ->assertSessionHasErrors(['role', 'password']);
     }
+
+    public function test_user_created_without_a_photo_uses_the_default_avatar(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin']);
+
+        $this->actingAs($admin)->post(route('insertUser'), [
+            'name' => 'No Photo User',
+            'email' => 'no-photo@example.com',
+            'phoneNumber' => '9812345678',
+            'role' => 'User',
+            'password' => 'secure-password',
+            'password_confirmation' => 'secure-password',
+        ])->assertRedirect(route('allUser'));
+
+        $user = User::where('email', 'no-photo@example.com')->firstOrFail();
+
+        $this->assertSame('dist/img/avatar.png', $user->profileImage);
+        $this->assertSame(asset('dist/img/avatar.png'), $user->avatar_url);
+        $this->assertFalse($user->hasMedia());
+    }
 }
