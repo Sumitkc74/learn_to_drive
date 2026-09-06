@@ -32,11 +32,15 @@ class UserController extends Controller
     //add user to database
     public function insertUser(Request $request)
     {
+        $allowedRoles = auth()->user()->is_seed_admin
+            ? 'in:User,PremiumUser,Admin'
+            : 'in:User,PremiumUser';
+
         $sanitized = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'phoneNumber' => ['required', 'digits:10'],
-            'role' => ['required', 'in:User,PremiumUser,Admin'],
+            'role' => ['required', $allowedRoles],
             'password' => ['required', 'confirmed', Password::min(8)],
             'profileImage' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
@@ -140,8 +144,8 @@ class UserController extends Controller
         $edit = User::findOrFail($id);
         $currentUser = auth()->user();
 
-        if ($edit->role === 'Admin' && $currentUser->email !== 'admin@admin.com') {
-            abort(403, 'Only the seed admin can edit other admin accounts.');
+        if (!$edit->canBeManagedBy($currentUser)) {
+            abort(403, 'You are not allowed to edit this account.');
         }
 
         return view('admin.crud.users.editUser', compact('edit'));
@@ -153,25 +157,24 @@ class UserController extends Controller
         $currentUser = auth()->user();
         $user = User::findOrFail($id);
 
-        if ($user->role === 'Admin' && $currentUser->email !== 'admin@admin.com') {
-            abort(403, 'Only the seed admin can edit other admin accounts.');
+        if (!$user->canBeManagedBy($currentUser)) {
+            abort(403, 'You are not allowed to edit this account.');
         }
 
+        $allowedRoles = $currentUser->is_seed_admin
+            ? 'in:User,PremiumUser,Admin'
+            : 'in:User,PremiumUser';
+
         $sanitized = $request->validate([
-            'name' => 'required',
-            'email' => 'required',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'phoneNumber' => 'required|digits:10',
-            'role' => 'required',
+            'role' => ['required', $allowedRoles],
         ]);
 
         if ($request->hasFile('profileImage') && $request->profileImage != '') {
             $user->clearMediaCollection();
             $user->addMedia($request->profileImage)->toMediaCollection();
-        } elseif ($user->getMedia()->isEmpty()) {
-            $seedAdmin = User::where('email', 'admin@admin.com')->first();
-            if ($seedAdmin && $seedAdmin->getFirstMediaUrl()) {
-                $user->addMediaFromUrl($seedAdmin->getFirstMediaUrl())->toMediaCollection();
-            }
         }
 
         $user->update($sanitized);
@@ -185,8 +188,8 @@ class UserController extends Controller
         $currentUser = auth()->user();
         $user = User::findOrFail($id);
 
-        if ($user->role === 'Admin' && $currentUser->email !== 'admin@admin.com') {
-            abort(403, 'Only the seed admin can manage other admin accounts.');
+        if (!$user->canBeManagedBy($currentUser)) {
+            abort(403, 'You are not allowed to delete this account.');
         }
 
         $user->delete();

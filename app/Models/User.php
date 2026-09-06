@@ -25,6 +25,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'password',
         'phoneNumber',
         'role',
+        'is_seed_admin',
         'profileImage',
         'phone_verified_at',
     ];
@@ -50,10 +51,20 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
         'phone_verification_expires_at' => 'datetime',
+        'is_seed_admin' => 'boolean',
     ];
 
     public function getAvatarUrlAttribute(): string
     {
         return $this->getFirstMediaUrl() ?: asset('dist/img/avatar.png');
+    }
+
+    public function canBeManagedBy(User $actor): bool
+    {
+        if ($this->is_seed_admin) {
+            return false;
+        }
+
+        return $actor->is_seed_admin || $this->role !== 'Admin';
     }
 }

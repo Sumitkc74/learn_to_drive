@@ -2,12 +2,6 @@
 
 @section('title', 'Users')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -61,15 +55,19 @@
                         <td>{{ $row->role }}</td>
                         <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
                         <td>
-                            @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
+                            @if($row->canBeManagedBy(auth()->user()))
                                 <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            @endif
-                            @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
                                 <form action="{{ route('deleteUser', $row->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
                                 </form>
+                            @else
+                                @if($row->is_seed_admin)
+                                    <span class="text-muted small">Managed through Profile Settings</span>
+                                @else
+                                    <span class="text-muted" aria-label="No actions available">&mdash;</span>
+                                @endif
                             @endif
                         </td>
                     </tr>
@@ -81,7 +79,7 @@
 @endsection
 
 @section('page-script')
-    <script type='text/javacript'>
+    <script type="text/javascript">
         $(document).ready(function(){
             $('#search').keyup(function(){
                 searchTable($(this).val());

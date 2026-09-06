@@ -63,7 +63,9 @@
                     <select class="form-control" id="exampleFormControlSelect1" name="role" required>
                         <option value="User" {{ 'User' == $edit->role ? 'selected' : '' }}>User</option>
                         <option value="PremiumUser" {{ 'PremiumUser' == $edit->role ? 'selected' : '' }}>Premium User</option>
-                        <option value="Admin" {{ 'Admin' == $edit->role ? 'selected' : '' }}>Admin</option>
+                        @if(auth()->user()->is_seed_admin)
+                            <option value="Admin" {{ 'Admin' == $edit->role ? 'selected' : '' }}>Admin</option>
+                        @endif
                     </select>
                 </div>
             </div>
