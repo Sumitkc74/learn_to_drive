@@ -31,13 +31,14 @@ class VisionTestController extends Controller
     public function insertVisionTest(Request $request)
     {
         $sanitized = $request->validate([
-            'testNumber' => 'required',
-            'image' => 'required|image',
+            'testNumber' => ['required', 'integer', 'min:1', 'unique:vision_tests,testNumber'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
-        // $sanitized['image'] = "demo";
+        $image = $sanitized['image'];
+        $sanitized['image'] = $image->getClientOriginalName();
 
         $visionTest = VisionTest::create($sanitized);
-        $visionTest->addMedia($request->image)->toMediaCollection();
+        $visionTest->addMedia($image)->toMediaCollection();
 
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test added successfully');
     }

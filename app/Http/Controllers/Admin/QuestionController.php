@@ -31,12 +31,12 @@ class QuestionController extends Controller
     public function insertQuestion(Request $request)
     {
         $sanitized = $request->validate([
-            'question' => 'required',
-            'option1' => 'required',
-            'option2' => 'required',
-            'option3' => 'required',
-            'option4' => 'required',
-            'correctOption' => 'required',
+            'question' => ['required', 'string', 'max:500'],
+            'option1' => ['required', 'string', 'max:255'],
+            'option2' => ['required', 'string', 'max:255', 'different:option1'],
+            'option3' => ['required', 'string', 'max:255', 'different:option1,option2'],
+            'option4' => ['required', 'string', 'max:255', 'different:option1,option2,option3'],
+            'correctOption' => ['required', 'in:A,B,C,D'],
         ]);
         Question::create($sanitized);
         return redirect()->to('/admin/questions')->with('success','Question Added Successfully');

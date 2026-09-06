@@ -31,11 +31,11 @@ class NoticeController extends Controller
     public function insertNotice(Request $request)
     {
         $sanitized = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'nepaliTitle' => 'required',
-            'nepaliDescription' => 'required',
-            'link' => 'nullable',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'nepaliTitle' => ['required', 'string', 'max:255'],
+            'nepaliDescription' => ['required', 'string', 'max:1000'],
+            'link' => ['nullable', 'url:http,https', 'max:2048'],
         ]);
         Notice::create($sanitized);
         return redirect()->to('/admin/notices')->with('success','Notice Added Successfully');

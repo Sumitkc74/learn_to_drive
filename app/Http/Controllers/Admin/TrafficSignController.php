@@ -31,10 +31,10 @@ class TrafficSignController extends Controller
     public function insertTrafficSign(Request $request)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliSignName' => 'required',
-            'description' => 'required',
-            'image' => 'required|image',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliSignName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
         $sanitized['image'] = "demo";
 

@@ -33,12 +33,12 @@ class UserController extends Controller
     public function insertUser(Request $request)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-            'phoneNumber' => 'required|digits:10',
-            'role' => 'required',
-            'password' => 'required',
-            'profileImage' => ['nullable', 'image'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phoneNumber' => ['required', 'digits:10'],
+            'role' => ['required', 'in:User,PremiumUser,Admin'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'profileImage' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
         $sanitized['profileImage'] = 'demo';
         $sanitized['password'] = Hash::make($sanitized['password']);

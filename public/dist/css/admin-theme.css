@@ -483,6 +483,136 @@ body.ltd-body {
     color: var(--text);
 }
 
+/* ---------- Add-item forms ---------- */
+.ltd-form-shell {
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.ltd-form-card {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(16, 24, 40, 0.06);
+}
+
+.ltd-form-card__intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, var(--charcoal-deep), var(--charcoal));
+    color: #fff;
+}
+
+.ltd-form-card__intro i {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--yellow);
+    color: var(--charcoal-deep);
+}
+
+.ltd-form-card__intro h2 {
+    margin: 0 0 0.2rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.ltd-form-card__intro p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.82rem;
+}
+
+.ltd-form-card__body {
+    padding: 1.5rem;
+}
+
+.ltd-form-section + .ltd-form-section {
+    padding-top: 1.35rem;
+    margin-top: 1.35rem;
+    border-top: 1px solid var(--border);
+}
+
+.ltd-form-section__title {
+    margin: 0 0 1rem;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.ltd-field-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
+.ltd-required {
+    color: #dc3545;
+}
+
+.ltd-field-help {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+}
+
+.ltd-file-field {
+    position: relative;
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+}
+
+.ltd-image-preview {
+    display: none;
+    width: 100%;
+    max-width: 210px;
+    height: 140px;
+    margin-top: 0.8rem;
+    object-fit: contain;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+}
+
+.ltd-image-preview.has-image {
+    display: block;
+}
+
+.ltd-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+}
+
+@media (max-width: 576px) {
+    .ltd-form-card__body {
+        padding: 1.15rem;
+    }
+
+    .ltd-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        padding: 1rem 1.15rem;
+    }
+}
+
 /* ---------- Footer ---------- */
 .ltd-footer {
     padding: 1.25rem 1.75rem;

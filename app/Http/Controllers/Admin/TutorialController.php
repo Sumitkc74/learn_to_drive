@@ -31,13 +31,17 @@ class TutorialController extends Controller
     public function insertTutorial(Request $request)
     {
         $sanitized = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'videoLink' => 'required',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'videoLink' => ['required', 'url:http,https', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ]);
 
+        $image = $sanitized['image'];
+        unset($sanitized['image']);
+
         $tutorial = Tutorial::create($sanitized);
-        $tutorial->addMedia($request->image)->toMediaCollection();
+        $tutorial->addMedia($image)->toMediaCollection();
 
         return redirect()->to('/admin/tutorials')->with('success','Tutorial Added Successfully');
     }

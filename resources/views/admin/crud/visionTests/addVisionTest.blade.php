@@ -1,55 +1,14 @@
 @extends('admin.layout.master')
-
-@section('title', 'Vision Test')
-
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
+@section('title', 'Add Vision Test')
 @section('content')
-    @include('admin.layout.flash')
-    <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/insert-vision-test') }}" method="post"  enctype="multipart/form-data">
-            @csrf
-            <div class="form-group row">
-                <label for="testNumber" class="col-sm-2 col-form-label">Test number :</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('testNumber')) is-invalid @endif" name="testNumber" placeholder="Enter vision-test number">
-                    @if($errors->has('testNumber'))
-                        <p class="text-danger">{{ $errors->first('testNumber') }}</p>
-                    @endif
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <div class="col-sm-10 input-group">
-                    <label for="image" class="col-sm-2 col-form-label">Input Test Image :</label>
-                    <div class="col-sm-10">
-                        <input type="file" name="image" class="@if($errors->has('image')) is-invalid @endif">
-                        @if($errors->has('image'))
-                            <p class="text-danger">{{ $errors->first('image') }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-            </div> --}}
-            <!-- /.card-body -->
-
-            <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+<div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Learning Content</span><h1>Add Vision Test</h1></div></div>
+<div class="ltd-form-shell"><form class="ltd-form-card" action="{{ route('insertVisionTest') }}" method="POST" enctype="multipart/form-data" data-add-form>@csrf
+    <div class="ltd-form-card__intro"><i class="fas fa-eye"></i><div><h2>Create a vision test</h2><p>Use a unique test number and an image that remains clear on mobile screens.</p></div></div>
+    <div class="ltd-form-card__body">
+        <section class="ltd-form-section"><label class="ltd-field-label" for="testNumber">Test number <span class="ltd-required">*</span></label><input id="testNumber" type="number" name="testNumber" value="{{ old('testNumber') }}" min="1" step="1" class="form-control @error('testNumber') is-invalid @enderror" placeholder="1" required>@error('testNumber')<div class="invalid-feedback">{{ $message }}</div>@enderror<span class="ltd-field-help">Each vision test must have a different number.</span></section>
+        <section class="ltd-form-section"><h3 class="ltd-form-section__title">Test image</h3><div class="ltd-file-field"><input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" data-image-input="#visionImagePreview" class="form-control-file @error('image') is-invalid @enderror" required>@error('image')<div class="text-danger small mt-2">{{ $message }}</div>@enderror<span class="ltd-field-help">JPEG, PNG or WebP up to 2 MB.</span><img id="visionImagePreview" class="ltd-image-preview" alt="Selected vision test preview"></div></section>
     </div>
+    <div class="ltd-form-actions"><a href="{{ route('allVisionTest') }}" class="btn btn-outline-secondary">Cancel</a><button class="btn btn-primary" type="submit" data-submit-button><i class="fas fa-plus mr-2"></i>Add Vision Test</button></div>
+</form></div>
 @endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
-@endsection
+@section('page-script')@include('admin.crud.partials.add-form-script')@endsection

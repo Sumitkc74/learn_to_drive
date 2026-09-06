@@ -1,76 +1,39 @@
 @extends('admin.layout.master')
-
 @section('title', 'Add Question')
-
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
-    <div class="ltd-page-header">
-        <div>
-            <span class="ltd-page-header__eyebrow">Admin Panel</span>
-            <h1>Add Question</h1>
-        </div>
-    </div>
-
-    <div class="ltd-panel">
-        <form role="form" action="{{ URL::to('/admin/insert-question') }}" method="post">
-            @csrf
-            <div class="form-group">
-                <label for="question">Question</label>
-                <input type="text" class="form-control @error('question') is-invalid @enderror" name="question" placeholder="Enter the question" value="{{ old('question') }}">
-                @error('question')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 form-group">
-                    <label for="option1">Option A</label>
-                    <input type="text" class="form-control @error('option1') is-invalid @enderror" name="option1" placeholder="Enter option 1" value="{{ old('option1') }}">
-                    @error('option1')<p class="text-danger mt-1">{{ $message }}</p>@enderror
+<div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Question Bank</span><h1>Add Question</h1></div></div>
+<div class="ltd-form-shell">
+    <form class="ltd-form-card" action="{{ route('insertQuestion') }}" method="POST" data-add-form>
+        @csrf
+        <div class="ltd-form-card__intro"><i class="fas fa-question"></i><div><h2>Create a practice question</h2><p>Add one clear question, four distinct answers, and identify the correct option.</p></div></div>
+        <div class="ltd-form-card__body">
+            <section class="ltd-form-section">
+                <h3 class="ltd-form-section__title">Question</h3>
+                <label class="ltd-field-label" for="question">Question text <span class="ltd-required">*</span></label>
+                <textarea id="question" name="question" rows="3" maxlength="500" class="form-control @error('question') is-invalid @enderror" placeholder="What does this traffic sign indicate?" required>{{ old('question') }}</textarea>
+                @error('question')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </section>
+            <section class="ltd-form-section">
+                <h3 class="ltd-form-section__title">Answer options</h3>
+                <div class="row">
+                    @foreach(['option1' => 'A', 'option2' => 'B', 'option3' => 'C', 'option4' => 'D'] as $field => $letter)
+                        <div class="col-md-6 form-group">
+                            <label class="ltd-field-label" for="{{ $field }}">Option {{ $letter }} <span class="ltd-required">*</span></label>
+                            <input id="{{ $field }}" name="{{ $field }}" value="{{ old($field) }}" maxlength="255" class="form-control @error($field) is-invalid @enderror" placeholder="Enter option {{ $letter }}" required>
+                            @error($field)<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    @endforeach
                 </div>
-                <div class="col-md-6 form-group">
-                    <label for="option2">Option B</label>
-                    <input type="text" class="form-control @error('option2') is-invalid @enderror" name="option2" placeholder="Enter option 2" value="{{ old('option2') }}">
-                    @error('option2')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 form-group">
-                    <label for="option3">Option C</label>
-                    <input type="text" class="form-control @error('option3') is-invalid @enderror" name="option3" placeholder="Enter option 3" value="{{ old('option3') }}">
-                    @error('option3')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div class="col-md-6 form-group">
-                    <label for="option4">Option D</label>
-                    <input type="text" class="form-control @error('option4') is-invalid @enderror" name="option4" placeholder="Enter option 4" value="{{ old('option4') }}">
-                    @error('option4')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="correctOption">Correct Option</label>
-                <select class="form-control" name="correctOption">
-                    <option value="A">Option A</option>
-                    <option value="B">Option B</option>
-                    <option value="C">Option C</option>
-                    <option value="D">Option D</option>
+                <label class="ltd-field-label" for="correctOption">Correct answer <span class="ltd-required">*</span></label>
+                <select id="correctOption" name="correctOption" class="form-control @error('correctOption') is-invalid @enderror" required>
+                    <option value="" disabled {{ old('correctOption') ? '' : 'selected' }}>Select the correct option</option>
+                    @foreach(['A', 'B', 'C', 'D'] as $letter)<option value="{{ $letter }}" {{ old('correctOption') === $letter ? 'selected' : '' }}>Option {{ $letter }}</option>@endforeach
                 </select>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="/admin/questions" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
+                @error('correctOption')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </section>
+        </div>
+        <div class="ltd-form-actions"><a href="{{ route('allQuestion') }}" class="btn btn-outline-secondary">Cancel</a><button class="btn btn-primary" type="submit" data-submit-button><i class="fas fa-plus mr-2"></i>Add Question</button></div>
+    </form>
+</div>
 @endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
-@endsection
+@section('page-script')@include('admin.crud.partials.add-form-script')@endsection
