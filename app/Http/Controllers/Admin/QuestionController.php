@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class QuestionController extends Controller
 {
@@ -72,10 +73,16 @@ class QuestionController extends Controller
         return view('admin.crud.questions.editQuestion', compact('edit'));
     }
 
+    public function previewQuestion($id)
+    {
+        $question = Question::findOrFail($id);
+        return view('admin.crud.questions.preview', compact('question'));
+    }
+
     //update question to database
     public function updateQuestion(Request $request, $id)
     {
-        $sanitized = $request->validate($this->rules());
+        $sanitized = $request->validate($this->rules($id));
         unset($sanitized['image']);
         $question = Question::findOrFail($id);
         $question->update($sanitized);
@@ -107,10 +114,10 @@ class QuestionController extends Controller
         return redirect()->route('questionTrash')->with('success', 'Question permanently deleted.');
     }
 
-    private function rules(): array
+    private function rules(?int $ignoreId = null): array
     {
         return [
-            'question' => ['required', 'string', 'max:500'],
+            'question' => ['required', 'string', 'max:500', Rule::unique('questions', 'question')->ignore($ignoreId)],
             'option1' => ['required', 'string', 'max:255'],
             'option2' => ['required', 'string', 'max:255', 'different:option1'],
             'option3' => ['required', 'string', 'max:255', 'different:option1,option2'],

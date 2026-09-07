@@ -57,6 +57,7 @@
                         <td>{{ $row->correctOption }}</td>
                         <td><span class="badge badge-{{ $row->status === 'Published' ? 'success' : ($row->status === 'Draft' ? 'secondary' : 'dark') }}">{{ $row->status }}</span></td>
                         <td>
+                            <a href="{{ route('previewQuestion', $row->id) }}" class="btn btn-sm btn-outline-primary"><i class="nav-icon fas fa-eye"></i> Preview</a>
                             <a href="{{ URL::to('/admin/edit-question/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteQuestion', $row->id) }}" method="POST" class="d-inline">
                                 @csrf

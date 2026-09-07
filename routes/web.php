@@ -111,6 +111,7 @@ Route::get('/admin/questions-trash', [QuestionController::class, 'trashedQuestio
 Route::get('/admin/add-question', [QuestionController::class, 'addQuestion'])->name('addQuestion');
 Route::post('/admin/insert-question', [QuestionController::class, 'insertQuestion'])->name('insertQuestion');
 Route::get('/admin/edit-question/{id}', [QuestionController::class, 'editQuestion'])->name('editQuestion');
+Route::get('/admin/questions/{id}/preview', [QuestionController::class, 'previewQuestion'])->whereNumber('id')->name('previewQuestion');
 Route::post('/admin/update-question/{id}', [QuestionController::class, 'updateQuestion'])->name('updateQuestion');
 Route::delete('/admin/delete-question/{id}', [QuestionController::class, 'deleteQuestion'])->name('deleteQuestion');
 Route::get('/admin/questions-import', [QuestionImportController::class, 'create'])->name('questionImport');

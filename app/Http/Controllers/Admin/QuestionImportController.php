@@ -34,6 +34,7 @@ class QuestionImportController extends Controller
 
         $rows = [];
         $errors = [];
+        $seenQuestions = [];
         $line = 1;
         while (($values = fgetcsv($handle)) !== false) {
             $line++;
@@ -43,11 +44,17 @@ class QuestionImportController extends Controller
                 continue;
             }
             $row = array_combine(self::HEADERS, array_map('trim', $values));
+            $normalizedQuestion = mb_strtolower(preg_replace('/\s+/', ' ', $row['question']));
+            if (isset($seenQuestions[$normalizedQuestion]) || Question::withTrashed()->whereRaw('LOWER(question) = ?', [mb_strtolower($row['question'])])->exists()) {
+                $errors[] = "Row {$line}: the question already exists or is duplicated in this file.";
+                continue;
+            }
             $validator = Validator::make($row, $this->rules());
             if ($validator->fails()) {
                 $errors[] = "Row {$line}: ".$validator->errors()->first();
                 continue;
             }
+            $seenQuestions[$normalizedQuestion] = true;
             $rows[] = $this->map($validator->validated());
         }
         fclose($handle);
