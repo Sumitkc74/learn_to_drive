@@ -25,7 +25,7 @@ class UserController extends Controller
             User::query(),
             $request,
             ['name', 'email', 'phoneNumber', 'role'],
-            ['id', 'name', 'email', 'role', 'created_at'],
+            ['id', 'name', 'email', 'role', 'is_active', 'last_login_at', 'created_at'],
             [
                 'role' => ['allowed' => ['User', 'PremiumUser', 'Admin']],
                 'verification' => [
@@ -39,6 +39,10 @@ class UserController extends Controller
                             $query->whereNull('phone_verified_at');
                         }
                     },
+                ],
+                'account_status' => [
+                    'allowed' => ['active', 'suspended'],
+                    'apply' => fn ($query, $value) => $query->where('is_active', $value === 'active'),
                 ],
             ]
         );
@@ -235,5 +239,35 @@ class UserController extends Controller
 
         $user->delete();
         return redirect()->to('/admin/users')->with('success','User Deleted Successfully');
+    }
+
+    public function suspendUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if (!$user->canBeManagedBy(auth()->user())) abort(403, 'You are not allowed to suspend this account.');
+
+        $data = $request->validate(['suspension_reason' => ['nullable', 'string', 'max:500']]);
+        $user->update(['is_active' => false, 'suspended_at' => now(), 'suspension_reason' => $data['suspension_reason'] ?? null]);
+        $user->tokens()->delete();
+
+        return back()->with('success', 'Account suspended and active API sessions revoked.');
+    }
+
+    public function reactivateUser($id)
+    {
+        $user = User::findOrFail($id);
+        if (!$user->canBeManagedBy(auth()->user())) abort(403, 'You are not allowed to reactivate this account.');
+        $user->update(['is_active' => true, 'suspended_at' => null, 'suspension_reason' => null]);
+
+        return back()->with('success', 'Account reactivated successfully.');
+    }
+
+    public function revokeUserTokens($id)
+    {
+        $user = User::findOrFail($id);
+        if (!$user->canBeManagedBy(auth()->user())) abort(403, 'You are not allowed to revoke sessions for this account.');
+        $user->tokens()->delete();
+
+        return back()->with('success', 'All API sessions for this account were revoked.');
     }
 }

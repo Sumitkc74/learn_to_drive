@@ -87,6 +87,12 @@ class AuthController extends BaseController
             return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
         }
 
+        if (!$user->is_active) {
+            return response()->json(['message' => 'This account is suspended. Contact an administrator.'], 403);
+        }
+
+        $user->update(['last_login_at' => now()]);
+
         $expiresAt = Carbon::now()->addMonths(3);
         $token = $user->createToken('Personal Access Token', ['*'], $expiresAt);
         $text= $token->plainTextToken;

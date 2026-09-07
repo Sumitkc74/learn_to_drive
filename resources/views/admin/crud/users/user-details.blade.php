@@ -10,14 +10,22 @@
     <div class="row align-items-center">
         <div class="col-md-auto text-center mb-3 mb-md-0"><img src="{{ $user->avatar_url }}" alt="{{ $user->name }} profile photo" width="120" height="120" class="rounded-circle" style="object-fit:cover"></div>
         <div class="col-md">
-            <div class="d-flex align-items-center flex-wrap mb-2"><h2 class="mb-0 mr-2">{{ $user->name }}</h2><span class="badge badge-primary">{{ $user->role === 'PremiumUser' ? 'Premium User' : $user->role }}</span></div>
+            <div class="d-flex align-items-center flex-wrap mb-2"><h2 class="mb-0 mr-2">{{ $user->name }}</h2><span class="badge badge-primary mr-2">{{ $user->role === 'PremiumUser' ? 'Premium User' : $user->role }}</span><span class="badge badge-{{ $user->is_active ? 'success' : 'danger' }}">{{ $user->is_active ? 'Active' : 'Suspended' }}</span></div>
             <p class="mb-2"><i class="fas fa-envelope mr-2 text-muted"></i>{{ $user->email }} <span class="badge badge-{{ $user->hasVerifiedEmail() ? 'success' : 'warning' }}">{{ $user->hasVerifiedEmail() ? 'Verified' : 'Not verified' }}</span></p>
             <p class="mb-2"><i class="fas fa-phone mr-2 text-muted"></i>{{ $user->phoneNumber }} <span class="badge badge-{{ $user->phone_verified_at ? 'success' : 'warning' }}">{{ $user->phone_verified_at ? 'Verified' : 'Not verified' }}</span></p>
-            <p class="mb-0 text-muted">Joined {{ $user->created_at->format('M j, Y') }}</p>
+            <p class="mb-1 text-muted">Joined {{ $user->created_at->format('M j, Y') }}</p><p class="mb-0 text-muted">Last login: {{ $user->last_login_at?->format('M j, Y g:i A') ?? 'Never' }}</p>
         </div>
         <div class="col-md-auto mt-3 mt-md-0"><a href="{{ route('editUser', $user->id) }}" class="btn btn-primary"><i class="fas fa-edit mr-2"></i>Edit Account</a></div>
     </div>
 </div>
+
+@if(!$user->is_active && $user->suspension_reason)<div class="alert alert-warning"><strong>Suspension reason:</strong> {{ $user->suspension_reason }}</div>@endif
+
+<div class="ltd-panel mb-4"><h3 class="ltd-panel__title">Account Controls</h3><div class="d-flex flex-wrap align-items-end" style="gap:12px">
+    @if($user->is_active)<form action="{{ route('suspendUser', $user->id) }}" method="POST" class="d-flex flex-wrap align-items-end" style="gap:8px">@csrf @method('PATCH')<div><label for="suspension_reason" class="small text-muted">Reason (optional)</label><input id="suspension_reason" name="suspension_reason" maxlength="500" class="form-control" placeholder="Reason for suspension"></div><button class="btn btn-warning" type="submit" onclick="return confirm('Suspend this account and revoke its API sessions?')"><i class="fas fa-user-lock mr-1"></i>Suspend</button></form>
+    @else<form action="{{ route('reactivateUser', $user->id) }}" method="POST">@csrf @method('PATCH')<button class="btn btn-success" type="submit"><i class="fas fa-user-check mr-1"></i>Reactivate</button></form>@endif
+    <form action="{{ route('revokeUserTokens', $user->id) }}" method="POST">@csrf @method('DELETE')<button class="btn btn-outline-danger" type="submit" onclick="return confirm('Sign this user out of all API sessions?')"><i class="fas fa-sign-out-alt mr-1"></i>Revoke API Sessions</button></form>
+</div></div>
 
 <div class="row mb-4">
     @foreach([['Attempts', $summary['attempts'], 'clipboard-list'], ['Average score', $summary['average'].'%', 'chart-line'], ['Best score', $summary['best'].'%', 'trophy'], ['Questions answered', $summary['questions'], 'question-circle']] as [$label, $value, $icon])

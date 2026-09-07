@@ -73,6 +73,9 @@ Route::post('/admin/insert-user', [UserController::class, 'insertUser'])->name('
 Route::get('/admin/edit-user/{id}', [UserController::class, 'editUser'])->name('editUser');
 Route::post('/admin/update-user/{id}', [UserController::class, 'updateUser'])->name('updateUser');
 Route::delete('/admin/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
+Route::patch('/admin/users/{id}/suspend', [UserController::class, 'suspendUser'])->name('suspendUser');
+Route::patch('/admin/users/{id}/reactivate', [UserController::class, 'reactivateUser'])->name('reactivateUser');
+Route::delete('/admin/users/{id}/tokens', [UserController::class, 'revokeUserTokens'])->name('revokeUserTokens');
 
 Route::get('/admin/exam-papers', [ExamPaperController::class, 'allExamPaper'])->name('allExamPaper');
 Route::get('/admin/add-exam-paper', [ExamPaperController::class, 'addExamPaper'])->name('addExamPaper');

@@ -28,10 +28,11 @@
 
         @include('admin.crud.partials.table-controls', [
             'items' => $users,
-            'sortOptions' => ['created_at' => 'Date added', 'name' => 'Name', 'email' => 'Email', 'role' => 'Role', 'id' => 'ID'],
+            'sortOptions' => ['created_at' => 'Date added', 'last_login_at' => 'Last login', 'name' => 'Name', 'email' => 'Email', 'role' => 'Role', 'is_active' => 'Account status', 'id' => 'ID'],
             'filters' => [
                 'role' => ['label' => 'Roles', 'options' => ['User' => 'User', 'PremiumUser' => 'Premium User', 'Admin' => 'Admin']],
                 'verification' => ['label' => 'Verification', 'options' => ['verified' => 'Email and phone verified', 'email_unverified' => 'Email not verified', 'phone_unverified' => 'Phone not verified']],
+                'account_status' => ['label' => 'Account status', 'options' => ['active' => 'Active', 'suspended' => 'Suspended']],
             ],
         ])
 
@@ -44,6 +45,7 @@
                         <th>Email</th>
                         <th>Phone Number</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th>Profile Image</th>
                         <th>Action</th>
                     </tr>
@@ -56,6 +58,7 @@
                         <td>{{ $row->email }}</td>
                         <td>{{ $row->phoneNumber }}</td>
                         <td>{{ $row->role }}</td>
+                        <td><span class="badge badge-{{ $row->is_active ? 'success' : 'danger' }}">{{ $row->is_active ? 'Active' : 'Suspended' }}</span></td>
                         <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
                         <td>
                             @if($row->canBeManagedBy(auth()->user()))

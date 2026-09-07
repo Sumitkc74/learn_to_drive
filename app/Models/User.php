@@ -26,6 +26,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'phoneNumber',
         'role',
         'is_seed_admin',
+        'is_active',
+        'suspended_at',
+        'suspension_reason',
+        'last_login_at',
         'profileImage',
         'phone_verified_at',
     ];
@@ -52,6 +56,9 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'phone_verified_at' => 'datetime',
         'phone_verification_expires_at' => 'datetime',
         'is_seed_admin' => 'boolean',
+        'is_active' => 'boolean',
+        'suspended_at' => 'datetime',
+        'last_login_at' => 'datetime',
     ];
 
     public function getAvatarUrlAttribute(): string
