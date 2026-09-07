@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ProfileVerificationController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AppSettingController;
+use App\Http\Controllers\Admin\QuestionImportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -112,6 +113,10 @@ Route::post('/admin/insert-question', [QuestionController::class, 'insertQuestio
 Route::get('/admin/edit-question/{id}', [QuestionController::class, 'editQuestion'])->name('editQuestion');
 Route::post('/admin/update-question/{id}', [QuestionController::class, 'updateQuestion'])->name('updateQuestion');
 Route::delete('/admin/delete-question/{id}', [QuestionController::class, 'deleteQuestion'])->name('deleteQuestion');
+Route::get('/admin/questions-import', [QuestionImportController::class, 'create'])->name('questionImport');
+Route::post('/admin/questions-import', [QuestionImportController::class, 'store'])->name('questionImport.store');
+Route::get('/admin/questions-import/template', [QuestionImportController::class, 'template'])->name('questionImport.template');
+Route::get('/admin/questions-export', [QuestionImportController::class, 'export'])->name('questionExport');
 Route::patch('/admin/questions-trash/{id}/restore', [QuestionController::class, 'restoreQuestion'])->name('restoreQuestion');
 Route::delete('/admin/questions-trash/{id}', [QuestionController::class, 'forceDeleteQuestion'])->name('forceDeleteQuestion');
 
