@@ -49,7 +49,7 @@ class AdminAuditObserver
             'event' => $event,
             'subject_type' => class_basename($model),
             'subject_id' => $model->getKey(),
-            'subject_label' => $model->name ?? $model->question ?? $model->email ?? class_basename($model).' #'.$model->getKey(),
+            'subject_label' => $model->name ?? $model->question ?? $model->email ?? $model->key ?? class_basename($model).' #'.$model->getKey(),
             'old_values' => $this->safe($old),
             'new_values' => $this->safe($new),
             'ip_address' => $request?->ip(),

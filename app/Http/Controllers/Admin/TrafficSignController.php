@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrafficSign;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
@@ -38,7 +39,7 @@ class TrafficSignController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'nepaliSignName' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
-            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
         $sanitized['image'] = "demo";
 

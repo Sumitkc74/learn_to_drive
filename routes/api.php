@@ -12,6 +12,7 @@ use App\Http\Controllers\API\NoticeController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserHistoryController;
 use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\AppConfigurationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,7 @@ Route::get('/examInformation', [ExamInformationController::class, 'index']);
 Route::get('/question', [QuestionController::class, 'index']);
 Route::get('/tutorial', [TutorialController::class, 'index']);
 Route::get('/notice', [NoticeController::class, 'index']);
+Route::get('/configuration', [AppConfigurationController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn (Request $request) => $request->user());

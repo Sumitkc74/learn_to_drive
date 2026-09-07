@@ -35,6 +35,7 @@
                 <i class="fas fa-history"></i> Audit Log
             </a>
         </li>
+        <li><a href="{{ route('appSettings') }}" class="ltd-nav__item {{ Request::is('admin/settings') ? 'is-active' : '' }}"><i class="fas fa-sliders-h"></i> Application Settings</a></li>
     </ul>
 
     <div class="ltd-sidebar__footer">

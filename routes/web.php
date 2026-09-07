@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\ProfileVerificationController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -48,6 +49,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin', [DashboardController::class, 'index'])->name('adminDashboard');
 Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('auditLogs');
+Route::get('/admin/settings', [AppSettingController::class, 'index'])->name('appSettings');
+Route::patch('/admin/settings', [AppSettingController::class, 'update'])->name('appSettings.update');
 
 Route::get('/admin/profile-settings', [UserController::class, 'profileSettings'])->name('profileSettings');
 Route::patch('/admin/profile-settings/name', [UserController::class, 'updateProfileName'])->name('profile.name.update');

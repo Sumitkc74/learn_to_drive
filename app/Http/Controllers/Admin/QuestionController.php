@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
@@ -119,7 +120,7 @@ class QuestionController extends Controller
             'difficulty' => ['required', 'in:Easy,Medium,Hard'],
             'explanation' => ['nullable', 'string', 'max:2000'],
             'status' => ['required', 'in:Draft,Published,Archived'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ];
     }
 }

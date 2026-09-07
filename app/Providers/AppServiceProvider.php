@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Question;
 use App\Models\User;
+use App\Models\AppSetting;
 use App\Observers\AdminAuditObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(AdminAuditObserver::class);
         Question::observe(AdminAuditObserver::class);
+        AppSetting::observe(AdminAuditObserver::class);
     }
 }

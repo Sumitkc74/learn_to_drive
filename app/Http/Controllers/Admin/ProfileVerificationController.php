@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Models\AppSetting;
 
 class ProfileVerificationController extends Controller
 {
@@ -46,9 +47,10 @@ class ProfileVerificationController extends Controller
         }
 
         $code = (string) random_int(100000, 999999);
+        $expiryMinutes = AppSetting::read('otp_expiry_minutes');
         $user->forceFill([
             'phone_verification_code' => Hash::make($code),
-            'phone_verification_expires_at' => now()->addMinutes(10),
+            'phone_verification_expires_at' => now()->addMinutes($expiryMinutes),
         ])->save();
 
         Log::info('Local phone verification code generated.', [
@@ -58,7 +60,7 @@ class ProfileVerificationController extends Controller
         ]);
 
         return back()
-            ->with('success', 'A phone verification code was generated. It expires in 10 minutes.')
+            ->with('success', "A phone verification code was generated. It expires in {$expiryMinutes} minutes.")
             ->with('local_phone_otp', $code)
             ->with('open_phone_verification', true);
     }

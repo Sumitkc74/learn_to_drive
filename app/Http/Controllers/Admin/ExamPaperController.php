@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamPaper;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
@@ -38,8 +39,8 @@ class ExamPaperController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'nepaliName' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
-            'englishFile' => ['required', 'file', 'mimes:pdf', 'max:10240'],
-            'nepaliFile' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'englishFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
+            'nepaliFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
         ]);
         $englishFile = $sanitized['englishFile'];
         $nepaliFile = $sanitized['nepaliFile'];

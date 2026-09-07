@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tutorial;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
@@ -38,7 +39,7 @@ class TutorialController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
             'videoLink' => ['required', 'url:http,https', 'max:2048'],
-            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
 
         $image = $sanitized['image'];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\VisionTest;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
@@ -36,7 +37,7 @@ class VisionTestController extends Controller
     {
         $sanitized = $request->validate([
             'testNumber' => ['required', 'integer', 'min:1', 'unique:vision_tests,testNumber'],
-            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
         $image = $sanitized['image'];
         $sanitized['image'] = $image->getClientOriginalName();

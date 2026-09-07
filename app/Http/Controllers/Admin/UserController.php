@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\AppSetting;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -82,7 +83,7 @@ class UserController extends Controller
             'phoneNumber' => ['required', 'digits:10'],
             'role' => ['required', $allowedRoles],
             'password' => ['required', 'confirmed', Password::min(8)],
-            'profileImage' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'profileImage' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
         $sanitized['profileImage'] = 'dist/img/avatar.png';
         $sanitized['password'] = Hash::make($sanitized['password']);
@@ -168,7 +169,7 @@ class UserController extends Controller
     public function updateProfileImage(Request $request)
     {
         $data = $request->validate([
-            'profileImage' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'profileImage' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
 
         $user = auth()->user();
