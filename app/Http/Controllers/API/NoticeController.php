@@ -32,7 +32,7 @@ class NoticeController extends Controller
 
     public function index(){
         try {
-            $notices = Notice::all()->map(function($notice) {
+            $notices = Notice::visibleToLearners()->latest('publish_at')->get()->map(function($notice) {
                 return [
                     'id' => $notice->id,
                     'title' => $notice->title,
@@ -40,6 +40,8 @@ class NoticeController extends Controller
                     'nepaliTitle' => $notice->nepaliTitle,
                     'nepaliDescription' => $notice->nepaliDescription,
                     'link' => $notice->link,
+                    'publish_at' => $notice->publish_at?->toDateTimeString(),
+                    'expires_at' => $notice->expires_at?->toDateTimeString(),
                     'updated_at' => Carbon::parse(
                         $notice->updated_at
                     )->toDateTimeString()

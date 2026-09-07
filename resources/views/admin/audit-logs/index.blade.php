@@ -9,7 +9,7 @@
         'sortOptions' => ['created_at' => 'Date', 'event' => 'Action', 'subject_type' => 'Resource', 'subject_label' => 'Item', 'id' => 'ID'],
         'filters' => [
             'event' => ['label' => 'Actions', 'options' => ['created' => 'Created', 'updated' => 'Updated', 'deleted' => 'Deleted', 'restored' => 'Restored', 'permanently_deleted' => 'Permanently deleted']],
-            'subject_type' => ['label' => 'Resources', 'options' => ['User' => 'Users', 'Question' => 'Questions', 'AppSetting' => 'Settings']],
+            'subject_type' => ['label' => 'Resources', 'options' => ['User' => 'Users', 'Question' => 'Questions', 'Notice' => 'Notices', 'AppSetting' => 'Settings']],
         ],
     ])
     @if($logs->isEmpty())

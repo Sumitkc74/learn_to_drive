@@ -26,7 +26,8 @@
 
         @include('admin.crud.partials.table-controls', [
             'items' => $notices,
-            'sortOptions' => ['created_at' => 'Date added', 'title' => 'English title', 'nepaliTitle' => 'Nepali title', 'id' => 'ID'],
+            'sortOptions' => ['created_at' => 'Date added', 'title' => 'English title', 'nepaliTitle' => 'Nepali title', 'status' => 'Status', 'publish_at' => 'Publish date', 'expires_at' => 'Expiration', 'id' => 'ID'],
+            'filters' => ['status' => ['label' => 'Statuses', 'options' => ['Draft' => 'Draft', 'Published' => 'Published', 'Archived' => 'Archived']]],
         ])
 
         <div class="table-responsive">
@@ -35,10 +36,10 @@
                 <tr>
                     <th>ID</th>
                     <th>Title</th>
-                    <th>Description</th>
                     <th>Nepali Title</th>
-                    <th>Nepali Description</th>
-                    <th>Link</th>
+                    <th>Status</th>
+                    <th>Publish date</th>
+                    <th>Expires</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -47,10 +48,10 @@
                     <tr>
                         <td>{{ $row->id }}</td>
                         <td>{{ $row->title }}</td>
-                        <td>{{ $row->description }}</td>
                         <td>{{ $row->nepaliTitle }}</td>
-                        <td>{{ $row->nepaliDescription }}</td>
-                        <td>{{ $row->link }}</td>
+                        <td><span class="badge badge-{{ $row->publication_state === 'Active' ? 'success' : ($row->publication_state === 'Scheduled' ? 'info' : ($row->publication_state === 'Draft' ? 'secondary' : 'dark')) }}">{{ $row->publication_state }}</span></td>
+                        <td>{{ $row->publish_at?->format('M j, Y g:i A') ?? 'Immediately' }}</td>
+                        <td>{{ $row->expires_at?->format('M j, Y g:i A') ?? 'No expiration' }}</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteNotice', $row->id) }}" method="POST" class="d-inline">
