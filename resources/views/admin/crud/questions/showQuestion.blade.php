@@ -26,7 +26,12 @@
 
         @include('admin.crud.partials.table-controls', [
             'items' => $questions,
-            'sortOptions' => ['created_at' => 'Date added', 'question' => 'Question', 'correctOption' => 'Correct option', 'id' => 'ID'],
+            'sortOptions' => ['created_at' => 'Date added', 'question' => 'Question', 'category' => 'Category', 'difficulty' => 'Difficulty', 'status' => 'Status', 'correctOption' => 'Correct option', 'id' => 'ID'],
+            'filters' => [
+                'category' => ['label' => 'Categories', 'options' => array_combine(['General', 'Road Signs', 'Traffic Rules', 'Road Safety', 'Vehicle Knowledge'], ['General', 'Road Signs', 'Traffic Rules', 'Road Safety', 'Vehicle Knowledge'])],
+                'difficulty' => ['label' => 'Difficulties', 'options' => array_combine(['Easy', 'Medium', 'Hard'], ['Easy', 'Medium', 'Hard'])],
+                'status' => ['label' => 'Statuses', 'options' => array_combine(['Draft', 'Published', 'Archived'], ['Draft', 'Published', 'Archived'])],
+            ],
         ])
 
         <div class="table-responsive">
@@ -35,11 +40,10 @@
                     <tr>
                         <th>ID</th>
                         <th>Question</th>
-                        <th>Option A</th>
-                        <th>Option B</th>
-                        <th>Option C</th>
-                        <th>Option D</th>
+                        <th>Category</th>
+                        <th>Difficulty</th>
                         <th>Correct Option</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -47,12 +51,11 @@
                     @foreach ($questions as $row)
                     <tr>
                         <td>{{ $row->id }}</td>
-                        <td>{{ $row->question }}</td>
-                        <td>{{ $row->option1 }}</td>
-                        <td>{{ $row->option2 }}</td>
-                        <td>{{ $row->option3 }}</td>
-                        <td>{{ $row->option4 }}</td>
+                        <td><div class="d-flex align-items-center">@if($row->image_url)<img src="{{ $row->image_url }}" alt="" width="52" height="52" class="rounded mr-2" style="object-fit:cover">@endif<span>{{ $row->question }}</span></div></td>
+                        <td>{{ $row->category }}</td>
+                        <td><span class="badge badge-{{ $row->difficulty === 'Hard' ? 'danger' : ($row->difficulty === 'Easy' ? 'success' : 'warning') }}">{{ $row->difficulty }}</span></td>
                         <td>{{ $row->correctOption }}</td>
+                        <td><span class="badge badge-{{ $row->status === 'Published' ? 'success' : ($row->status === 'Draft' ? 'secondary' : 'dark') }}">{{ $row->status }}</span></td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-question/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteQuestion', $row->id) }}" method="POST" class="d-inline">

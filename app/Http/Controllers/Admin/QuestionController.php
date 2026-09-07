@@ -19,8 +19,13 @@ class QuestionController extends Controller
     public function allQuestion(Request $request)
     {
         $questions = AdminTable::paginate(Question::query(), $request,
-            ['question', 'option1', 'option2', 'option3', 'option4'],
-            ['id', 'question', 'correctOption', 'created_at']
+            ['question', 'option1', 'option2', 'option3', 'option4', 'category', 'explanation'],
+            ['id', 'question', 'category', 'difficulty', 'status', 'correctOption', 'created_at'],
+            [
+                'category' => ['allowed' => ['General', 'Road Signs', 'Traffic Rules', 'Road Safety', 'Vehicle Knowledge']],
+                'difficulty' => ['allowed' => ['Easy', 'Medium', 'Hard']],
+                'status' => ['allowed' => ['Draft', 'Published', 'Archived']],
+            ]
         );
         return view('admin.crud.questions.showQuestion', compact('questions'));
     }
@@ -34,44 +39,57 @@ class QuestionController extends Controller
     //function to add question to database
     public function insertQuestion(Request $request)
     {
-        $sanitized = $request->validate([
-            'question' => ['required', 'string', 'max:500'],
-            'option1' => ['required', 'string', 'max:255'],
-            'option2' => ['required', 'string', 'max:255', 'different:option1'],
-            'option3' => ['required', 'string', 'max:255', 'different:option1,option2'],
-            'option4' => ['required', 'string', 'max:255', 'different:option1,option2,option3'],
-            'correctOption' => ['required', 'in:A,B,C,D'],
-        ]);
-        Question::create($sanitized);
+        $sanitized = $request->validate($this->rules());
+        unset($sanitized['image']);
+        $question = Question::create($sanitized);
+        if ($request->hasFile('image')) {
+            $question->addMediaFromRequest('image')->toMediaCollection('question-images');
+        }
         return redirect()->to('/admin/questions')->with('success','Question Added Successfully');
     }
 
     //show form to edit question to database
     public function editQuestion($id)
     {
-        $edit = Question::find($id);
+        $edit = Question::findOrFail($id);
         return view('admin.crud.questions.editQuestion', compact('edit'));
     }
 
     //update question to database
     public function updateQuestion(Request $request, $id)
     {
-        $sanitized = $request->validate([
-            'question' => 'required',
-            'option1' => 'required',
-            'option2' => 'required',
-            'option3' => 'required',
-            'option4' => 'required',
-            'correctOption' => 'required',
-        ]);
-        Question::find($id)->update($sanitized);
+        $sanitized = $request->validate($this->rules());
+        unset($sanitized['image']);
+        $question = Question::findOrFail($id);
+        $question->update($sanitized);
+        if ($request->hasFile('image')) {
+            $question->clearMediaCollection('question-images');
+            $question->addMediaFromRequest('image')->toMediaCollection('question-images');
+        }
         return redirect()->to('/admin/questions')->with('success','Question Updated Successfully');
     }
 
     //delete question from database
     public function deleteQuestion($id)
     {
-        Question::find($id)->delete();
+        Question::findOrFail($id)->delete();
         return redirect()->to('/admin/questions')->with('success','Question Deleted Successfully');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'question' => ['required', 'string', 'max:500'],
+            'option1' => ['required', 'string', 'max:255'],
+            'option2' => ['required', 'string', 'max:255', 'different:option1'],
+            'option3' => ['required', 'string', 'max:255', 'different:option1,option2'],
+            'option4' => ['required', 'string', 'max:255', 'different:option1,option2,option3'],
+            'correctOption' => ['required', 'in:A,B,C,D'],
+            'category' => ['required', 'in:General,Road Signs,Traffic Rules,Road Safety,Vehicle Knowledge'],
+            'difficulty' => ['required', 'in:Easy,Medium,Hard'],
+            'explanation' => ['nullable', 'string', 'max:2000'],
+            'status' => ['required', 'in:Draft,Published,Archived'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+        ];
     }
 }
