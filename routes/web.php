@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\ProfileVerificationController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -45,7 +46,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::view('admin', 'admin.dashboard');
+    Route::get('admin', [DashboardController::class, 'index'])->name('adminDashboard');
 Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('auditLogs');
 
 Route::get('/admin/profile-settings', [UserController::class, 'profileSettings'])->name('profileSettings');

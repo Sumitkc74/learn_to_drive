@@ -18,6 +18,8 @@
 
     @include('admin.dashboard-components.quick-actions')
 
+    @include('admin.dashboard-components.learning-health')
+
     <div class="ltd-dashboard-grid">
         @include('admin.dashboard-components.signups-chart')
         @include('admin.dashboard-components.recent-activity')

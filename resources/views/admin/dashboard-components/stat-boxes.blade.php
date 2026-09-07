@@ -1,67 +1,14 @@
 <div class="ltd-stats">
-
-    <a href="/admin/users" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-user-plus"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\User::count() }}</div>
-            <div class="ltd-stat-card__label">User Registrations</div>
-        </div>
-    </a>
-
-    <a href="/admin/traffic-signs" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-map-signs"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\TrafficSign::count() }}</div>
-            <div class="ltd-stat-card__label">Traffic Signs</div>
-        </div>
-    </a>
-
-    <a href="/admin/exam-papers" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-file-alt"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\ExamPaper::count() }}</div>
-            <div class="ltd-stat-card__label">Exam Papers</div>
-        </div>
-    </a>
-
-    <a href="/admin/vision-tests" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-low-vision"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\VisionTest::count() }}</div>
-            <div class="ltd-stat-card__label">Vision Tests</div>
-        </div>
-    </a>
-
-    <a href="/admin/exam-information" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-info"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\ExamInformation::count() }}</div>
-            <div class="ltd-stat-card__label">Exam Information</div>
-        </div>
-    </a>
-
-    <a href="/admin/questions" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-question"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\Question::count() }}</div>
-            <div class="ltd-stat-card__label">Exam Questions</div>
-        </div>
-    </a>
-
-    <a href="/admin/tutorials" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-desktop"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\Tutorial::count() }}</div>
-            <div class="ltd-stat-card__label">Tutorials</div>
-        </div>
-    </a>
-
-    <a href="/admin/notices" class="ltd-stat-card">
-        <div class="ltd-stat-card__icon"><i class="fas fa-bell"></i></div>
-        <div>
-            <div class="ltd-stat-card__value">{{ \App\Models\Notice::count() }}</div>
-            <div class="ltd-stat-card__label">Notices</div>
-        </div>
-    </a>
-
+    @foreach([
+        [route('allUser'), 'fa-users', $users['total'], 'Total users'],
+        [route('allUser', ['verification' => 'verified']), 'fa-user-check', $users['verified'], 'Fully verified'],
+        [route('allUser', ['role' => 'PremiumUser']), 'fa-crown', $users['premium'], 'Premium users'],
+        [route('allUser'), 'fa-user-plus', $users['new_this_month'], 'New this month'],
+        [route('allQuestion'), 'fa-question-circle', $questions['published'], 'Published questions'],
+        [route('allQuestion', ['status' => 'Draft']), 'fa-pencil-alt', $questions['draft'], 'Question drafts'],
+        [route('allUser'), 'fa-clipboard-check', $performance['attempts'], 'Exam attempts'],
+        [route('allUser'), 'fa-chart-line', $performance['average'].'%', 'Average score'],
+    ] as [$link, $icon, $value, $label])
+    <a href="{{ $link }}" class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}"></i></div><div><div class="ltd-stat-card__value">{{ $value }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></a>
+    @endforeach
 </div>
