@@ -59,6 +59,7 @@
                         <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
                         <td>
                             @if($row->canBeManagedBy(auth()->user()))
+                                <a href="{{ route('showUser', $row->id) }}" class="btn btn-sm btn-outline-primary"><i class="nav-icon fas fa-eye"></i> View</a>
                                 <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                 <form action="{{ route('deleteUser', $row->id) }}" method="POST" class="d-inline">
                                     @csrf

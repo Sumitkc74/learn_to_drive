@@ -67,4 +67,9 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
 
         return $actor->is_seed_admin || $this->role !== 'Admin';
     }
+
+    public function histories()
+    {
+        return $this->hasMany(UserHistory::class);
+    }
 }

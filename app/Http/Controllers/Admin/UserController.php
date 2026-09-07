@@ -50,6 +50,25 @@ class UserController extends Controller
         return view('admin.crud.users.addUser');
     }
 
+    public function showUser($id)
+    {
+        $user = User::with(['histories' => fn ($query) => $query->latest()])->findOrFail($id);
+
+        if (!$user->canBeManagedBy(auth()->user())) {
+            abort(403, 'You are not allowed to view this account.');
+        }
+
+        $attempts = $user->histories;
+        $summary = [
+            'attempts' => $attempts->count(),
+            'average' => $attempts->count() ? (int) round($attempts->avg('score_percentage')) : 0,
+            'best' => $attempts->max('score_percentage') ?? 0,
+            'questions' => $attempts->sum('question_count'),
+        ];
+
+        return view('admin.crud.users.user-details', compact('user', 'attempts', 'summary'));
+    }
+
     //add user to database
     public function insertUser(Request $request)
     {

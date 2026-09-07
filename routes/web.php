@@ -61,6 +61,7 @@ Route::post('/admin/profile-settings/phone/verification-code', [ProfileVerificat
 Route::post('/admin/profile-settings/phone/verify', [ProfileVerificationController::class, 'verifyPhone'])
     ->middleware('throttle:6,1')->name('profile.phone.verification.verify');
 Route::get('/admin/users', [UserController::class, 'allUser'])->name('allUser');
+Route::get('/admin/users/{id}', [UserController::class, 'showUser'])->whereNumber('id')->name('showUser');
 Route::get('/admin/add-user', [UserController::class, 'addUser'])->name('addUser');
 Route::post('/admin/insert-user', [UserController::class, 'insertUser'])->name('insertUser');
 Route::get('/admin/edit-user/{id}', [UserController::class, 'editUser'])->name('editUser');
