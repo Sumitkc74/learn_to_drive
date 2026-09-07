@@ -1,99 +1,61 @@
 @extends('admin.layout.master')
 
-@section('title', 'Vision-Tests')
-
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
+@section('title', 'Vision Tests')
 
 @section('content')
-    <!-- Content Header (Page header) -->
-    @include('admin.layout.flash')
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Vision-Tests</h1>
-                </div><!-- /.col -->
-
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                        <li class="breadcrumb-item">Add Vision-Test</li>
-                    </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col card">
-                    <div class="card-header">
-                        <h3 class="card-title">Vision-Tests</h3>
-
-                        <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 300px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default">
-                                    <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <a href="{{ URL::to('/admin/add-vision-test/') }}" class="btn btn-sm btn-success">
-                                    <i class="nav-icon fas fa-plus"></i>
-                                    Add Test
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.card-header -->
-
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Test-Number</th>
-                                <th>Image</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($visionTests as $key=>$row)
-                                <tr>
-                                    <td>{{ $row->id }}</td>
-                                    <td>{{ $row->testNumber }}</td>
-                                    {{-- <td>{{ $row->description }}</td> --}}
-                                    <td><img src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
-                                    <td>
-                                        <a href="{{ URL::to('/admin/edit-vision-test/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                                        <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this vision test?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-            </div>
+    <div class="ltd-page-header">
+        <div>
+            <span class="ltd-page-header__eyebrow">Admin Panel</span>
+            <h1>Vision Tests</h1>
         </div>
-    </section>
-@endsection
+        <ol class="ltd-breadcrumb">
+            <li><a href="/admin">Home</a></li>
+            <li>Vision Tests</li>
+        </ol>
+    </div>
 
-@section('page-script')
-    <script type='text/javacript'>
+    <div class="ltd-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h3 class="ltd-panel__title mb-0">Vision Tests</h3>
+            <a href="{{ route('addVisionTest') }}" class="btn btn-sm btn-success">
+                <i class="nav-icon fas fa-plus"></i> Add Test
+            </a>
+        </div>
 
-    </script>
+        @include('admin.crud.partials.table-controls', [
+            'items' => $visionTests,
+            'sortOptions' => ['created_at' => 'Date added', 'testNumber' => 'Test number', 'id' => 'ID'],
+        ])
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Test Number</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($visionTests as $row)
+                        <tr>
+                            <td>{{ $row->id }}</td>
+                            <td>{{ $row->testNumber }}</td>
+                            <td><img src="{{ $row->getFirstMediaUrl() }}" alt="Vision test {{ $row->testNumber }}" width="100"></td>
+                            <td>
+                                <a href="{{ route('editVisionTest', $row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this vision test?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $visionTests])
+    </div>
 @endsection

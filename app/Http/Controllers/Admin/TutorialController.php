@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tutorial;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class TutorialController extends Controller
@@ -15,9 +16,12 @@ class TutorialController extends Controller
     }
 
     //show tutorials from database
-    public function allTutorial()
+    public function allTutorial(Request $request)
     {
-        $tutorials = Tutorial::all();
+        $tutorials = AdminTable::paginate(Tutorial::query(), $request,
+            ['title', 'description', 'videoLink'],
+            ['id', 'title', 'created_at']
+        );
         return view('admin.crud.tutorials.showTutorial', compact('tutorials'));
     }
 

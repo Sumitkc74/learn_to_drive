@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamPaper;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class ExamPaperController extends Controller
@@ -15,9 +16,12 @@ class ExamPaperController extends Controller
     }
 
     //show users from database
-    public function allExamPaper()
+    public function allExamPaper(Request $request)
     {
-        $examPapers = ExamPaper::all();
+        $examPapers = AdminTable::paginate(ExamPaper::query(), $request,
+            ['name', 'nepaliName', 'description'],
+            ['id', 'name', 'nepaliName', 'created_at']
+        );
         return view('admin.crud.examPapers.showExamPaper', compact('examPapers'));
     }
 

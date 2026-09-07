@@ -2,12 +2,6 @@
 
 @section('title', 'Questions')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -29,6 +23,11 @@
                 <i class="nav-icon fas fa-plus"></i> Add Question
             </a>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $questions,
+            'sortOptions' => ['created_at' => 'Date added', 'question' => 'Question', 'correctOption' => 'Correct option', 'id' => 'ID'],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -67,12 +66,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $questions])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-
-    </script>
 @endsection

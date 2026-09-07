@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -17,9 +18,29 @@ class UserController extends Controller
     }
 
     //show users from database
-    public function allUser()
+    public function allUser(Request $request)
     {
-        $users = User::all();
+        $users = AdminTable::paginate(
+            User::query(),
+            $request,
+            ['name', 'email', 'phoneNumber', 'role'],
+            ['id', 'name', 'email', 'role', 'created_at'],
+            [
+                'role' => ['allowed' => ['User', 'PremiumUser', 'Admin']],
+                'verification' => [
+                    'allowed' => ['verified', 'email_unverified', 'phone_unverified'],
+                    'apply' => function ($query, $value) {
+                        if ($value === 'verified') {
+                            $query->whereNotNull('email_verified_at')->whereNotNull('phone_verified_at');
+                        } elseif ($value === 'email_unverified') {
+                            $query->whereNull('email_verified_at');
+                        } else {
+                            $query->whereNull('phone_verified_at');
+                        }
+                    },
+                ],
+            ]
+        );
         return view('admin.crud.users.showUser', compact('users'));
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\VisionTest;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class VisionTestController extends Controller
@@ -15,9 +16,12 @@ class VisionTestController extends Controller
     }
 
     //show users from database
-    public function allVisionTest()
+    public function allVisionTest(Request $request)
     {
-        $visionTests = VisionTest::all();
+        $visionTests = AdminTable::paginate(VisionTest::query(), $request,
+            ['testNumber'],
+            ['id', 'testNumber', 'created_at']
+        );
         return view('admin.crud.visionTests.showVisionTest', compact('visionTests'));
     }
 

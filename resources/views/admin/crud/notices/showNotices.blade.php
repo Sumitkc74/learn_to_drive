@@ -2,12 +2,6 @@
 
 @section('title', 'Notices')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -29,6 +23,11 @@
                 <i class="nav-icon fas fa-plus"></i> Add Notice
             </a>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $notices,
+            'sortOptions' => ['created_at' => 'Date added', 'title' => 'English title', 'nepaliTitle' => 'Nepali title', 'id' => 'ID'],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -65,11 +64,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $notices])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
 @endsection

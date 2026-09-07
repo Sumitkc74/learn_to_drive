@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notice;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class NoticeController extends Controller
@@ -15,9 +16,12 @@ class NoticeController extends Controller
     }
 
     //show notices from database
-    public function allNotice()
+    public function allNotice(Request $request)
     {
-        $notices = Notice::all();
+        $notices = AdminTable::paginate(Notice::query(), $request,
+            ['title', 'description', 'nepaliTitle', 'nepaliDescription'],
+            ['id', 'title', 'nepaliTitle', 'created_at']
+        );
         return view('admin.crud.notices.showNotices', compact('notices'));
     }
 

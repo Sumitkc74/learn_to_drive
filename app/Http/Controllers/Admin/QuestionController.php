@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -15,9 +16,12 @@ class QuestionController extends Controller
     }
 
     //show questions from database
-    public function allQuestion()
+    public function allQuestion(Request $request)
     {
-        $questions = Question::all();
+        $questions = AdminTable::paginate(Question::query(), $request,
+            ['question', 'option1', 'option2', 'option3', 'option4'],
+            ['id', 'question', 'correctOption', 'created_at']
+        );
         return view('admin.crud.questions.showQuestion', compact('questions'));
     }
 

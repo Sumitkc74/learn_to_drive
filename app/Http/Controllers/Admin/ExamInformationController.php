@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamInformation;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class ExamInformationController extends Controller
@@ -14,9 +15,12 @@ class ExamInformationController extends Controller
     }
 
     //show users from database
-    public function allExamInformation()
+    public function allExamInformation(Request $request)
     {
-        $examInformation = ExamInformation::all();
+        $examInformation = AdminTable::paginate(ExamInformation::query(), $request,
+            ['name', 'nepaliName', 'description'],
+            ['id', 'name', 'nepaliName', 'created_at']
+        );
         return view('admin.crud.examInformation.showExamInformation', compact('examInformation'));
     }
 

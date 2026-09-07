@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrafficSign;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class TrafficSignController extends Controller
@@ -15,9 +16,12 @@ class TrafficSignController extends Controller
     }
 
     //show traffic signs from database
-    public function allTrafficSign()
+    public function allTrafficSign(Request $request)
     {
-        $trafficSigns = TrafficSign::all();
+        $trafficSigns = AdminTable::paginate(TrafficSign::query(), $request,
+            ['name', 'nepaliSignName', 'description'],
+            ['id', 'name', 'nepaliSignName', 'created_at']
+        );
         return view('admin.crud.trafficSigns.showTrafficSign', compact('trafficSigns'));
     }
 

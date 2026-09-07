@@ -20,17 +20,20 @@
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h3 class="ltd-panel__title mb-0">App Users</h3>
             <div class="d-flex align-items-center gap-2">
-                <div class="input-group input-group-sm" style="width: 260px;">
-                    <input type="text" id="search" class="form-control" placeholder="Search">
-                    <div class="input-group-append">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    </div>
-                </div>
                 <a href="{{ URL::to('/admin/add-user/') }}" class="btn btn-sm btn-success">
                     <i class="nav-icon fas fa-plus"></i> Add User
                 </a>
             </div>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $users,
+            'sortOptions' => ['created_at' => 'Date added', 'name' => 'Name', 'email' => 'Email', 'role' => 'Role', 'id' => 'ID'],
+            'filters' => [
+                'role' => ['label' => 'Roles', 'options' => ['User' => 'User', 'PremiumUser' => 'Premium User', 'Admin' => 'Admin']],
+                'verification' => ['label' => 'Verification', 'options' => ['verified' => 'Email and phone verified', 'email_unverified' => 'Email not verified', 'phone_unverified' => 'Phone not verified']],
+            ],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -75,33 +78,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $users])
     </div>
-@endsection
-
-@section('page-script')
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('#search').keyup(function(){
-                searchTable($(this).val());
-            });
-        });
-
-        function searchTable(inputVal){
-            var table = $('.table');
-            table.find('tr').each(function(index, row){
-                var allCells = $(row).find('td');
-                if(allCells.length > 0){
-                    var found = false;
-                    allCells.each(function(index, td){
-                        var regExp = new RegExp(inputVal, 'i');
-                        if(regExp.test($(td).text())){
-                            found = true;
-                            return false;
-                        }
-                    });
-                    if(found == true)$(row).show();else $(row).hide();
-                }
-            });
-        }
-    </script>
 @endsection

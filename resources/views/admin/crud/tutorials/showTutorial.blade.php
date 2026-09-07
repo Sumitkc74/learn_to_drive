@@ -2,12 +2,6 @@
 
 @section('title', 'Tutorials')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -29,6 +23,11 @@
                 <i class="nav-icon fas fa-plus"></i> Add Tutorial
             </a>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $tutorials,
+            'sortOptions' => ['created_at' => 'Date added', 'title' => 'Title', 'id' => 'ID'],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -63,11 +62,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $tutorials])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
 @endsection

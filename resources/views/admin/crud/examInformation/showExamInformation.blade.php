@@ -2,12 +2,6 @@
 
 @section('title', 'Exam-Papers')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -29,6 +23,11 @@
                 <i class="nav-icon fas fa-plus"></i> Add Exam Information
             </a>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $examInformation,
+            'sortOptions' => ['created_at' => 'Date added', 'name' => 'English name', 'nepaliName' => 'Nepali name', 'id' => 'ID'],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -65,11 +64,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $examInformation])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
 @endsection
