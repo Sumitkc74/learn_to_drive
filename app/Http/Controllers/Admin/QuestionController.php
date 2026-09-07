@@ -36,6 +36,22 @@ class QuestionController extends Controller
         return view('admin.crud.questions.addQuestion');
     }
 
+    public function trashedQuestions(Request $request)
+    {
+        if (!$request->query->has('sort')) {
+            $request->query->set('sort', 'deleted_at');
+        }
+
+        $questions = AdminTable::paginate(
+            Question::onlyTrashed(),
+            $request,
+            ['question', 'category', 'explanation'],
+            ['id', 'question', 'category', 'difficulty', 'status', 'deleted_at']
+        );
+
+        return view('admin.crud.questions.trash', compact('questions'));
+    }
+
     //function to add question to database
     public function insertQuestion(Request $request)
     {
@@ -74,6 +90,20 @@ class QuestionController extends Controller
     {
         Question::findOrFail($id)->delete();
         return redirect()->to('/admin/questions')->with('success','Question Deleted Successfully');
+    }
+
+    public function restoreQuestion($id)
+    {
+        Question::onlyTrashed()->findOrFail($id)->restore();
+
+        return redirect()->route('questionTrash')->with('success', 'Question restored successfully.');
+    }
+
+    public function forceDeleteQuestion($id)
+    {
+        Question::onlyTrashed()->findOrFail($id)->forceDelete();
+
+        return redirect()->route('questionTrash')->with('success', 'Question permanently deleted.');
     }
 
     private function rules(): array

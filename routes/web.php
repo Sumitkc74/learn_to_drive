@@ -97,11 +97,14 @@ Route::post('/admin/update-exam-information/{id}', [ExamInformationController::c
 Route::delete('/admin/delete-exam-information/{id}', [ExamInformationController::class, 'deleteExamInformation'])->name('deleteExamInformation');
 
 Route::get('/admin/questions', [QuestionController::class, 'allQuestion'])->name('allQuestion');
+Route::get('/admin/questions-trash', [QuestionController::class, 'trashedQuestions'])->name('questionTrash');
 Route::get('/admin/add-question', [QuestionController::class, 'addQuestion'])->name('addQuestion');
 Route::post('/admin/insert-question', [QuestionController::class, 'insertQuestion'])->name('insertQuestion');
 Route::get('/admin/edit-question/{id}', [QuestionController::class, 'editQuestion'])->name('editQuestion');
 Route::post('/admin/update-question/{id}', [QuestionController::class, 'updateQuestion'])->name('updateQuestion');
 Route::delete('/admin/delete-question/{id}', [QuestionController::class, 'deleteQuestion'])->name('deleteQuestion');
+Route::patch('/admin/questions-trash/{id}/restore', [QuestionController::class, 'restoreQuestion'])->name('restoreQuestion');
+Route::delete('/admin/questions-trash/{id}', [QuestionController::class, 'forceDeleteQuestion'])->name('forceDeleteQuestion');
 
 Route::get('/admin/tutorials', [TutorialController::class, 'allTutorial'])->name('allTutorial');
 Route::get('/admin/add-tutorial', [TutorialController::class, 'addTutorial'])->name('addTutorial');
