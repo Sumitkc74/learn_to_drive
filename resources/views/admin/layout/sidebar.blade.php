@@ -30,6 +30,11 @@
                 <i class="fas fa-user-cog"></i> Profile Settings
             </a>
         </li>
+        <li>
+            <a href="{{ route('auditLogs') }}" class="ltd-nav__item {{ Request::is('admin/audit-logs') ? 'is-active' : '' }}">
+                <i class="fas fa-history"></i> Audit Log
+            </a>
+        </li>
     </ul>
 
     <div class="ltd-sidebar__footer">
