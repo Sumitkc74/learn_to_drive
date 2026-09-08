@@ -33,6 +33,7 @@
                 'role' => ['label' => 'Roles', 'options' => ['User' => 'User', 'PremiumUser' => 'Premium User', 'Admin' => 'Admin']],
                 'verification' => ['label' => 'Verification', 'options' => ['verified' => 'Email and phone verified', 'email_unverified' => 'Email not verified', 'phone_unverified' => 'Phone not verified']],
                 'account_status' => ['label' => 'Account status', 'options' => ['active' => 'Active', 'suspended' => 'Suspended']],
+                'joined' => ['label' => 'Joined', 'options' => ['this_month' => 'This month']],
             ],
         ])
 

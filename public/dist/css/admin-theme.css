@@ -202,6 +202,19 @@ body.ltd-body {
     transition: background 0.15s ease, color 0.15s ease;
 }
 
+.ltd-nav__section {
+    margin: 1.1rem 0.9rem 0.4rem;
+    color: var(--sidebar-footer);
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.ltd-nav__section:first-child {
+    margin-top: 0.25rem;
+}
+
 .ltd-nav__item i {
     width: 18px;
     text-align: center;
@@ -820,18 +833,6 @@ body.ltd-body {
     border-color: var(--yellow);
     color: var(--charcoal-deep);
     transform: translateY(-2px);
-}
-
-.ltd-quick-action__count {
-    min-width: 1.45rem;
-    margin-left: auto;
-    padding: 0.12rem 0.4rem;
-    border-radius: 999px;
-    background: var(--yellow);
-    color: var(--charcoal-deep);
-    font-size: 0.72rem;
-    line-height: 1.2;
-    text-align: center;
 }
 
 /* ---------- Dashboard grid (chart + activity) ---------- */

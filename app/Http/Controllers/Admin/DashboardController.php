@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
-use App\Models\GovernmentNoticeImport;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\UserHistory;
@@ -14,6 +13,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        return view('admin.dashboard', $this->dashboardData());
+    }
+
+    public function analytics()
+    {
+        return view('admin.analytics', $this->dashboardData());
+    }
+
+    private function dashboardData(): array
+    {
         $users = ['total' => User::count(), 'premium' => User::where('role', 'PremiumUser')->count(), 'verified' => User::whereNotNull('email_verified_at')->whereNotNull('phone_verified_at')->count(), 'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count()];
         $questions = ['total' => Question::count(), 'published' => Question::where('status', 'Published')->count(), 'draft' => Question::where('status', 'Draft')->count(), 'archived' => Question::where('status', 'Archived')->count()];
         $attempts = UserHistory::latest()->get();
@@ -22,10 +31,9 @@ class DashboardController extends Controller
         $signupLabels = $months->map(fn ($month) => $month->format('M Y'));
         $signupCounts = $months->map(fn ($month) => User::whereYear('created_at', $month->year)->whereMonth('created_at', $month->month)->count());
         $recentActivity = AuditLog::with('actor')->latest()->take(8)->get();
-        $pendingGovernmentNotices = GovernmentNoticeImport::where('status', 'Pending')->count();
         $mostMissed = $this->mostMissedQuestions($attempts);
 
-        return view('admin.dashboard', compact('users', 'questions', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'pendingGovernmentNotices', 'mostMissed'));
+        return compact('users', 'questions', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'mostMissed');
     }
 
     private function mostMissedQuestions($attempts)

@@ -3,11 +3,11 @@
         [route('allUser'), 'fa-users', $users['total'], 'Total users'],
         [route('allUser', ['verification' => 'verified']), 'fa-user-check', $users['verified'], 'Fully verified'],
         [route('allUser', ['role' => 'PremiumUser']), 'fa-crown', $users['premium'], 'Premium users'],
-        [route('allUser'), 'fa-user-plus', $users['new_this_month'], 'New this month'],
-        [route('allQuestion'), 'fa-question-circle', $questions['published'], 'Published questions'],
+        [route('allUser', ['joined' => 'this_month']), 'fa-user-plus', $users['new_this_month'], 'New this month'],
+        [route('allQuestion', ['status' => 'Published']), 'fa-question-circle', $questions['published'], 'Published questions'],
         [route('allQuestion', ['status' => 'Draft']), 'fa-pencil-alt', $questions['draft'], 'Question drafts'],
-        [route('allUser'), 'fa-clipboard-check', $performance['attempts'], 'Exam attempts'],
-        [route('allUser'), 'fa-chart-line', $performance['average'].'%', 'Average score'],
+        [route('adminAnalytics').'#learning-performance', 'fa-clipboard-check', $performance['attempts'], 'Exam attempts'],
+        [route('adminAnalytics').'#learning-performance', 'fa-chart-line', $performance['average'].'%', 'Average score'],
     ] as [$link, $icon, $value, $label])
     <a href="{{ $link }}" class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}"></i></div><div><div class="ltd-stat-card__value">{{ $value }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></a>
     @endforeach

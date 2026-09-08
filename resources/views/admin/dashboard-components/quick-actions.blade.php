@@ -7,12 +7,6 @@
         <a href="{{ route('addNotice') }}" class="ltd-quick-action">
             <i class="fas fa-bell"></i> Add Notice
         </a>
-        <a href="{{ route('governmentNotices', ['status' => 'Pending']) }}" class="ltd-quick-action">
-            <i class="fas fa-landmark"></i> Government Notices
-            @if($pendingGovernmentNotices > 0)
-                <span class="ltd-quick-action__count" aria-label="{{ $pendingGovernmentNotices }} pending">{{ $pendingGovernmentNotices }}</span>
-            @endif
-        </a>
         <a href="{{ route('addExamPaper') }}" class="ltd-quick-action">
             <i class="fas fa-file-alt"></i> Add Exam Paper
         </a>

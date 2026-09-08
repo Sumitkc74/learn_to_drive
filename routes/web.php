@@ -50,6 +50,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin', [DashboardController::class, 'index'])->name('adminDashboard');
+Route::get('/admin/analytics', [DashboardController::class, 'analytics'])->name('adminAnalytics');
 Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('auditLogs');
 Route::get('/admin/settings', [AppSettingController::class, 'index'])->name('appSettings');
 Route::patch('/admin/settings', [AppSettingController::class, 'update'])->name('appSettings.update');

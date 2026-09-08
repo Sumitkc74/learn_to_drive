@@ -44,6 +44,10 @@ class UserController extends Controller
                     'allowed' => ['active', 'suspended'],
                     'apply' => fn ($query, $value) => $query->where('is_active', $value === 'active'),
                 ],
+                'joined' => [
+                    'allowed' => ['this_month'],
+                    'apply' => fn ($query, $value) => $query->where('created_at', '>=', now()->startOfMonth()),
+                ],
             ]
         );
         return view('admin.crud.users.showUser', compact('users'));
