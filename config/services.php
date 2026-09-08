@@ -2,6 +2,10 @@
 
 return [
 
+    'dotm' => [
+        'notices_url' => env('DOTM_NOTICES_URL', 'https://dotm.gov.np/'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

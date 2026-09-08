@@ -18,7 +18,7 @@ class AuditLogController extends Controller
             ['id', 'event', 'subject_type', 'subject_label', 'created_at'],
             [
                 'event' => ['allowed' => ['created', 'updated', 'deleted', 'restored', 'permanently_deleted']],
-                'subject_type' => ['allowed' => ['User', 'Question', 'Notice', 'AppSetting']],
+                'subject_type' => ['allowed' => ['User', 'Question', 'Notice', 'GovernmentNoticeImport', 'AppSetting']],
             ]
         );
 

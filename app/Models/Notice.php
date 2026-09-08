@@ -23,6 +23,9 @@ class Notice extends Model
         'status',
         'publish_at',
         'expires_at',
+        'source_name',
+        'source_url',
+        'government_notice_import_id',
     ];
 
     protected $casts = [

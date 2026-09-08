@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\QuestionImportController;
+use App\Http\Controllers\Admin\GovernmentNoticeImportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -130,6 +131,10 @@ Route::delete('/admin/delete-tutorial/{id}', [TutorialController::class, 'delete
 
 Route::get('/admin/notices', [NoticeController::class, 'allNotice'])->name('allNotice');
 Route::get('/admin/notices-trash', [NoticeController::class, 'trashedNotices'])->name('noticeTrash');
+Route::get('/admin/government-notices', [GovernmentNoticeImportController::class, 'index'])->name('governmentNotices');
+Route::post('/admin/government-notices/fetch', [GovernmentNoticeImportController::class, 'fetch'])->middleware('throttle:2,10')->name('governmentNotices.fetch');
+Route::post('/admin/government-notices/{id}/approve', [GovernmentNoticeImportController::class, 'approve'])->name('governmentNotices.approve');
+Route::post('/admin/government-notices/{id}/reject', [GovernmentNoticeImportController::class, 'reject'])->name('governmentNotices.reject');
 Route::get('/admin/add-notice', [NoticeController::class, 'addNotice'])->name('addNotice');
 Route::post('/admin/insert-notice', [NoticeController::class, 'insertNotice'])->name('insertNotice');
 Route::get('/admin/edit-notice/{id}', [NoticeController::class, 'editNotice'])->name('editNotice');

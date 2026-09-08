@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Models\User;
 use App\Models\AppSetting;
 use App\Models\Notice;
+use App\Models\GovernmentNoticeImport;
 use App\Observers\AdminAuditObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,5 +29,6 @@ class AppServiceProvider extends ServiceProvider
         Question::observe(AdminAuditObserver::class);
         AppSetting::observe(AdminAuditObserver::class);
         Notice::observe(AdminAuditObserver::class);
+        GovernmentNoticeImport::observe(AdminAuditObserver::class);
     }
 }

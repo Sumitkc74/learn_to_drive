@@ -42,6 +42,8 @@ class NoticeController extends Controller
                     'link' => $notice->link,
                     'publish_at' => $notice->publish_at?->toDateTimeString(),
                     'expires_at' => $notice->expires_at?->toDateTimeString(),
+                    'source_name' => $notice->source_name,
+                    'source_url' => $notice->source_url,
                     'updated_at' => Carbon::parse(
                         $notice->updated_at
                     )->toDateTimeString()
