@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
-use App\Support\QuestionSpreadsheetReader;
+use App\Support\SpreadsheetReader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -24,7 +24,7 @@ class QuestionImportController extends Controller
         $request->validate(['question_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:2048']]);
         $file = $request->file('question_file');
         try {
-            $spreadsheetRows = QuestionSpreadsheetReader::read($file->getRealPath(), strtolower($file->getClientOriginalExtension()));
+            $spreadsheetRows = SpreadsheetReader::read($file->getRealPath(), strtolower($file->getClientOriginalExtension()));
         } catch (\RuntimeException $exception) {
             throw ValidationException::withMessages(['question_file' => $exception->getMessage()]);
         }

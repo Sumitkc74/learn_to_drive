@@ -6,7 +6,7 @@ use RuntimeException;
 use SimpleXMLElement;
 use ZipArchive;
 
-class QuestionSpreadsheetReader
+class SpreadsheetReader
 {
     public static function read(string $path, string $extension): array
     {

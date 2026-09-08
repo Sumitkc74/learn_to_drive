@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\NoticeController;
+use App\Http\Controllers\Admin\NoticeImportController;
 use App\Http\Controllers\Admin\ProfileVerificationController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -131,6 +132,9 @@ Route::post('/admin/update-tutorial/{id}', [TutorialController::class, 'updateTu
 Route::delete('/admin/delete-tutorial/{id}', [TutorialController::class, 'deleteTutorial'])->name('deleteTutorial');
 
 Route::get('/admin/notices', [NoticeController::class, 'allNotice'])->name('allNotice');
+Route::get('/admin/notices-import', [NoticeImportController::class, 'create'])->name('noticeImport');
+Route::post('/admin/notices-import', [NoticeImportController::class, 'store'])->name('noticeImport.store');
+Route::get('/admin/notices-import/template', [NoticeImportController::class, 'template'])->name('noticeImport.template');
 Route::get('/admin/notices-trash', [NoticeController::class, 'trashedNotices'])->name('noticeTrash');
 Route::get('/admin/government-notices', [GovernmentNoticeImportController::class, 'index'])->name('governmentNotices');
 Route::post('/admin/government-notices/fetch', [GovernmentNoticeImportController::class, 'fetch'])->middleware('throttle:2,10')->name('governmentNotices.fetch');

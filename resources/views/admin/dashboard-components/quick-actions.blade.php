@@ -10,6 +10,9 @@
         <a href="{{ route('addNotice') }}" class="ltd-quick-action">
             <i class="fas fa-bell"></i> Add Notice
         </a>
+        <a href="{{ route('noticeImport') }}" class="ltd-quick-action">
+            <i class="fas fa-file-excel"></i> Import Notices
+        </a>
         <a href="{{ route('addExamPaper') }}" class="ltd-quick-action">
             <i class="fas fa-file-alt"></i> Add Exam Paper
         </a>
