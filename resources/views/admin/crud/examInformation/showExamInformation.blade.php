@@ -39,6 +39,7 @@
                     <th>Description</th>
                     <th>English File</th>
                     <th>Nepali File</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -51,6 +52,7 @@
                         <td>{{ $row->description }}</td>
                         <td><embed src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                         <td><embed src="{{ $row->getMedia()[1]->getUrl() }}" width="100px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-exam-information/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteExamInformation', $row->id) }}" method="POST" class="d-inline">

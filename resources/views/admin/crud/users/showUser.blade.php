@@ -48,6 +48,7 @@
                         <th>Role</th>
                         <th>Status</th>
                         <th>Profile Image</th>
+                        <th>Added by</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -61,6 +62,7 @@
                         <td>{{ $row->role }}</td>
                         <td><span class="badge badge-{{ $row->is_active ? 'success' : 'danger' }}">{{ $row->is_active ? 'Active' : 'Suspended' }}</span></td>
                         <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             @if($row->canBeManagedBy(auth()->user()))
                                 <a href="{{ route('showUser', $row->id) }}" class="btn btn-sm btn-outline-primary"><i class="nav-icon fas fa-eye"></i> View</a>

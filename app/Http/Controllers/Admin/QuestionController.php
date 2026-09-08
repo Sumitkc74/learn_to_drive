@@ -20,7 +20,7 @@ class QuestionController extends Controller
     //show questions from database
     public function allQuestion(Request $request)
     {
-        $questions = AdminTable::paginate(Question::query(), $request,
+        $questions = AdminTable::paginate(Question::with('creator'), $request,
             ['question', 'option1', 'option2', 'option3', 'option4', 'category', 'explanation'],
             ['id', 'question', 'category', 'difficulty', 'status', 'correctOption', 'created_at'],
             [

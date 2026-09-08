@@ -692,6 +692,46 @@ body.ltd-body {
     color: var(--text-muted) !important;
 }
 
+.ltd-creator {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 145px;
+}
+
+.ltd-creator__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--charcoal-deep);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.ltd-creator > span:last-child {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.ltd-creator strong {
+    color: var(--text);
+    font-size: 0.78rem;
+    line-height: 1.2;
+}
+
+.ltd-creator small {
+    margin-top: 0.15rem;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
 .ltd-body .table-responsive::-webkit-scrollbar {
     height: 8px;
 }

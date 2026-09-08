@@ -19,7 +19,7 @@ class ExamPaperController extends Controller
     //show users from database
     public function allExamPaper(Request $request)
     {
-        $examPapers = AdminTable::paginate(ExamPaper::query(), $request,
+        $examPapers = AdminTable::paginate(ExamPaper::with('creator'), $request,
             ['name', 'nepaliName', 'description'],
             ['id', 'name', 'nepaliName', 'created_at']
         );

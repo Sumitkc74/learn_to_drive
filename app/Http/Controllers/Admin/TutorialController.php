@@ -19,7 +19,7 @@ class TutorialController extends Controller
     //show tutorials from database
     public function allTutorial(Request $request)
     {
-        $tutorials = AdminTable::paginate(Tutorial::query(), $request,
+        $tutorials = AdminTable::paginate(Tutorial::with('creator'), $request,
             ['title', 'description', 'videoLink'],
             ['id', 'title', 'created_at']
         );

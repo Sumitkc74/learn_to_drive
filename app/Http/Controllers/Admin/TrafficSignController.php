@@ -19,7 +19,7 @@ class TrafficSignController extends Controller
     //show traffic signs from database
     public function allTrafficSign(Request $request)
     {
-        $trafficSigns = AdminTable::paginate(TrafficSign::query(), $request,
+        $trafficSigns = AdminTable::paginate(TrafficSign::with('creator'), $request,
             ['name', 'nepaliSignName', 'description'],
             ['id', 'name', 'nepaliSignName', 'created_at']
         );

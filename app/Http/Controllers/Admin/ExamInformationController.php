@@ -18,7 +18,7 @@ class ExamInformationController extends Controller
     //show users from database
     public function allExamInformation(Request $request)
     {
-        $examInformation = AdminTable::paginate(ExamInformation::query(), $request,
+        $examInformation = AdminTable::paginate(ExamInformation::with('creator'), $request,
             ['name', 'nepaliName', 'description'],
             ['id', 'name', 'nepaliName', 'created_at']
         );

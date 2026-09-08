@@ -44,6 +44,7 @@
                         <th>Difficulty</th>
                         <th>Correct Option</th>
                         <th>Status</th>
+                        <th>Added by</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -56,6 +57,7 @@
                         <td><span class="badge badge-{{ $row->difficulty === 'Hard' ? 'danger' : ($row->difficulty === 'Easy' ? 'success' : 'warning') }}">{{ $row->difficulty }}</span></td>
                         <td>{{ $row->correctOption }}</td>
                         <td><span class="badge badge-{{ $row->status === 'Published' ? 'success' : ($row->status === 'Draft' ? 'secondary' : 'dark') }}">{{ $row->status }}</span></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ route('previewQuestion', $row->id) }}" class="btn btn-sm btn-outline-primary"><i class="nav-icon fas fa-eye"></i> Preview</a>
                             <a href="{{ URL::to('/admin/edit-question/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>

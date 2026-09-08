@@ -40,6 +40,7 @@
                     <th>Status</th>
                     <th>Publish date</th>
                     <th>Expires</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -52,6 +53,7 @@
                         <td><span class="badge badge-{{ $row->publication_state === 'Active' ? 'success' : ($row->publication_state === 'Scheduled' ? 'info' : ($row->publication_state === 'Draft' ? 'secondary' : 'dark')) }}">{{ $row->publication_state }}</span></td>
                         <td>{{ $row->publish_at?->format('M j, Y g:i A') ?? 'Immediately' }}</td>
                         <td>{{ $row->expires_at?->format('M j, Y g:i A') ?? 'No expiration' }}</td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteNotice', $row->id) }}" method="POST" class="d-inline">

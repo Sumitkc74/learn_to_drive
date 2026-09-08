@@ -22,7 +22,7 @@ class UserController extends Controller
     public function allUser(Request $request)
     {
         $users = AdminTable::paginate(
-            User::query(),
+            User::with('creator'),
             $request,
             ['name', 'email', 'phoneNumber', 'role'],
             ['id', 'name', 'email', 'role', 'is_active', 'last_login_at', 'created_at'],

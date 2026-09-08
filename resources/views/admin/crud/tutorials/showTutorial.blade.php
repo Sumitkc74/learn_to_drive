@@ -38,6 +38,7 @@
                     <th>Description</th>
                     <th>Video Link</th>
                     <th>Image</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -49,6 +50,7 @@
                         <td>{{ $row->description }}</td>
                         <td>{{ $row->videoLink }}</td>
                         <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                             <form action="{{ route('deleteTutorial', $row->id) }}" method="POST" class="d-inline">

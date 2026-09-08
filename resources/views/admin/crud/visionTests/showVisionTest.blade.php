@@ -34,6 +34,7 @@
                         <th>ID</th>
                         <th>Test Number</th>
                         <th>Image</th>
+                        <th>Added by</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -43,6 +44,7 @@
                             <td>{{ $row->id }}</td>
                             <td>{{ $row->testNumber }}</td>
                             <td><img src="{{ $row->getFirstMediaUrl() }}" alt="Vision test {{ $row->testNumber }}" width="100"></td>
+                            <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                             <td>
                                 <a href="{{ route('editVisionTest', $row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
                                 <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">

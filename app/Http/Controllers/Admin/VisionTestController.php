@@ -19,7 +19,7 @@ class VisionTestController extends Controller
     //show users from database
     public function allVisionTest(Request $request)
     {
-        $visionTests = AdminTable::paginate(VisionTest::query(), $request,
+        $visionTests = AdminTable::paginate(VisionTest::with('creator'), $request,
             ['testNumber'],
             ['id', 'testNumber', 'created_at']
         );

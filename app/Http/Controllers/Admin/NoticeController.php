@@ -18,7 +18,7 @@ class NoticeController extends Controller
     //show notices from database
     public function allNotice(Request $request)
     {
-        $notices = AdminTable::paginate(Notice::query(), $request,
+        $notices = AdminTable::paginate(Notice::with('creator'), $request,
             ['title', 'description', 'nepaliTitle', 'nepaliDescription'],
             ['id', 'title', 'nepaliTitle', 'status', 'publish_at', 'expires_at', 'created_at'],
             ['status' => ['allowed' => ['Draft', 'Published', 'Archived']]]
