@@ -28,6 +28,8 @@ class AdminTableFeaturesTest extends TestCase
         $this->actingAs($admin)
             ->get(route('allUser', ['search' => 'Searchable', 'role' => 'User']))
             ->assertOk()
+            ->assertSee('Filters &amp; sorting', false)
+            ->assertSee('1 active')
             ->assertSee('Searchable Learner')
             ->assertDontSee('Different Premium Account');
     }

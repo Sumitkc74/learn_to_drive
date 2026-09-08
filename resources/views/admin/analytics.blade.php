@@ -10,8 +10,8 @@
 
     @include('admin.dashboard-components.stat-boxes')
     <div id="learning-performance">@include('admin.dashboard-components.learning-health')</div>
-    <div class="ltd-dashboard-grid">
+    <div class="ltd-analytics-chart">
         @include('admin.dashboard-components.signups-chart')
-        @include('admin.dashboard-components.recent-activity')
     </div>
+    <div class="ltd-analytics-activity">@include('admin.dashboard-components.recent-activity')</div>
 @endsection

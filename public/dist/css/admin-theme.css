@@ -231,6 +231,44 @@ body.ltd-body {
     color: var(--sidebar-accent-text);
 }
 
+.ltd-nav__toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.ltd-nav__toggle span {
+    flex: 1;
+}
+
+.ltd-nav__toggle-icon {
+    margin-left: auto;
+    font-size: 0.72rem !important;
+    transition: transform 0.2s ease;
+}
+
+.ltd-nav__toggle.is-open .ltd-nav__toggle-icon {
+    transform: rotate(180deg);
+}
+
+.ltd-nav__submenu {
+    display: none;
+    list-style: none;
+    margin: 0.25rem 0 0.4rem;
+    padding: 0 0 0 0.65rem;
+}
+
+.ltd-nav__submenu.is-open {
+    display: block;
+}
+
+.ltd-nav__submenu .ltd-nav__item {
+    padding-left: 1rem;
+    font-size: 0.84rem;
+}
+
 .ltd-sidebar__footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--sidebar-border);
@@ -443,15 +481,8 @@ body.ltd-body {
     display: flex;
     align-items: center;
     gap: 1rem;
-    text-decoration: none;
     color: inherit;
     border: 1px solid var(--border);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.ltd-stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
 }
 
 .ltd-stat-card__icon {
@@ -498,18 +529,33 @@ body.ltd-body {
 
 /* ---------- Data tables ---------- */
 .ltd-table-controls {
-    display: grid;
-    grid-template-columns: minmax(210px, 1fr) repeat(4, minmax(120px, auto));
-    gap: 0.65rem;
-    align-items: center;
     margin-bottom: 1rem;
 }
 
+.ltd-table-controls__primary {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.65rem;
+}
+
 .ltd-table-controls__search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.ltd-table-controls label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text);
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.ltd-search-input {
     position: relative;
 }
 
-.ltd-table-controls__search i {
+.ltd-search-input i {
     position: absolute;
     top: 50%;
     left: 0.8rem;
@@ -518,8 +564,69 @@ body.ltd-body {
     transform: translateY(-50%);
 }
 
-.ltd-table-controls__search .form-control {
+.ltd-search-input .form-control {
     padding-left: 2.35rem;
+}
+
+.ltd-filter-panel {
+    margin-top: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-secondary);
+}
+
+.ltd-filter-panel summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    list-style: none;
+}
+
+.ltd-filter-panel summary::-webkit-details-marker { display: none; }
+.ltd-filter-panel summary > span:first-child i { margin-right: 0.5rem; color: var(--yellow-dark); }
+
+.ltd-filter-panel__summary-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.ltd-filter-panel__summary-meta strong {
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--charcoal-deep);
+}
+
+.ltd-filter-panel[open] .ltd-filter-panel__summary-meta .fa-chevron-down { transform: rotate(180deg); }
+.ltd-filter-panel__summary-meta .fa-chevron-down { transition: transform 0.2s ease; }
+
+.ltd-filter-panel__body {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.ltd-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.85rem;
+}
+
+.ltd-filter-panel__actions {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 1rem;
 }
 
 .ltd-table-pagination {
@@ -632,24 +739,11 @@ body.ltd-body {
     border-bottom-color: var(--border);
 }
 
-@media (max-width: 992px) {
-    .ltd-table-controls {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .ltd-table-controls__search {
-        grid-column: 1 / -1;
-    }
-}
-
 @media (max-width: 576px) {
-    .ltd-table-controls {
-        grid-template-columns: 1fr;
-    }
-
-    .ltd-table-controls__search {
-        grid-column: auto;
-    }
+    .ltd-table-controls__primary { align-items: stretch; flex-direction: column; }
+    .ltd-table-controls__search { min-width: 0; width: 100%; }
+    .ltd-table-controls__primary .btn { width: 100%; }
+    .ltd-filter-panel__actions { flex-direction: column; }
 
     .ltd-table-pagination {
         align-items: flex-start;
@@ -797,6 +891,66 @@ body.ltd-body {
 }
 
 /* ---------- Quick Actions ---------- */
+.ltd-management {
+    margin-bottom: 1.25rem;
+}
+
+.ltd-section-heading p {
+    margin: -0.55rem 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.ltd-management__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+    gap: 0.75rem;
+}
+
+.ltd-management-card {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-secondary);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ltd-management-card:hover {
+    border-color: var(--yellow-dark);
+    color: var(--text);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.ltd-management-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: var(--yellow);
+    color: var(--charcoal-deep);
+}
+
+.ltd-management-card__body {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.ltd-management-card__body strong { font-size: 0.88rem; }
+.ltd-management-card__body small { color: var(--text-muted); overflow-wrap: anywhere; }
+.ltd-management-card__arrow { color: var(--text-muted); font-size: 0.72rem; }
+
 .ltd-quick-actions {
     margin-bottom: 1.75rem;
 }
@@ -855,6 +1009,11 @@ body.ltd-body {
 
 .ltd-chart-panel canvas {
     max-height: 260px;
+}
+
+.ltd-analytics-chart,
+.ltd-analytics-activity {
+    margin-bottom: 1.25rem;
 }
 
 /* ---------- Recent activity ---------- */
