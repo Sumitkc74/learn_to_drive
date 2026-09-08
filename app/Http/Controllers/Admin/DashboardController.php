@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\GovernmentNoticeImport;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\UserHistory;
@@ -21,9 +22,10 @@ class DashboardController extends Controller
         $signupLabels = $months->map(fn ($month) => $month->format('M Y'));
         $signupCounts = $months->map(fn ($month) => User::whereYear('created_at', $month->year)->whereMonth('created_at', $month->month)->count());
         $recentActivity = AuditLog::with('actor')->latest()->take(8)->get();
+        $pendingGovernmentNotices = GovernmentNoticeImport::where('status', 'Pending')->count();
         $mostMissed = $this->mostMissedQuestions($attempts);
 
-        return view('admin.dashboard', compact('users', 'questions', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'mostMissed'));
+        return view('admin.dashboard', compact('users', 'questions', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'pendingGovernmentNotices', 'mostMissed'));
     }
 
     private function mostMissedQuestions($attempts)

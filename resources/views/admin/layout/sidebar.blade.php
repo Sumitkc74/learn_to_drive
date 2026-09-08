@@ -35,6 +35,11 @@
                 <i class="fas fa-history"></i> Audit Log
             </a>
         </li>
+        <li>
+            <a href="{{ route('governmentNotices') }}" class="ltd-nav__item {{ Request::is('admin/government-notices*') ? 'is-active' : '' }}">
+                <i class="fas fa-landmark"></i> Government Notices
+            </a>
+        </li>
         <li><a href="{{ route('appSettings') }}" class="ltd-nav__item {{ Request::is('admin/settings') ? 'is-active' : '' }}"><i class="fas fa-sliders-h"></i> Application Settings</a></li>
     </ul>
 
