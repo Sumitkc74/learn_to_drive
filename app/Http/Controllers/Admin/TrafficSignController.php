@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrafficSign;
+use App\Models\AppSetting;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class TrafficSignController extends Controller
@@ -15,9 +17,12 @@ class TrafficSignController extends Controller
     }
 
     //show traffic signs from database
-    public function allTrafficSign()
+    public function allTrafficSign(Request $request)
     {
-        $trafficSigns = TrafficSign::all();
+        $trafficSigns = AdminTable::paginate(TrafficSign::with('creator'), $request,
+            ['name', 'nepaliSignName', 'description'],
+            ['id', 'name', 'nepaliSignName', 'created_at']
+        );
         return view('admin.crud.trafficSigns.showTrafficSign', compact('trafficSigns'));
     }
 
@@ -31,10 +36,10 @@ class TrafficSignController extends Controller
     public function insertTrafficSign(Request $request)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliSignName' => 'required',
-            'description' => 'required',
-            'image' => 'required|image',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliSignName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
         $sanitized['image'] = "demo";
 

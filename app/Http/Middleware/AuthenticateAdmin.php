@@ -15,9 +15,14 @@ class AuthenticateAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user || $request->user()->role != 'admin') {
+        if (!$request->user()) {
             return redirect()->route('login');
         }
+
+        if ($request->user()->role !== 'Admin') {
+            abort(403, 'Administrator access is required.');
+        }
+
         return $next($request);
     }
 }

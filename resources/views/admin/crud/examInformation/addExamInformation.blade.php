@@ -1,64 +1,14 @@
 @extends('admin.layout.master')
-
-@section('title', 'Edit Exam Information')
-
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
+@section('title', 'Add Exam Information')
 @section('content')
-    @include('admin.layout.flash')
-    <div class="ltd-page-header">
-        <div>
-            <span class="ltd-page-header__eyebrow">Admin Panel</span>
-            <h1>Add Exam Information</h1>
-        </div>
+<div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Study Materials</span><h1>Add Exam Information</h1></div></div>
+<div class="ltd-form-shell"><form class="ltd-form-card" action="{{ route('insertExamInformation') }}" method="POST" enctype="multipart/form-data" data-add-form>@csrf
+    <div class="ltd-form-card__intro"><i class="fas fa-info-circle"></i><div><h2>Upload bilingual exam guidance</h2><p>Add a clear title, summary, and matching PDF documents for both languages.</p></div></div>
+    <div class="ltd-form-card__body">
+        <section class="ltd-form-section"><h3 class="ltd-form-section__title">Document details</h3><div class="row"><div class="col-md-6 form-group"><label class="ltd-field-label" for="name">English name <span class="ltd-required">*</span></label><input id="name" name="name" value="{{ old('name') }}" maxlength="255" class="form-control @error('name') is-invalid @enderror" required>@error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror</div><div class="col-md-6 form-group"><label class="ltd-field-label" for="nepaliName">Nepali name <span class="ltd-required">*</span></label><input id="nepaliName" name="nepaliName" value="{{ old('nepaliName') }}" maxlength="255" lang="ne" class="form-control @error('nepaliName') is-invalid @enderror" required>@error('nepaliName')<div class="invalid-feedback">{{ $message }}</div>@enderror</div></div><label class="ltd-field-label" for="description">Summary <span class="ltd-required">*</span></label><textarea id="description" name="description" rows="4" maxlength="1000" class="form-control @error('description') is-invalid @enderror" placeholder="Explain what learners will find in these documents." required>{{ old('description') }}</textarea>@error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror></section>
+        <section class="ltd-form-section"><h3 class="ltd-form-section__title">PDF files</h3><div class="row"><div class="col-md-6 form-group"><div class="ltd-file-field"><label class="ltd-field-label" for="englishFile">English PDF <span class="ltd-required">*</span></label><input id="englishFile" type="file" name="englishFile" accept=".pdf,application/pdf" class="form-control-file @error('englishFile') is-invalid @enderror" required>@error('englishFile')<div class="text-danger small mt-2">{{ $message }}</div>@enderror<span class="ltd-field-help">PDF, maximum 10 MB.</span></div></div><div class="col-md-6 form-group"><div class="ltd-file-field"><label class="ltd-field-label" for="nepaliFile">Nepali PDF <span class="ltd-required">*</span></label><input id="nepaliFile" type="file" name="nepaliFile" accept=".pdf,application/pdf" class="form-control-file @error('nepaliFile') is-invalid @enderror" required>@error('nepaliFile')<div class="text-danger small mt-2">{{ $message }}</div>@enderror<span class="ltd-field-help">PDF, maximum 10 MB.</span></div></div></div></section>
     </div>
-
-    <div class="ltd-panel">
-        <form role="form" action="{{ URL::to('/admin/insert-exam-information') }}" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="form-group">
-                <label for="name">Exam Information Name</label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter exam-information name" value="{{ old('name') }}">
-                @error('name')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div class="form-group">
-                <label for="nepaliName">Nepali Name</label>
-                <input type="text" class="form-control @error('nepaliName') is-invalid @enderror" name="nepaliName" placeholder="Enter nepali-name" value="{{ old('nepaliName') }}">
-                @error('nepaliName')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control @error('description') is-invalid @enderror" rows="4" name="description" placeholder="Enter exam-information description">{{ old('description') }}</textarea>
-                @error('description')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 form-group">
-                    <label for="englishFile">English File</label>
-                    <input type="file" name="englishFile" class="form-control-file @error('englishFile') is-invalid @enderror">
-                    @error('englishFile')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div class="col-md-6 form-group">
-                    <label for="nepaliFile">Nepali File</label>
-                    <input type="file" name="nepaliFile" class="form-control-file @error('nepaliFile') is-invalid @enderror">
-                    @error('nepaliFile')<p class="text-danger mt-1">{{ $message }}</p>@enderror
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="/admin" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
+    <div class="ltd-form-actions"><a href="{{ route('allExamInformation') }}" class="btn btn-outline-secondary">Cancel</a><button class="btn btn-primary" type="submit" data-submit-button><i class="fas fa-plus mr-2"></i>Add Exam Information</button></div>
+</form></div>
 @endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
-@endsection
+@section('page-script')@include('admin.crud.partials.add-form-script')@endsection

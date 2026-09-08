@@ -2,12 +2,6 @@
 
 @section('title', 'Tutorials')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -30,6 +24,11 @@
             </a>
         </div>
 
+        @include('admin.crud.partials.table-controls', [
+            'items' => $tutorials,
+            'sortOptions' => ['created_at' => 'Date added', 'title' => 'Title', 'id' => 'ID'],
+        ])
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
@@ -39,6 +38,7 @@
                     <th>Description</th>
                     <th>Video Link</th>
                     <th>Image</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -50,20 +50,20 @@
                         <td>{{ $row->description }}</td>
                         <td>{{ $row->videoLink }}</td>
                         <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <a href="{{ URL::to('/admin/delete-tutorial/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                            <form action="{{ route('deleteTutorial', $row->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this tutorial?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $tutorials])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
 @endsection

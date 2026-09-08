@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tutorial;
+use App\Models\AppSetting;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class TutorialController extends Controller
@@ -15,9 +17,12 @@ class TutorialController extends Controller
     }
 
     //show tutorials from database
-    public function allTutorial()
+    public function allTutorial(Request $request)
     {
-        $tutorials = Tutorial::all();
+        $tutorials = AdminTable::paginate(Tutorial::with('creator'), $request,
+            ['title', 'description', 'videoLink'],
+            ['id', 'title', 'created_at']
+        );
         return view('admin.crud.tutorials.showTutorial', compact('tutorials'));
     }
 
@@ -31,13 +36,17 @@ class TutorialController extends Controller
     public function insertTutorial(Request $request)
     {
         $sanitized = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'videoLink' => 'required',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'videoLink' => ['required', 'url:http,https', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
 
+        $image = $sanitized['image'];
+        unset($sanitized['image']);
+
         $tutorial = Tutorial::create($sanitized);
-        $tutorial->addMedia($request->image)->toMediaCollection();
+        $tutorial->addMedia($image)->toMediaCollection();
 
         return redirect()->to('/admin/tutorials')->with('success','Tutorial Added Successfully');
     }

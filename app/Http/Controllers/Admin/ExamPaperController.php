@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamPaper;
+use App\Models\AppSetting;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class ExamPaperController extends Controller
@@ -15,9 +17,12 @@ class ExamPaperController extends Controller
     }
 
     //show users from database
-    public function allExamPaper()
+    public function allExamPaper(Request $request)
     {
-        $examPapers = ExamPaper::all();
+        $examPapers = AdminTable::paginate(ExamPaper::with('creator'), $request,
+            ['name', 'nepaliName', 'description'],
+            ['id', 'name', 'nepaliName', 'created_at']
+        );
         return view('admin.crud.examPapers.showExamPaper', compact('examPapers'));
     }
 
@@ -31,17 +36,20 @@ class ExamPaperController extends Controller
     public function insertExamPaper(Request $request)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliName' => 'required',
-            'description' => 'required',
-            'englishFile' => 'required|mimes:pdf|max:10000',
-            'nepaliFile' => 'required|mimes:pdf|max:10000',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'englishFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
+            'nepaliFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
         ]);
-        // $sanitized['file'] = "demo";
+        $englishFile = $sanitized['englishFile'];
+        $nepaliFile = $sanitized['nepaliFile'];
+        $sanitized['englishFile'] = $englishFile->getClientOriginalName();
+        $sanitized['nepaliFile'] = $nepaliFile->getClientOriginalName();
 
         $examPaper = ExamPaper::create($sanitized);
-        $examPaper->addMedia($request->englishFile)->toMediaCollection();
-        $examPaper->addMedia($request->nepaliFile)->toMediaCollection();
+        $examPaper->addMedia($englishFile)->toMediaCollection();
+        $examPaper->addMedia($nepaliFile)->toMediaCollection();
 
         return redirect()->to('/admin/exam-papers')->with('success','Exam Paper Added Successfully');
     }

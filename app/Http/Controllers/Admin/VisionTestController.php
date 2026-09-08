@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\VisionTest;
+use App\Models\AppSetting;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class VisionTestController extends Controller
@@ -15,9 +17,12 @@ class VisionTestController extends Controller
     }
 
     //show users from database
-    public function allVisionTest()
+    public function allVisionTest(Request $request)
     {
-        $visionTests = VisionTest::all();
+        $visionTests = AdminTable::paginate(VisionTest::with('creator'), $request,
+            ['testNumber'],
+            ['id', 'testNumber', 'created_at']
+        );
         return view('admin.crud.visionTests.showVisionTest', compact('visionTests'));
     }
 
@@ -31,13 +36,14 @@ class VisionTestController extends Controller
     public function insertVisionTest(Request $request)
     {
         $sanitized = $request->validate([
-            'testNumber' => 'required',
-            'image' => 'required|image',
+            'testNumber' => ['required', 'integer', 'min:1', 'unique:vision_tests,testNumber'],
+            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
-        // $sanitized['image'] = "demo";
+        $image = $sanitized['image'];
+        $sanitized['image'] = $image->getClientOriginalName();
 
         $visionTest = VisionTest::create($sanitized);
-        $visionTest->addMedia($request->image)->toMediaCollection();
+        $visionTest->addMedia($image)->toMediaCollection();
 
         return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test added successfully');
     }

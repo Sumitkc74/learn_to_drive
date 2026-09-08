@@ -31,7 +31,7 @@ Learn to Drive is a web application that helps users prepare for their driving t
 
 ### Prerequisites
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js & npm
 - MySQL
@@ -83,6 +83,10 @@ The app should now be running at `http://localhost:8000`.
 - [ ] Practice test / quiz mode
 - [ ] User progress tracking
 - [ ] Mobile-friendly UI
+
+> Payment upgrades are temporarily disabled until server-side payment-provider
+> verification is implemented. Never grant premium access from a client-provided
+> transaction token or amount.
 
 ## License
 

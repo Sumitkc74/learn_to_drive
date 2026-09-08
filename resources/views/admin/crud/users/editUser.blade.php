@@ -63,7 +63,9 @@
                     <select class="form-control" id="exampleFormControlSelect1" name="role" required>
                         <option value="User" {{ 'User' == $edit->role ? 'selected' : '' }}>User</option>
                         <option value="PremiumUser" {{ 'PremiumUser' == $edit->role ? 'selected' : '' }}>Premium User</option>
-                        <option value="Admin" {{ 'Admin' == $edit->role ? 'selected' : '' }}>Admin</option>
+                        @if(auth()->user()->is_seed_admin)
+                            <option value="Admin" {{ 'Admin' == $edit->role ? 'selected' : '' }}>Admin</option>
+                        @endif
                     </select>
                 </div>
             </div>
@@ -71,7 +73,7 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="profileImage" class="col-sm-2 col-form-label">Input Profile Image :</label>
-                    <img src="{{ $edit->getFirstMediaUrl() }}" height="200" width="200">
+                    <img src="{{ $edit->avatar_url }}" alt="{{ $edit->name }} profile photo" height="200" width="200">
                     <div class="col-sm-10">
                         <input type="file" name="profileImage">
                     </div>

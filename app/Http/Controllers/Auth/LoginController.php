@@ -36,13 +36,15 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            if ($user->role !== 'Admin') {
+            if ($user->role !== 'Admin' || !$user->is_active) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return redirect()->back()->with('error', 'Invalid credentials');
             }
+
+            $user->update(['last_login_at' => now()]);
 
             $request->session()->regenerate();
 

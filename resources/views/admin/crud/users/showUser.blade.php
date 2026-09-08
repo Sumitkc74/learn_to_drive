@@ -2,12 +2,6 @@
 
 @section('title', 'Users')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -26,17 +20,22 @@
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h3 class="ltd-panel__title mb-0">App Users</h3>
             <div class="d-flex align-items-center gap-2">
-                <div class="input-group input-group-sm" style="width: 260px;">
-                    <input type="text" id="search" class="form-control" placeholder="Search">
-                    <div class="input-group-append">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    </div>
-                </div>
                 <a href="{{ URL::to('/admin/add-user/') }}" class="btn btn-sm btn-success">
                     <i class="nav-icon fas fa-plus"></i> Add User
                 </a>
             </div>
         </div>
+
+        @include('admin.crud.partials.table-controls', [
+            'items' => $users,
+            'sortOptions' => ['created_at' => 'Date added', 'last_login_at' => 'Last login', 'name' => 'Name', 'email' => 'Email', 'role' => 'Role', 'is_active' => 'Account status', 'id' => 'ID'],
+            'filters' => [
+                'role' => ['label' => 'Roles', 'options' => ['User' => 'User', 'PremiumUser' => 'Premium User', 'Admin' => 'Admin']],
+                'verification' => ['label' => 'Verification', 'options' => ['verified' => 'Email and phone verified', 'email_unverified' => 'Email not verified', 'phone_unverified' => 'Phone not verified']],
+                'account_status' => ['label' => 'Account status', 'options' => ['active' => 'Active', 'suspended' => 'Suspended']],
+                'joined' => ['label' => 'Joined', 'options' => ['this_month' => 'This month']],
+            ],
+        ])
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -47,7 +46,9 @@
                         <th>Email</th>
                         <th>Phone Number</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th>Profile Image</th>
+                        <th>Added by</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -59,13 +60,24 @@
                         <td>{{ $row->email }}</td>
                         <td>{{ $row->phoneNumber }}</td>
                         <td>{{ $row->role }}</td>
-                        <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td><span class="badge badge-{{ $row->is_active ? 'success' : 'danger' }}">{{ $row->is_active ? 'Active' : 'Suspended' }}</span></td>
+                        <td><img src="{{ $row->avatar_url }}" alt="{{ $row->name }} profile photo" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
-                            @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
+                            @if($row->canBeManagedBy(auth()->user()))
+                                <a href="{{ route('showUser', $row->id) }}" class="btn btn-sm btn-outline-primary"><i class="nav-icon fas fa-eye"></i> View</a>
                                 <a href="{{ URL::to('/admin/edit-user/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            @endif
-                            @if(auth()->user()->email === 'admin@admin.com' || $row->role !== 'Admin')
-                                <a href="{{ URL::to('/admin/delete-user/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                                <form action="{{ route('deleteUser', $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
+                            @else
+                                @if($row->is_seed_admin)
+                                    <span class="text-muted small">Managed through Profile Settings</span>
+                                @else
+                                    <span class="text-muted" aria-label="No actions available">&mdash;</span>
+                                @endif
                             @endif
                         </td>
                     </tr>
@@ -73,33 +85,6 @@
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $users])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-        $(document).ready(function(){
-            $('#search').keyup(function(){
-                searchTable($(this).val());
-            });
-        });
-
-        function searchTable(inputVal){
-            var table = $('.table');
-            table.find('tr').each(function(index, row){
-                var allCells = $(row).find('td');
-                if(allCells.length > 0){
-                    var found = false;
-                    allCells.each(function(index, td){
-                        var regExp = new RegExp(inputVal, 'i');
-                        if(regExp.test($(td).text())){
-                            found = true;
-                            return false;
-                        }
-                    });
-                    if(found == true)$(row).show();else $(row).hide();
-                }
-            });
-        }
-    </script>
 @endsection

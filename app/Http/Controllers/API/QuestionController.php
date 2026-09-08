@@ -11,11 +11,11 @@ class QuestionController extends Controller
     //
     public function index(){
         try {
-            $questions = Question::all();
+            $questions = Question::where('status', 'Published')->get();
             return response()->json([
                 'status' => true,
                 'data' => ['questions' => $questions]
-                ], 201);
+                ], 200);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

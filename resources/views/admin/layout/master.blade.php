@@ -37,12 +37,31 @@
                 const sidebar = document.getElementById('ltdSidebar');
                 const toggleButton = document.getElementById('ltdSidebarToggle');
                 const themeButton = document.getElementById('ltdThemeToggle');
+                const managementToggle = document.getElementById('managementNavToggle');
+                const managementItems = document.getElementById('managementNavItems');
                 const storageKey = 'ltd-theme';
 
                 // Custom sidebar toggle (mobile) — independent of AdminLTE's pushmenu widget
                 toggleButton?.addEventListener('click', function () {
                     sidebar?.classList.toggle('is-open');
                 });
+
+                if (managementToggle && managementItems) {
+                    const savedManagementState = localStorage.getItem('ltd-management-open');
+                    const containsActivePage = managementItems.querySelector('.is-active') !== null;
+                    const shouldOpen = containsActivePage || savedManagementState === 'true';
+                    managementToggle.classList.toggle('is-open', shouldOpen);
+                    managementItems.classList.toggle('is-open', shouldOpen);
+                    managementToggle.setAttribute('aria-expanded', String(shouldOpen));
+
+                    managementToggle.addEventListener('click', function () {
+                        const isOpen = !managementItems.classList.contains('is-open');
+                        managementItems.classList.toggle('is-open', isOpen);
+                        managementToggle.classList.toggle('is-open', isOpen);
+                        managementToggle.setAttribute('aria-expanded', String(isOpen));
+                        localStorage.setItem('ltd-management-open', String(isOpen));
+                    });
+                }
 
                 const applyTheme = (theme) => {
                     const isDark = theme === 'dark';

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExamInformation;
+use App\Models\AppSetting;
+use App\Support\AdminTable;
 use Illuminate\Http\Request;
 
 class ExamInformationController extends Controller
@@ -14,9 +16,12 @@ class ExamInformationController extends Controller
     }
 
     //show users from database
-    public function allExamInformation()
+    public function allExamInformation(Request $request)
     {
-        $examInformation = ExamInformation::all();
+        $examInformation = AdminTable::paginate(ExamInformation::with('creator'), $request,
+            ['name', 'nepaliName', 'description'],
+            ['id', 'name', 'nepaliName', 'created_at']
+        );
         return view('admin.crud.examInformation.showExamInformation', compact('examInformation'));
     }
 
@@ -30,17 +35,20 @@ class ExamInformationController extends Controller
     public function insertExamInformation(Request $request)
     {
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliName' => 'required',
-            'description' => 'required',
-            'englishFile' => 'required|mimes:pdf|max:10000',
-            'nepaliFile' => 'required|mimes:pdf|max:10000',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'englishFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
+            'nepaliFile' => ['required', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
         ]);
-        $sanitized['file'] = "demo";
+        $englishFile = $sanitized['englishFile'];
+        $nepaliFile = $sanitized['nepaliFile'];
+        $sanitized['englishFile'] = $englishFile->getClientOriginalName();
+        $sanitized['nepaliFile'] = $nepaliFile->getClientOriginalName();
 
         $examInformation = ExamInformation::create($sanitized);
-        $examInformation->addMedia($request->englishFile)->toMediaCollection();
-        $examInformation->addMedia($request->nepaliFile)->toMediaCollection();
+        $examInformation->addMedia($englishFile)->toMediaCollection();
+        $examInformation->addMedia($nepaliFile)->toMediaCollection();
 
         return redirect()->to('/admin/exam-information')->with('success','Exam Information Added Successfully');
     }
@@ -86,4 +94,3 @@ class ExamInformationController extends Controller
         return redirect()->back()->with('success','Exam Information Deleted Successfully');
     }
 }
-

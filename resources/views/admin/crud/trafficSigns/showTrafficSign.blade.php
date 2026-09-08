@@ -2,12 +2,6 @@
 
 @section('title', 'Traffic Signs')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 
 @section('content_header')
 
@@ -35,6 +29,11 @@
             </a>
         </div>
 
+        @include('admin.crud.partials.table-controls', [
+            'items' => $trafficSigns,
+            'sortOptions' => ['created_at' => 'Date added', 'name' => 'English name', 'nepaliSignName' => 'Nepali name', 'id' => 'ID'],
+        ])
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
@@ -44,6 +43,7 @@
                     <th>Nepali Sign Name</th>
                     <th>Description</th>
                     <th>Image</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -55,42 +55,20 @@
                         <td>{{ $row->nepaliSignName }}</td>
                         <td>{{ $row->description }}</td>
                         <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <a href="{{ URL::to('/admin/delete-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                            <form action="{{ route('deleteTrafficSign', $row->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this traffic sign?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $trafficSigns])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-        $(document).ready(function(){
-            $('#search').keyup(function(){
-                searchTable($(this).val());
-            });
-        });
-
-        function searchTable(inputVal){
-            var table = $('.table');
-            table.find('tr').each(function(index, row){
-                var allCells = $(row).find('td');
-                if(allCells.length > 0){
-                    var found = false;
-                    allCells.each(function(index, td){
-                        var regExp = new RegExp(inputVal, 'i');
-                        if(regExp.test($(td).text())){
-                            found = true;
-                            return false;
-                        }
-                    });
-                    if(found == true)$(row).show();else $(row).hide();
-                }
-            });
-        }
-    </script>
 @endsection

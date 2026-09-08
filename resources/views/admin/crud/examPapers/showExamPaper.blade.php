@@ -2,12 +2,6 @@
 
 @section('title', 'Exam-Papers')
 
-@section('page-script')
-    <style type='text/css'>
-
-    </style>
-@endsection
-
 @section('content')
     @include('admin.layout.flash')
 
@@ -30,6 +24,11 @@
             </a>
         </div>
 
+        @include('admin.crud.partials.table-controls', [
+            'items' => $examPapers,
+            'sortOptions' => ['created_at' => 'Date added', 'name' => 'English name', 'nepaliName' => 'Nepali name', 'id' => 'ID'],
+        ])
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
@@ -40,6 +39,7 @@
                     <th>Description</th>
                     <th>English File</th>
                     <th>Nepali File</th>
+                    <th>Added by</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -52,20 +52,20 @@
                         <td>{{ $row->description }}</td>
                         <td><embed src="{{ $row->getFirstMediaUrl() }}" width="100px"></td>
                         <td><embed src="{{ $row->getMedia()[1]->getUrl() }}" width="100px"></td>
+                        <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
                             <a href="{{ URL::to('/admin/edit-exam-paper/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <a href="{{ URL::to('/admin/delete-exam-paper/'.$row->id) }}" class="btn btn-sm btn-danger"><i class="nav-icon fas fa-trash"></i> Delete</a>
+                            <form action="{{ route('deleteExamPaper', $row->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this exam paper?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        @include('admin.crud.partials.table-pagination', ['items' => $examPapers])
     </div>
-@endsection
-
-@section('page-script')
-    <script type='text/javacript'>
-
-    </script>
 @endsection

@@ -22,6 +22,7 @@ class UserTableSeeder extends Seeder
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
                 'role' => 'Admin',
+                'is_seed_admin' => true,
                 'phoneNumber' => '9800000000',
                 'profileImage' => 'dist/img/avatar-160x160.png',
             ]
