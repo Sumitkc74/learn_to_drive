@@ -129,9 +129,12 @@ Route::post('/admin/update-tutorial/{id}', [TutorialController::class, 'updateTu
 Route::delete('/admin/delete-tutorial/{id}', [TutorialController::class, 'deleteTutorial'])->name('deleteTutorial');
 
 Route::get('/admin/notices', [NoticeController::class, 'allNotice'])->name('allNotice');
+Route::get('/admin/notices-trash', [NoticeController::class, 'trashedNotices'])->name('noticeTrash');
 Route::get('/admin/add-notice', [NoticeController::class, 'addNotice'])->name('addNotice');
 Route::post('/admin/insert-notice', [NoticeController::class, 'insertNotice'])->name('insertNotice');
 Route::get('/admin/edit-notice/{id}', [NoticeController::class, 'editNotice'])->name('editNotice');
 Route::post('/admin/update-notice/{id}', [NoticeController::class, 'updateNotice'])->name('updateNotice');
 Route::delete('/admin/delete-notice/{id}', [NoticeController::class, 'deleteNotice'])->name('deleteNotice');
+Route::patch('/admin/notices-trash/{id}/restore', [NoticeController::class, 'restoreNotice'])->name('restoreNotice');
+Route::delete('/admin/notices-trash/{id}', [NoticeController::class, 'forceDeleteNotice'])->name('forceDeleteNotice');
 });

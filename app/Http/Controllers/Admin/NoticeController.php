@@ -32,6 +32,22 @@ class NoticeController extends Controller
         return view('admin.crud.notices.addNotice');
     }
 
+    public function trashedNotices(Request $request)
+    {
+        if (!$request->query->has('sort')) {
+            $request->query->set('sort', 'deleted_at');
+        }
+
+        $notices = AdminTable::paginate(
+            Notice::onlyTrashed(),
+            $request,
+            ['title', 'description', 'nepaliTitle', 'nepaliDescription'],
+            ['id', 'title', 'nepaliTitle', 'status', 'deleted_at']
+        );
+
+        return view('admin.crud.notices.trash', compact('notices'));
+    }
+
     //add notice to database
     public function insertNotice(Request $request)
     {
@@ -60,6 +76,18 @@ class NoticeController extends Controller
     {
         Notice::findOrFail($id)->delete();
         return redirect()->back()->with('success','Notice Deleted Successfully');
+    }
+
+    public function restoreNotice($id)
+    {
+        Notice::onlyTrashed()->findOrFail($id)->restore();
+        return redirect()->route('noticeTrash')->with('success', 'Notice restored successfully.');
+    }
+
+    public function forceDeleteNotice($id)
+    {
+        Notice::onlyTrashed()->findOrFail($id)->forceDelete();
+        return redirect()->route('noticeTrash')->with('success', 'Notice permanently deleted.');
     }
 
     private function rules(): array

@@ -19,9 +19,9 @@
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h3 class="ltd-panel__title mb-0">Notices</h3>
-            <a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success">
+            <div><a href="{{ route('noticeTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Notice
-            </a>
+            </a></div>
         </div>
 
         @include('admin.crud.partials.table-controls', [
@@ -57,7 +57,7 @@
                             <form action="{{ route('deleteNotice', $row->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this notice?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Move this notice to Trash?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
                             </form>
                         </td>
                     </tr>
