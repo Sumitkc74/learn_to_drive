@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
+use App\Support\QuestionSpreadsheetReader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -20,23 +21,27 @@ class QuestionImportController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:2048']]);
-        $handle = fopen($request->file('csv_file')->getRealPath(), 'r');
-        $headers = array_map(fn ($value) => strtolower(trim((string) $value)), fgetcsv($handle) ?: []);
+        $request->validate(['question_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:2048']]);
+        $file = $request->file('question_file');
+        try {
+            $spreadsheetRows = QuestionSpreadsheetReader::read($file->getRealPath(), strtolower($file->getClientOriginalExtension()));
+        } catch (\RuntimeException $exception) {
+            throw ValidationException::withMessages(['question_file' => $exception->getMessage()]);
+        }
+        $headers = array_map(fn ($value) => strtolower(trim((string) $value)), array_shift($spreadsheetRows) ?: []);
         if (isset($headers[0])) {
             $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
         }
 
         if ($headers !== self::HEADERS) {
-            fclose($handle);
-            throw ValidationException::withMessages(['csv_file' => 'The CSV columns do not match the required template.']);
+            throw ValidationException::withMessages(['question_file' => 'The file columns do not match the required template.']);
         }
 
         $rows = [];
         $errors = [];
         $seenQuestions = [];
         $line = 1;
-        while (($values = fgetcsv($handle)) !== false) {
+        foreach ($spreadsheetRows as $values) {
             $line++;
             if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) continue;
             if (count($values) !== count(self::HEADERS)) {
@@ -57,13 +62,11 @@ class QuestionImportController extends Controller
             $seenQuestions[$normalizedQuestion] = true;
             $rows[] = $this->map($validator->validated());
         }
-        fclose($handle);
-
         if ($errors !== []) {
-            throw ValidationException::withMessages(['csv_file' => $errors]);
+            throw ValidationException::withMessages(['question_file' => $errors]);
         }
         if ($rows === []) {
-            throw ValidationException::withMessages(['csv_file' => 'The CSV contains no question rows.']);
+            throw ValidationException::withMessages(['question_file' => 'The file contains no question rows.']);
         }
 
         DB::transaction(fn () => collect($rows)->each(fn ($row) => Question::create($row)));

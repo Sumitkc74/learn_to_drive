@@ -19,7 +19,7 @@
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h3 class="ltd-panel__title mb-0">Exam Questions</h3>
-            <div><a href="{{ route('questionExport') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-download"></i> Export</a><a href="{{ route('questionImport') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-file-import"></i> Import</a><a href="{{ route('questionTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-question/') }}" class="btn btn-sm btn-success">
+            <div><a href="{{ route('questionExport') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-download"></i> Export CSV</a><a href="{{ route('questionImport') }}" class="btn btn-sm btn-primary mr-2"><i class="fas fa-file-excel"></i> Import from CSV / Excel</a><a href="{{ route('questionTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-question/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Question
             </a></div>
         </div>

@@ -4,6 +4,9 @@
         <a href="{{ route('addQuestion') }}" class="ltd-quick-action">
             <i class="fas fa-question"></i> Add Question
         </a>
+        <a href="{{ route('questionImport') }}" class="ltd-quick-action">
+            <i class="fas fa-file-excel"></i> Import from CSV / Excel
+        </a>
         <a href="{{ route('addNotice') }}" class="ltd-quick-action">
             <i class="fas fa-bell"></i> Add Notice
         </a>
