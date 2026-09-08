@@ -49,6 +49,10 @@ class QuestionCsvImportTest extends TestCase
         $admin = User::factory()->create(['role' => 'Admin']);
         $this->actingAs($admin)->get(route('questionImport.template'))->assertOk()->assertHeader('content-disposition');
         $this->actingAs($admin)->get(route('questionExport'))->assertOk()->assertHeader('content-disposition');
+        if (class_exists(ZipArchive::class)) {
+            $this->actingAs($admin)->get(route('questionExport', ['format' => 'xlsx']))
+                ->assertOk()->assertDownload('questions-'.now()->format('Y-m-d').'.xlsx');
+        }
     }
 
     public function test_import_page_offers_csv_and_excel_uploads(): void

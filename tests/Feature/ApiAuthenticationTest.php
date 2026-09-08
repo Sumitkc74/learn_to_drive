@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AppSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -35,6 +36,16 @@ class ApiAuthenticationTest extends TestCase
             ->assertJsonStructure(['token' => ['access_token', 'token_type', 'expires_at']]);
 
         $this->assertNotNull($user->tokens()->first()->expires_at);
+    }
+
+    public function test_login_uses_configured_api_session_lifetime(): void
+    {
+        AppSetting::updateOrCreate(['key' => 'access_token_expiry_days'], ['value' => '14']);
+        $user = User::factory()->create();
+
+        $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => 'password'])->assertOk();
+
+        $this->assertTrue($user->tokens()->first()->expires_at->between(now()->addDays(13), now()->addDays(15)));
     }
 
     public function test_password_change_uses_the_authenticated_user(): void

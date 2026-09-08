@@ -991,6 +991,63 @@ body.ltd-body {
 .ltd-management-card__body small { color: var(--text-muted); overflow-wrap: anywhere; }
 .ltd-management-card__arrow { color: var(--text-muted); font-size: 0.72rem; }
 
+.ltd-admin-tools {
+    margin-top: 1.25rem;
+}
+
+.ltd-admin-tools__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.75rem;
+}
+
+.ltd-admin-tool {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-secondary);
+    color: var(--text);
+    text-decoration: none;
+}
+
+.ltd-admin-tool:hover { border-color: var(--yellow-dark); color: var(--text); text-decoration: none; }
+.ltd-admin-tool > i { width: 28px; color: var(--yellow-dark); text-align: center; }
+.ltd-admin-tool span { display: flex; min-width: 0; flex-direction: column; }
+.ltd-admin-tool strong { font-size: 0.84rem; }
+.ltd-admin-tool small { color: var(--text-muted); overflow-wrap: anywhere; }
+
+.ltd-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.ltd-settings-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.ltd-settings-card--wide { grid-column: 1 / -1; }
+.ltd-settings-card__heading { display: flex; gap: 0.85rem; padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--surface-secondary); }
+.ltd-settings-card__heading > i { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 10px; background: var(--yellow); color: var(--charcoal-deep); }
+.ltd-settings-card__heading h2 { margin: 0 0 0.2rem; color: var(--text); font-size: 1rem; font-weight: 800; }
+.ltd-settings-card__heading p { margin: 0; color: var(--text-muted); font-size: 0.78rem; }
+.ltd-settings-card__body { flex: 1; padding: 1.25rem; }
+.ltd-settings-card__actions { padding: 1rem 1.25rem; border-top: 1px solid var(--border); background: var(--surface-secondary); }
+
+@media (max-width: 800px) {
+    .ltd-settings-grid { grid-template-columns: 1fr; }
+    .ltd-settings-card--wide { grid-column: auto; }
+}
+
 .ltd-quick-actions {
     margin-bottom: 1.75rem;
 }

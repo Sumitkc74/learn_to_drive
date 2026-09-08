@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Notice;
 use App\Support\SpreadsheetReader;
+use App\Support\SpreadsheetDownload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -80,6 +81,13 @@ class NoticeImportController extends Controller
             fputcsv($stream, ['Trial exam schedule', 'Review the official schedule and requirements.', 'ट्रायल परीक्षा तालिका', 'आधिकारिक तालिका र आवश्यकताहरू हेर्नुहोस्।', 'https://example.com/notice', 'Draft', '2026-09-15 09:00', '2026-09-30 23:59']);
             fclose($stream);
         }, 'notice-import-template.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function export(Request $request)
+    {
+        $format = $request->query('format', 'csv');
+        $rows = Notice::orderBy('id')->cursor()->map(fn ($notice) => [$notice->title, $notice->description, $notice->nepaliTitle, $notice->nepaliDescription, $notice->link, $notice->status, $notice->publish_at?->format('Y-m-d H:i'), $notice->expires_at?->format('Y-m-d H:i')]);
+        return SpreadsheetDownload::make('notices-'.now()->format('Y-m-d'), self::HEADERS, $rows, $format);
     }
 
     private function rules(): array

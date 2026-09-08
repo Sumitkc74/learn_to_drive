@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -41,7 +42,7 @@ class AuthController extends BaseController
 
         // $user->addMedia('/public/dist/image.jpg')->toMediaCollection('avatar');
 
-        $expiresAt = Carbon::now()->addMonths(3);
+        $expiresAt = Carbon::now()->addDays(AppSetting::read('access_token_expiry_days'));
         $token = $user->createToken('Personal Access Token', ['*'], $expiresAt);
         $text= $token->plainTextToken;
 
@@ -93,7 +94,7 @@ class AuthController extends BaseController
 
         $user->update(['last_login_at' => now()]);
 
-        $expiresAt = Carbon::now()->addMonths(3);
+        $expiresAt = Carbon::now()->addDays(AppSetting::read('access_token_expiry_days'));
         $token = $user->createToken('Personal Access Token', ['*'], $expiresAt);
         $text= $token->plainTextToken;
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Question;
 use App\Support\SpreadsheetReader;
+use App\Support\SpreadsheetDownload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -81,16 +82,11 @@ class QuestionImportController extends Controller
         });
     }
 
-    public function export()
+    public function export(Request $request)
     {
-        return $this->csvResponse('questions-'.now()->format('Y-m-d').'.csv', function ($stream) {
-            fputcsv($stream, self::HEADERS);
-            Question::orderBy('id')->chunk(500, function ($questions) use ($stream) {
-                foreach ($questions as $question) {
-                    fputcsv($stream, [$question->question, $question->option1, $question->option2, $question->option3, $question->option4, $question->correctOption, $question->category, $question->difficulty, $question->explanation, $question->status]);
-                }
-            });
-        });
+        $format = $request->query('format', 'csv');
+        $rows = Question::orderBy('id')->cursor()->map(fn ($question) => [$question->question, $question->option1, $question->option2, $question->option3, $question->option4, $question->correctOption, $question->category, $question->difficulty, $question->explanation, $question->status]);
+        return SpreadsheetDownload::make('questions-'.now()->format('Y-m-d'), self::HEADERS, $rows, $format);
     }
 
     private function rules(): array

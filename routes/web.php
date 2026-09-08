@@ -54,7 +54,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/admin/analytics', [DashboardController::class, 'analytics'])->name('adminAnalytics');
 Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('auditLogs');
 Route::get('/admin/settings', [AppSettingController::class, 'index'])->name('appSettings');
-Route::patch('/admin/settings', [AppSettingController::class, 'update'])->name('appSettings.update');
+Route::patch('/admin/settings/{section}', [AppSettingController::class, 'update'])->whereIn('section', ['question-bank', 'verification', 'users', 'uploads', 'general'])->name('appSettings.update');
 
 Route::get('/admin/profile-settings', [UserController::class, 'profileSettings'])->name('profileSettings');
 Route::patch('/admin/profile-settings/name', [UserController::class, 'updateProfileName'])->name('profile.name.update');
@@ -135,6 +135,7 @@ Route::get('/admin/notices', [NoticeController::class, 'allNotice'])->name('allN
 Route::get('/admin/notices-import', [NoticeImportController::class, 'create'])->name('noticeImport');
 Route::post('/admin/notices-import', [NoticeImportController::class, 'store'])->name('noticeImport.store');
 Route::get('/admin/notices-import/template', [NoticeImportController::class, 'template'])->name('noticeImport.template');
+Route::get('/admin/notices-export', [NoticeImportController::class, 'export'])->name('noticeExport');
 Route::get('/admin/notices-trash', [NoticeController::class, 'trashedNotices'])->name('noticeTrash');
 Route::get('/admin/government-notices', [GovernmentNoticeImportController::class, 'index'])->name('governmentNotices');
 Route::post('/admin/government-notices/fetch', [GovernmentNoticeImportController::class, 'fetch'])->middleware('throttle:2,10')->name('governmentNotices.fetch');

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
+use ZipArchive;
 
 class NoticeSpreadsheetImportTest extends TestCase
 {
@@ -52,5 +53,19 @@ class NoticeSpreadsheetImportTest extends TestCase
         $this->actingAs($admin)->get(route('noticeImport.template'))
             ->assertOk()
             ->assertHeader('content-disposition');
+    }
+
+    public function test_admin_can_download_notices_as_csv_and_excel(): void
+    {
+        $admin = User::where('is_seed_admin', true)->firstOrFail();
+        Notice::create(['title' => 'Downloadable notice', 'description' => 'English description', 'nepaliTitle' => 'डाउनलोड सूचना', 'nepaliDescription' => 'नेपाली विवरण', 'status' => 'Draft']);
+
+        $this->actingAs($admin)->get(route('noticeExport', ['format' => 'csv']))
+            ->assertOk()->assertDownload('notices-'.now()->format('Y-m-d').'.csv');
+
+        if (class_exists(ZipArchive::class)) {
+            $this->actingAs($admin)->get(route('noticeExport', ['format' => 'xlsx']))
+                ->assertOk()->assertDownload('notices-'.now()->format('Y-m-d').'.xlsx');
+        }
     }
 }

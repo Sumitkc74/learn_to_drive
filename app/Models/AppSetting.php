@@ -13,6 +13,7 @@ class AppSetting extends Model
         'exam_passing_score' => 60,
         'exam_question_count' => 20,
         'otp_expiry_minutes' => 10,
+        'access_token_expiry_days' => 90,
         'image_upload_limit_mb' => 2,
         'document_upload_limit_mb' => 10,
         'maintenance_notice' => '',

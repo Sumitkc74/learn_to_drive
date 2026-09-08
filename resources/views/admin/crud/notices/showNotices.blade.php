@@ -19,7 +19,7 @@
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h3 class="ltd-panel__title mb-0">Notices</h3>
-            <div><a href="{{ route('noticeImport') }}" class="btn btn-sm btn-primary mr-2"><i class="fas fa-file-excel"></i> Import from CSV / Excel</a><a href="{{ route('governmentNotices') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-landmark"></i> Government Imports</a><a href="{{ route('noticeTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success">
+            <div><a href="{{ route('noticeExport', ['format' => 'csv']) }}" class="btn btn-sm btn-outline-primary mr-1"><i class="fas fa-file-csv"></i> Download CSV</a><a href="{{ route('noticeExport', ['format' => 'xlsx']) }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-file-excel"></i> Download Excel</a><a href="{{ route('noticeImport') }}" class="btn btn-sm btn-primary mr-2"><i class="fas fa-file-import"></i> Import from CSV / Excel</a><a href="{{ route('governmentNotices') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-landmark"></i> Government Imports</a><a href="{{ route('noticeTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Notice
             </a></div>
         </div>

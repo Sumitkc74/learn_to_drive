@@ -16,4 +16,5 @@
 
     @include('admin.dashboard-components.management')
     @include('admin.dashboard-components.quick-actions')
+    @include('admin.dashboard-components.admin-tools')
 @endsection

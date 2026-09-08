@@ -23,6 +23,8 @@ class AdminDashboardAnalyticsTest extends TestCase
             ->assertSee('Management')
             ->assertSee('Accounts, roles and learning history')
             ->assertSee('Quick Actions')
+            ->assertSee('Admin Tools')
+            ->assertSee('Review imported content, recover deleted items')
             ->assertDontSee('Learning Health')
             ->assertDontSee('Recent Admin Activity');
     }
