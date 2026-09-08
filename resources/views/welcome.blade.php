@@ -160,7 +160,7 @@
         </div>
         @if (Route::has('login'))
             @auth
-                <a href="{{ url('/home') }}" class="nav-link">Home</a>
+                <a href="{{ Auth::user()?->role === 'Admin' ? route('adminDashboard') : url('/') }}" class="nav-link">Home</a>
             @else
                 <a href="{{ route('login') }}" class="nav-link">Log in</a>
             @endauth

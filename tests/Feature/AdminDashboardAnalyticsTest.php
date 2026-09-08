@@ -34,4 +34,16 @@ class AdminDashboardAnalyticsTest extends TestCase
             ->assertSee('Notices')
             ->assertSee('Government Review');
     }
+
+    public function test_legacy_home_route_redirects_admin_to_the_data_backed_dashboard(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin']);
+
+        $this->actingAs($admin)->get('/home')
+            ->assertRedirect(route('adminDashboard'));
+
+        $this->followingRedirects()->actingAs($admin)->get('/home')
+            ->assertOk()
+            ->assertSee('Total users');
+    }
 }
