@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\AppSetting;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\UserHistory;
@@ -13,7 +14,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        return view('admin.dashboard', $this->dashboardData());
     }
 
     public function analytics()
@@ -26,8 +27,9 @@ class DashboardController extends Controller
         $users = ['total' => User::count(), 'premium' => User::where('role', 'PremiumUser')->count(), 'verified' => User::whereNotNull('email_verified_at')->whereNotNull('phone_verified_at')->count(), 'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count()];
         $questions = ['total' => Question::count(), 'published' => Question::where('status', 'Published')->count(), 'draft' => Question::where('status', 'Draft')->count(), 'archived' => Question::where('status', 'Archived')->count()];
         $attempts = UserHistory::latest()->get();
-        $performance = ['attempts' => $attempts->count(), 'average' => $attempts->count() ? (int) round($attempts->avg('score_percentage')) : 0, 'pass_rate' => $attempts->count() ? (int) round(($attempts->filter(fn ($attempt) => $attempt->score_percentage >= 60)->count() / $attempts->count()) * 100) : 0, 'active_learners' => $attempts->pluck('user_id')->unique()->count()];
-        $months = collect(range(5, 0))->map(fn ($offset) => Carbon::now()->subMonths($offset));
+        $passingScore = AppSetting::read('exam_passing_score');
+        $performance = ['attempts' => $attempts->count(), 'average' => $attempts->count() ? (int) round($attempts->avg('score_percentage')) : 0, 'pass_rate' => $attempts->count() ? (int) round(($attempts->filter(fn ($attempt) => $attempt->score_percentage >= $passingScore)->count() / $attempts->count()) * 100) : 0, 'active_learners' => $attempts->pluck('user_id')->unique()->count()];
+        $months = collect(range(5, 0))->map(fn ($offset) => Carbon::now()->startOfMonth()->subMonths($offset));
         $signupLabels = $months->map(fn ($month) => $month->format('M Y'));
         $signupCounts = $months->map(fn ($month) => User::whereYear('created_at', $month->year)->whereMonth('created_at', $month->month)->count());
         $recentActivity = AuditLog::with('actor')->latest()->take(8)->get();

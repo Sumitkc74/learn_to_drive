@@ -7,6 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use App\Models\AppSetting;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting(): void
     {
+        RateLimiter::for('phone-resend', function (Request $request) {
+            return Limit::perSecond(1, AppSetting::read('otp_resend_seconds'))
+                ->by('phone-resend:'.$request->user()->id);
+        });
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });

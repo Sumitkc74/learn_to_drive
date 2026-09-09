@@ -10,6 +10,8 @@
 
 
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $trafficSign])</div>
+
     <div class="card-header">
     </div>
     <div class="card-body">

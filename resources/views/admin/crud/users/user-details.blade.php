@@ -1,6 +1,8 @@
 @extends('admin.layout.master')
 @section('title', 'User Details')
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $user])</div>
+
 <div class="ltd-page-header">
     <div><span class="ltd-page-header__eyebrow">User Management</span><h1>User Details</h1></div>
     <a href="{{ route('allUser') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-2"></i>Back to Users</a>

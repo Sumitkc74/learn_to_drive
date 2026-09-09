@@ -96,5 +96,6 @@
         </script>
 
         @yield('page-script')
+        @stack('scripts')
     </body>
 </html>

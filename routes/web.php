@@ -67,7 +67,7 @@ Route::post('/admin/profile-settings/email/verification-notification', [ProfileV
 Route::get('/admin/profile-settings/email/verify/{id}/{hash}', [ProfileVerificationController::class, 'verifyEmail'])
     ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 Route::post('/admin/profile-settings/phone/verification-code', [ProfileVerificationController::class, 'sendPhone'])
-    ->middleware('throttle:3,10')->name('profile.phone.verification.send');
+    ->middleware(['throttle:3,10', 'throttle:phone-resend'])->name('profile.phone.verification.send');
 Route::post('/admin/profile-settings/phone/verify', [ProfileVerificationController::class, 'verifyPhone'])
     ->middleware('throttle:6,1')->name('profile.phone.verification.verify');
 Route::get('/admin/users', [UserController::class, 'allUser'])->name('allUser');

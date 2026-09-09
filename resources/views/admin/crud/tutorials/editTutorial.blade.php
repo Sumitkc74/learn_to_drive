@@ -9,6 +9,8 @@
 @endsection
 
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $tutorial])</div>
+
     <div class="card-body">
         <form role="form" action="{{ URL::to('/admin/update-tutorial/'.$tutorial->id) }}" method="post" enctype="multipart/form-data">
             @csrf

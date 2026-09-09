@@ -12,7 +12,7 @@ trait TracksCreator
         static::creating(function ($model): void {
             $actor = auth()->user();
 
-            if ($actor instanceof User && $actor->role === 'Admin' && empty($model->created_by)) {
+            if ($actor instanceof User && $actor->role === 'Admin') {
                 $model->created_by = $actor->id;
             }
         });

@@ -14,7 +14,10 @@ class AppSettingController extends Controller
             'exam_passing_score' => ['required', 'integer', 'between:1,100'],
             'exam_question_count' => ['required', 'integer', 'between:5,100'],
         ],
-        'verification' => ['otp_expiry_minutes' => ['required', 'integer', 'between:2,30']],
+        'verification' => [
+            'otp_expiry_minutes' => ['required', 'integer', 'between:2,30'],
+            'otp_resend_seconds' => ['required', 'integer', 'between:30,600'],
+        ],
         'users' => ['access_token_expiry_days' => ['required', 'integer', 'between:1,365']],
         'uploads' => [
             'image_upload_limit_mb' => ['required', 'integer', 'between:1,10'],

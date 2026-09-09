@@ -14,7 +14,9 @@
         </ul>
     </div>
 
+    @include('admin.dashboard-components.stat-boxes')
     @include('admin.dashboard-components.management')
     @include('admin.dashboard-components.quick-actions')
     @include('admin.dashboard-components.admin-tools')
+    @include('admin.dashboard-components.recent-activity')
 @endsection

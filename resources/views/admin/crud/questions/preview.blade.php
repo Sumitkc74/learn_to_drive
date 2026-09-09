@@ -1,6 +1,8 @@
 @extends('admin.layout.master')
 @section('title', 'Preview Question')
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $question])</div>
+
 <div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Question Bank</span><h1>Learner Preview</h1></div><div><a href="{{ route('editQuestion', $question->id) }}" class="btn btn-outline-primary mr-2"><i class="fas fa-edit mr-1"></i>Edit</a><a href="{{ route('allQuestion') }}" class="btn btn-outline-secondary">Back</a></div></div>
 
 @if($question->status !== 'Published')<div class="alert alert-warning"><i class="fas fa-eye-slash mr-2"></i>This question is <strong>{{ strtolower($question->status) }}</strong> and is not visible to learners.</div>@endif

@@ -1,6 +1,8 @@
 @extends('admin.layout.master')
 @section('title', 'Edit Question')
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $edit])</div>
+
 <div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Question Bank</span><h1>Edit Question</h1></div></div>
 <div class="ltd-form-shell">
     <form class="ltd-form-card" action="{{ route('updateQuestion', $edit->id) }}" method="POST" enctype="multipart/form-data" data-add-form>
