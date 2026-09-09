@@ -54,27 +54,32 @@ class TutorialController extends Controller
     //show tutorial to edit user to database
     public function editTutorial($id)
     {
-        $tutorial = Tutorial::find($id);
+        $tutorial = Tutorial::findOrFail($id);
         return view('admin.crud.tutorials.editTutorial', compact('tutorial'));
     }
 
     //update tutorial to database
     public function updateTutorial(Request $request, $id)
     {
+        $tutorial = Tutorial::findOrFail($id);
         $sanitized = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'videoLink' => 'required',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'videoLink' => ['required', 'url:http,https', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
-
-        Tutorial::find($id)->update($sanitized);
-        return redirect()->to('/admin/tutorials')->with('success','Tutorial Updated successfully');
+        unset($sanitized['image']);
+        if ($request->hasFile('image')) {
+            \App\Support\ReplaceMedia::at($tutorial, $request->file('image'), 0);
+        }
+        $tutorial->update($sanitized);
+        return redirect()->route('allTutorial')->with('success', 'Record updated successfully.');
     }
 
     //delete tutorial from database
     public function deleteTutorial($id)
     {
-        Tutorial::find($id)->delete();
+        Tutorial::findOrFail($id)->delete();
         return redirect()->back()->with('success','Tutorial Deleted Successfully');
     }
 }

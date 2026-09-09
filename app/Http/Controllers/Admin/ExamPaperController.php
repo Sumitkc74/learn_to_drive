@@ -57,40 +57,39 @@ class ExamPaperController extends Controller
     //show form to edit user to database
     public function editExamPaper($id)
     {
-        $examPaper = ExamPaper::find($id);
+        $examPaper = ExamPaper::findOrFail($id);
         return view('admin.crud.examPapers.editExamPaper', compact('examPaper'));
     }
 
     //update user to database
     public function updateExamPaper(Request $request, $id)
     {
+        $examPaper = ExamPaper::findOrFail($id);
         $sanitized = $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            // 'file' => 'required',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'englishFile' => ['nullable', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
+            'nepaliFile' => ['nullable', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
         ]);
-        // $sanitized['file'] = "demo";
-
-        $examPaper = ExamPaper::find($id);
-
-        if ($request -> hasFile('englishFile') && $request->image != ''){
-            $examPaper->clearMediaCollection();
-            $examPaper->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['englishFile']);
+        if ($request->hasFile('englishFile')) {
+            \App\Support\ReplaceMedia::at($examPaper, $request->file('englishFile'), 0);
+            $sanitized['englishFile'] = $request->file('englishFile')->getClientOriginalName();
         }
-
-        if ($request -> hasFile('nepaliFile') && $request->image != ''){
-            $examPaper->clearMediaCollection();
-            $examPaper->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['nepaliFile']);
+        if ($request->hasFile('nepaliFile')) {
+            \App\Support\ReplaceMedia::at($examPaper, $request->file('nepaliFile'), 1);
+            $sanitized['nepaliFile'] = $request->file('nepaliFile')->getClientOriginalName();
         }
-
         $examPaper->update($sanitized);
-        return redirect()->to('/admin/exam-papers')->with('success','Exam Paper Updated Successfully');
+        return redirect()->route('allExamPaper')->with('success', 'Record updated successfully.');
     }
 
     //delete user from database
     public function deleteExamPaper($id)
     {
-        ExamPaper::find($id)->delete();
+        ExamPaper::findOrFail($id)->delete();
         return redirect()->back()->with('success','Exam Paper Deleted Successfully');
     }
 }

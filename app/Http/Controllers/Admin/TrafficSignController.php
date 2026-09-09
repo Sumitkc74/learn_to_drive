@@ -53,34 +53,33 @@ class TrafficSignController extends Controller
     //show form to edit traffic sign to database
     public function editTrafficSign($id)
     {
-        $trafficSign = TrafficSign::find($id);
+        $trafficSign = TrafficSign::findOrFail($id);
         return view('admin.crud.trafficSigns.editTrafficSign', compact('trafficSign'));
     }
 
     //update traffic sign in database
     public function updateTrafficSign(Request $request, $id)
     {
+        $traffic = TrafficSign::findOrFail($id);
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliSignName' => 'required',
-            'description' => 'required',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliSignName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
-
-        $traffic = TrafficSign::find($id);
-
-        if ($request -> hasFile('image') && $request->image != ''){
-            $traffic->clearMediaCollection();
-            $traffic->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['image']);
+        if ($request->hasFile('image')) {
+            \App\Support\ReplaceMedia::at($traffic, $request->file('image'), 0);
+            $sanitized['image'] = $request->file('image')->getClientOriginalName();
         }
-
         $traffic->update($sanitized);
-        return redirect()->to('/admin/traffic-signs')->with('success','Traffic Sign Updated Successfully');
+        return redirect()->route('allTrafficSign')->with('success', 'Record updated successfully.');
     }
 
     //delete user from databasec
     public function deleteTrafficSign($id)
     {
-        TrafficSign::find($id)->delete();
+        TrafficSign::findOrFail($id)->delete();
         return redirect()->back()->with('success','Traffic Sign Deleted Successfully');
     }
 }

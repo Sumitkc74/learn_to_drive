@@ -51,35 +51,31 @@ class VisionTestController extends Controller
     //show form to edit user to database
     public function editVisionTest($id)
     {
-        $visionTest = VisionTest::find($id);
+        $visionTest = VisionTest::findOrFail($id);
         return view('admin.crud.visionTests.editVisionTest', compact('visionTest'));
     }
 
     //update user to database
     public function updateVisionTest(Request $request, $id)
     {
+        $visionTest = VisionTest::findOrFail($id);
         $sanitized = $request->validate([
-            'testNumber' => 'required',
-            // 'image' => 'required|image',
+            'testNumber' => ['required', 'integer', 'min:1', \Illuminate\Validation\Rule::unique('vision_tests', 'testNumber')->ignore($visionTest->id)],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
-
-        // $sanitized['image'] = "demo";
-
-        $visionTest = VisionTest::find($id);
-
-        if ($request -> hasFile('image') && $request->image != ''){
-            $visionTest->clearMediaCollection();
-            $visionTest->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['image']);
+        if ($request->hasFile('image')) {
+            \App\Support\ReplaceMedia::at($visionTest, $request->file('image'), 0);
+            $sanitized['image'] = $request->file('image')->getClientOriginalName();
         }
-
         $visionTest->update($sanitized);
-        return redirect()->to('/admin/vision-tests')->with('success', 'Vision Test updated successfully');
+        return redirect()->route('allVisionTest')->with('success', 'Record updated successfully.');
     }
 
     //delete user from database
     public function deleteVisionTest($id)
     {
-        VisionTest::find($id)->delete();
+        VisionTest::findOrFail($id)->delete();
         return redirect()->back();
     }
 }

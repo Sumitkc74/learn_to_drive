@@ -56,41 +56,39 @@ class ExamInformationController extends Controller
     //show form to edit user to database
     public function editExamInformation($id)
     {
-        $examInformation = ExamInformation::find($id);
+        $examInformation = ExamInformation::findOrFail($id);
         return view('admin.crud.examInformation.editExamInformation', compact('examInformation'));
     }
 
     //update user to database
     public function updateExamInformation(Request $request, $id)
     {
+        $examInformation = ExamInformation::findOrFail($id);
         $sanitized = $request->validate([
-            'name' => 'required',
-            'nepaliName' => 'required',
-            'description' => 'required',
-            // 'file' => 'required',
+            'name' => ['required', 'string', 'max:255'],
+            'nepaliName' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'englishFile' => ['nullable', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
+            'nepaliFile' => ['nullable', 'file', 'mimes:pdf', 'max:'.AppSetting::documentLimitKb()],
         ]);
-        // $sanitized['file'] = "demo";
-
-        $examInformation = ExamInformation::find($id);
-
-        if ($request -> hasFile('englishFile') && $request->image != ''){
-            $examInformation->clearMediaCollection();
-            $examInformation->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['englishFile']);
+        if ($request->hasFile('englishFile')) {
+            \App\Support\ReplaceMedia::at($examInformation, $request->file('englishFile'), 0);
+            $sanitized['englishFile'] = $request->file('englishFile')->getClientOriginalName();
         }
-
-        if ($request -> hasFile('nepaliFile') && $request->image != ''){
-            $examInformation->clearMediaCollection();
-            $examInformation->addMedia($request->image)->toMediaCollection();
+        unset($sanitized['nepaliFile']);
+        if ($request->hasFile('nepaliFile')) {
+            \App\Support\ReplaceMedia::at($examInformation, $request->file('nepaliFile'), 1);
+            $sanitized['nepaliFile'] = $request->file('nepaliFile')->getClientOriginalName();
         }
-
         $examInformation->update($sanitized);
-        return redirect()->to('/admin/exam-information')->with('success','Exam Information Updated Successfully');
+        return redirect()->route('allExamInformation')->with('success', 'Record updated successfully.');
     }
 
     //delete user from database
     public function deleteExamInformation($id)
     {
-        ExamInformation::find($id)->delete();
+        ExamInformation::findOrFail($id)->delete();
         return redirect()->back()->with('success','Exam Information Deleted Successfully');
     }
 }

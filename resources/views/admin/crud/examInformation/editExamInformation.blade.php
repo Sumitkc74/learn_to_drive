@@ -9,6 +9,8 @@
 @endsection
 
 @section('content')
+<div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $examInformation])</div>
+
     <div class="card-body">
         <form role="form" action="{{ URL::to('/admin/update-exam-information/'.$examInformation->id) }}" method="post" enctype="multipart/form-data">
             @csrf
@@ -31,7 +33,7 @@
                 <div class="col-sm-10">
                     <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter exam-paper description">
                         {{ $examInformation->description }}
-                    </textarea></textarea>
+                    </textarea>
                 </div>
             </div>
 
@@ -48,7 +50,7 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="nepaliFile" class="col-sm-2 col-form-label">Nepali File :</label>
-                    <embed src="{{ $examInformation->getMedia()[1]->getUrl()  }}" height="200" width="200">
+                    <embed src="{{ $examInformation->getMedia()->get(1)?->getUrl()  }}" height="200" width="200">
                     <div class="col-sm-10">
                         <input type="file" name="nepaliFile">
                     </div>
