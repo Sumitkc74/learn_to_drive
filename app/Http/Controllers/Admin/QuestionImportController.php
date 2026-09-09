@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Question;
 use App\Support\SpreadsheetReader;
 use App\Support\SpreadsheetDownload;
+use App\Support\ImportSummary;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -22,7 +23,7 @@ class QuestionImportController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['question_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:2048']]);
+        $request->validate(['question_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:'.AppSetting::documentLimitKb()]]);
         $file = $request->file('question_file');
         try {
             $spreadsheetRows = SpreadsheetReader::read($file->getRealPath(), strtolower($file->getClientOriginalExtension()));
@@ -41,10 +42,13 @@ class QuestionImportController extends Controller
         $rows = [];
         $errors = [];
         $seenQuestions = [];
+        $duplicates = 0;
+        $blankRows = 0;
         $line = 1;
         foreach ($spreadsheetRows as $values) {
             $line++;
-            if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) continue;
+            if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) { $blankRows++; continue; }
+            $values = array_pad($values, count(self::HEADERS), '');
             if (count($values) !== count(self::HEADERS)) {
                 $errors[] = "Row {$line}: expected ".count(self::HEADERS).' columns.';
                 continue;
@@ -52,7 +56,7 @@ class QuestionImportController extends Controller
             $row = array_combine(self::HEADERS, array_map('trim', $values));
             $normalizedQuestion = mb_strtolower(preg_replace('/\s+/', ' ', $row['question']));
             if (isset($seenQuestions[$normalizedQuestion]) || Question::withTrashed()->whereRaw('LOWER(question) = ?', [mb_strtolower($row['question'])])->exists()) {
-                $errors[] = "Row {$line}: the question already exists or is duplicated in this file.";
+                $duplicates++;
                 continue;
             }
             $validator = Validator::make($row, $this->rules());
@@ -63,14 +67,7 @@ class QuestionImportController extends Controller
             $seenQuestions[$normalizedQuestion] = true;
             $rows[] = $this->map($validator->validated());
         }
-        if ($errors !== []) {
-            throw ValidationException::withMessages(['question_file' => $errors]);
-        }
-        if ($rows === []) {
-            throw ValidationException::withMessages(['question_file' => 'The file contains no question rows.']);
-        }
-
-        DB::transaction(fn () => collect($rows)->each(fn ($row) => Question::create($row)));
+        ImportSummary::finish('question_file', Question::class, $rows, $errors, $duplicates, $blankRows);
         return redirect()->route('allQuestion')->with('success', count($rows).' questions imported successfully.');
     }
 

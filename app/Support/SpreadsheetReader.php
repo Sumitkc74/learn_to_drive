@@ -18,8 +18,14 @@ class SpreadsheetReader
         $handle = fopen($path, 'r');
         if ($handle === false) throw new RuntimeException('The CSV file could not be opened.');
         $rows = [];
-        while (($values = fgetcsv($handle)) !== false) $rows[] = $values;
-        fclose($handle);
+        try {
+            while (($values = fgetcsv($handle)) !== false) {
+                if (count($rows) >= 10001) throw new RuntimeException('Import at most 10,000 data rows at a time.');
+                $rows[] = array_map(fn ($value) => (string) ($value ?? ''), $values);
+            }
+        } finally {
+            fclose($handle);
+        }
         return $rows;
     }
 
@@ -38,8 +44,10 @@ class SpreadsheetReader
 
             $rows = [];
             foreach ($sheet->sheetData->row as $row) {
+                if (count($rows) >= 10001) throw new RuntimeException('Import at most 10,000 data rows at a time.');
                 $values = [];
                 foreach ($row->c as $cell) {
+                    if (isset($cell->f)) throw new RuntimeException('Replace spreadsheet formulas with plain values before importing.');
                     $column = self::columnIndex((string) $cell['r']);
                     $type = (string) $cell['t'];
                     $value = $type === 'inlineStr' ? (string) $cell->is->t : (string) $cell->v;
@@ -82,14 +90,20 @@ class SpreadsheetReader
         $stat = $zip->statIndex($index);
         if (($stat['size'] ?? 0) > 10 * 1024 * 1024) throw new RuntimeException('The Excel worksheet is too large.');
         $contents = $zip->getFromIndex($index);
+        if ($contents !== false && preg_match('/<!DOCTYPE|<!ENTITY/i', $contents)) {
+            throw new RuntimeException('Workbook XML must not contain document types or entities.');
+        }
         return $contents === false ? null : $contents;
     }
 
     private static function columnIndex(string $reference): int
     {
-        preg_match('/^[A-Z]+/i', $reference, $match);
+        if (!preg_match('/^([A-Z]{1,3})[1-9][0-9]*$/i', $reference, $match)) {
+            throw new RuntimeException('The workbook contains an invalid cell reference.');
+        }
         $index = 0;
-        foreach (str_split(strtoupper($match[0] ?? 'A')) as $letter) $index = ($index * 26) + ord($letter) - 64;
+        foreach (str_split(strtoupper($match[1])) as $letter) $index = ($index * 26) + ord($letter) - 64;
+        if ($index > 16384) throw new RuntimeException('The workbook contains an invalid column.');
         return max(0, $index - 1);
     }
 }

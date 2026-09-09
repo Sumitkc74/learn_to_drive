@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Notice;
 use App\Support\SpreadsheetReader;
 use App\Support\SpreadsheetDownload;
+use App\Support\ImportSummary;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -22,7 +23,7 @@ class NoticeImportController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['notice_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:2048']]);
+        $request->validate(['notice_file' => ['required', 'file', 'extensions:csv,xlsx', 'mimetypes:text/plain,text/csv,application/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip', 'max:'.AppSetting::documentLimitKb()]]);
         $file = $request->file('notice_file');
 
         try {
@@ -38,17 +39,21 @@ class NoticeImportController extends Controller
         $rows = [];
         $errors = [];
         $seen = [];
+        $duplicates = 0;
+        $blankRows = 0;
         foreach ($spreadsheetRows as $index => $values) {
             $line = $index + 2;
-            if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) continue;
+            if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) { $blankRows++; continue; }
+            $values = array_pad($values, count(self::HEADERS), '');
             if (count($values) !== count(self::HEADERS)) {
                 $errors[] = "Row {$line}: expected ".count(self::HEADERS).' columns.';
                 continue;
             }
             $row = array_combine(self::HEADERS, array_map(fn ($value) => trim((string) $value), $values));
+            $row['status'] = $row['status'] ?: 'Draft';
             $key = mb_strtolower(preg_replace('/\s+/', ' ', $row['title']));
             if (isset($seen[$key]) || Notice::withTrashed()->whereRaw('LOWER(title) = ?', [mb_strtolower($row['title'])])->exists()) {
-                $errors[] = "Row {$line}: this notice title already exists or is duplicated in the file.";
+                $duplicates++;
                 continue;
             }
             $validator = Validator::make($row, $this->rules());
@@ -65,10 +70,7 @@ class NoticeImportController extends Controller
             $rows[] = $this->map($validated);
         }
 
-        if ($errors !== []) throw ValidationException::withMessages(['notice_file' => $errors]);
-        if ($rows === []) throw ValidationException::withMessages(['notice_file' => 'The file contains no notice rows.']);
-
-        DB::transaction(fn () => collect($rows)->each(fn ($row) => Notice::create($row)));
+        ImportSummary::finish('notice_file', Notice::class, $rows, $errors, $duplicates, $blankRows);
         return redirect()->route('allNotice')->with('success', count($rows).' notices imported as prepared.');
     }
 

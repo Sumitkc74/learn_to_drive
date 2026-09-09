@@ -15,7 +15,7 @@ class SpreadsheetDownload
                 $stream = fopen('php://output', 'w');
                 fwrite($stream, "\xEF\xBB\xBF");
                 fputcsv($stream, $headers);
-                foreach ($rows as $row) fputcsv($stream, $row);
+                foreach ($rows as $row) fputcsv($stream, array_map(self::csvValue(...), $row));
                 fclose($stream);
             }, $baseName.'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
         }
@@ -36,6 +36,12 @@ class SpreadsheetDownload
         $zip->close();
 
         return response()->download($path, $baseName.'.xlsx', ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])->deleteFileAfterSend(true);
+    }
+
+    private static function csvValue(mixed $value): string
+    {
+        $text = (string) ($value ?? '');
+        return preg_match('/^[\s\x00-\x1f]*[=+@-]|^[\t\r\n]/u', $text) ? "'".$text : $text;
     }
 
     private static function rowXml(iterable $values, int $number): string
