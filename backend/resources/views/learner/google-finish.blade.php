@@ -1,0 +1,5 @@
+@extends('learner.layout')
+@section('title',__('Finish creating your account'))
+@section('content')
+<div class="auth-panel card"><h1>{{ __('A few final details') }}</h1><p>{{ __('Google verified') }} {{ $google['email'] }}{{ __('. Add your details and a backup password so you can sign in without Google too.') }}</p><form method="post" class="stack">@csrf<label>{{ __('Full name') }}<input name="name" required maxlength="100" autocomplete="name" value="{{ old('name',$google['name']) }}"></label><label>{{ __('Phone number') }}<input name="phoneNumber" required pattern="[0-9]{10}" maxlength="10" autocomplete="tel" value="{{ old('phoneNumber') }}"></label><label>{{ __('Backup password') }}<input type="password" name="password" required minlength="8" autocomplete="new-password"></label><label>{{ __('Confirm password') }}<input type="password" name="password_confirmation" required minlength="8" autocomplete="new-password"></label><button class="button">{{ __('Create account') }}</button></form></div>
+@endsection

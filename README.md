@@ -1,89 +1,102 @@
 # Learn to Drive
 
-Learn to Drive is a web application that helps users prepare for their driving test. It's built with Laravel as the backend/API, with a separate frontend for the user-facing experience.
+Learn to Drive is a driving-test preparation platform with a Laravel backend,
+administration interface, learner web experience, and Flutter mobile client.
 
-## Current Status
+## Repository layout
 
-🚧 **In Development**
+```text
+backend/   Laravel API, admin panel, learner website, and scheduled jobs
+mobile/    Flutter mobile application
+docs/      Feature documentation and operational guides
+```
 
-- ✅ Admin panel (web) — manage questions, content, and users
-- 🔜 Client-side app — for learners to study and take practice tests
+The repository has one Git root. Run Laravel, Composer, npm, and PHP commands
+from `backend/`; run Flutter commands from `mobile/`.
 
-## Features
+## Prerequisites
 
-### Admin (available now)
-- Manage driving test questions and answer options
-- Organize content into categories/topics
-- Manage users
-
-### Planned (client-side)
-- Browse and study driving test material
-- Take practice quizzes/mock tests
-- Track progress and scores
-
-## Tech Stack
-
-- **Backend:** Laravel (PHP) — REST API
-- **Frontend:** Separate JS application (built with Vite)
-- **Database:** MySQL
-
-## Getting Started
-
-### Prerequisites
-
-- PHP >= 8.1
+- PHP 8.2 or later with the required database, ZIP, and GD extensions
 - Composer
-- Node.js & npm
-- MySQL
+- Node.js and npm
+- MySQL or another database supported by the configured Laravel connection
+- Flutter 3.7.0 / Dart 2.19.0 for the current mobile dependency lockfile
 
-### Installation
+## Backend setup
 
-1. Clone the repository
-```bash
-   git clone https://github.com/Sumitkc74/learn_to_drive.git
-   cd learn_to_drive
+From a fresh checkout:
+
+```powershell
+cd backend
+composer install
+Copy-Item .env.example .env
+php artisan key:generate
 ```
 
-2. Install PHP dependencies
-```bash
-   composer install
+Configure the database, mail, storage, authentication, and other services in
+`backend/.env`, then run migrations and start the development server:
+
+```powershell
+php artisan migrate
+php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-3. Install JS dependencies
-```bash
-   npm install
+Build frontend assets in a second terminal from `backend/`:
+
+```powershell
+npm ci
+npm run build
 ```
 
-4. Set up environment file
-```bash
-   cp .env.example .env
-   php artisan key:generate
+The application is then available at `http://localhost:8000`.
+
+## Mobile setup
+
+Start the backend first, then from `mobile/`:
+
+```powershell
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api/
 ```
 
-5. Configure your database in `.env`, then run migrations
-```bash
-   php artisan migrate
+`10.0.2.2` points an Android emulator to the development computer. For a
+physical device, use the computer's LAN address and ensure both devices can
+reach the backend. Use HTTPS and production configuration for release builds.
+See [mobile setup](mobile/README.md) and [integration status](mobile/IMPORT.md)
+for current compatibility and API notes.
+
+## Verification
+
+Backend checks:
+
+```powershell
+cd backend
+php artisan test
+npm run build
+git diff --check
 ```
 
-6. Build frontend assets
-```bash
-   npm run dev
+Mobile checks:
+
+```powershell
+cd mobile
+flutter analyze --no-pub
+flutter test --no-pub
 ```
 
-7. Start the Laravel server
-```bash
-   php artisan serve
-```
+## Documentation
 
-The app should now be running at `http://localhost:8000`.
+Feature and operational guides are available in [docs/](docs/). Open
+[learn-to-drive.code-workspace](learn-to-drive.code-workspace) in VS Code to
+work with the backend, mobile client, and documentation together.
 
-## Roadmap
+## Security
 
-- [ ] Build client-facing frontend
-- [ ] Practice test / quiz mode
-- [ ] User progress tracking
-- [ ] Mobile-friendly UI
+Never commit `.env` files, application keys, database credentials, payment
+secrets, or provider tokens. Client applications and compiled assets are public;
+server-side validation and authorization remain mandatory for protected actions.
 
 ## License
 
-This is a personal project. All rights reserved — not licensed for reuse or distribution.
+This is a personal project and is not currently licensed for reuse or
+redistribution.

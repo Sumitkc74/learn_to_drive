@@ -1,0 +1,3 @@
+# Windows x64, Python 3.12. Includes Tesseract 5.5.2; no global installer needed.
+-r requirements-pdf-tools.txt
+https://github.com/simonflueckiger/tesserocr-windows_build/releases/download/tesserocr-v2.10.0-tesseract-5.5.2/tesserocr-2.10.0-cp312-cp312-win_amd64.whl

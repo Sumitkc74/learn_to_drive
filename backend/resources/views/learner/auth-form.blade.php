@@ -1,0 +1,5 @@
+<form method="post" action="{{ route($register ? 'learn.register' : 'learn.login') }}" class="stack">@csrf
+@if($register)<label>{{ __('Full name') }}<input name="name" required maxlength="100" autocomplete="name" value="{{ old('name') }}"></label><label>{{ __('Phone number') }}<input name="phoneNumber" required pattern="[0-9]{10}" inputmode="tel" autocomplete="tel" value="{{ old('phoneNumber') }}" placeholder="{{ __('10 digits') }}"></label>@endif
+<label>{{ __('Email') }}<input name="email" type="email" required autocomplete="email" value="{{ old('email') }}"></label><label>{{ __('Password') }}<input name="password" type="password" required minlength="8" autocomplete="{{ $register?'new-password':'current-password' }}"></label>
+@if($register)<label>{{ __('Confirm password') }}<input name="password_confirmation" type="password" required minlength="8" autocomplete="new-password"></label>@endif
+<button class="button">{{ __($register?'Create account':'Sign in') }}</button></form>
