@@ -1,0 +1,43 @@
+﻿{
+    "folders":  [
+                    {
+                        "name":  "Laravel backend \u0026 web",
+                        "path":  "backend"
+                    },
+                    {
+                        "name":  "Flutter mobile",
+                        "path":  "mobile"
+                    },
+                    {
+                        "name":  "Documentation",
+                        "path":  "docs"
+                    }
+                ],
+    "settings":  {
+                     "java.import.gradle.java.home":  "E:\\Class\\GitHub\\learn_to_drive\\.tools\\java17\\jdk-17.0.20.1+1",
+                     "dart.analysisExcludedFolders":  [
+                                                          "E:/Class/GitHub/learn_to_drive/backend/storage/flutter-import-source",
+                                                          "E:/Class/GitHub/learn_to_drive/storage/flutter-import-source"
+                                                      ]
+                 },
+    "tasks":  {
+                  "version":  "2.0.0",
+                  "tasks":  [
+                                {
+                                    "label":  "Flutter: Install dependencies (compatible)",
+                                    "problemMatcher":  [
+
+                                                       ],
+                                    "command":  "flutter",
+                                    "type":  "shell",
+                                    "args":  [
+                                                 "pub",
+                                                 "get"
+                                             ],
+                                    "options":  {
+                                                    "cwd":  "${workspaceFolder:Flutter mobile}"
+                                                }
+                                }
+                            ]
+              }
+}

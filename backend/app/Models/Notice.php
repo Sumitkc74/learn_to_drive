@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\TracksCreator;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Notice extends Model
+{
+    use HasFactory, SoftDeletes, TracksCreator;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'title',
+        'description',
+        'nepaliTitle',
+        'nepaliDescription',
+        'link',
+        'status',
+        'publish_at',
+        'expires_at',
+        'source_name',
+        'source_url',
+        'government_notice_import_id',
+    ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Notice $notice) {
+            if ($notice->status === 'Published' && !$notice->publish_at && ($notice->isDirty('status') || !$notice->exists)) {
+                $notice->publish_at = now();
+            }
+        });
+    }
+
+    protected $casts = [
+        'publish_at' => 'datetime',
+        'expires_at' => 'datetime',
+    ];
+
+    public function scopeVisibleToLearners($query)
+    {
+        return $query->where('status', 'Published')
+            ->where(fn ($builder) => $builder->whereNull('publish_at')->orWhere('publish_at', '<=', now()))
+            ->where(fn ($builder) => $builder->whereNull('expires_at')->orWhere('expires_at', '>', now()));
+    }
+
+    public function getPublicationStateAttribute(): string
+    {
+        if ($this->status !== 'Published') return $this->status;
+        if ($this->publish_at?->isFuture()) return 'Scheduled';
+        if ($this->expires_at?->isPast()) return 'Expired';
+        return 'Active';
+    }
+}

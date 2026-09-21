@@ -1,0 +1,5 @@
+@extends('learner.layout')
+@section('title',__('Your conversation'))
+@section('content')
+<div class="page-heading"><a href="{{ route('learn.support') }}">{{ __('← All conversations') }}</a><h1>{{ $ticket->subject }}</h1><span class="badge">{{ __($ticket->status) }}</span></div><div class="reading-column"><article class="card"><strong>{{ __('Your message ·') }} {{ $ticket->created_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }}</strong><p class="prose">{{ $ticket->message }}</p></article>@foreach($ticket->replies as $reply)<article @class(['card','soft'=>$reply->author_role==='Admin'])><strong>{{ __($reply->author_role==='Admin'?'Admin team':'You') }} · {{ $reply->created_at->locale(app()->getLocale())->translatedFormat('d M Y, H:i') }}</strong><p class="prose">{{ $reply->message }}</p></article>@endforeach<form class="card stack" method="post">@csrf<label>{{ __('Add a reply') }}<textarea name="message" required maxlength="5000" rows="5">{{ old('message') }}</textarea></label><button class="button">{{ __('Send reply →') }}</button></form></div>
+@endsection

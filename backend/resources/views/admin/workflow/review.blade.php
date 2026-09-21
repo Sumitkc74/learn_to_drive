@@ -1,0 +1,13 @@
+@extends('admin.layout.master')
+@section('title','Review Operations')
+@section('content')
+<div class="ltd-panel"><h1>Review operations</h1><p>Select up to 25 items. Publishing remains an individual review action.</p>
+<nav class="mb-3">@foreach(['learning'=>'Learning content','government'=>'Government imports','notices'=>'Published notices'] as $key=>$label)<a class="btn btn-outline-secondary" href="{{ route('reviewOperations',['type'=>$key]) }}">{{ $label }}</a> @endforeach</nav>
+<form method="POST" action="{{ route('reviewOperations.update') }}">@csrf<input type="hidden" name="type" value="{{ $type }}">
+<table class="table"><thead><tr><th>Select</th><th>Item</th><th>Assigned admin</th></tr></thead><tbody>@foreach($items as $item)<tr><td><input type="checkbox" name="ids[]" value="{{ $item->id }}" aria-label="Select item {{ $item->id }}"></td><td><a href="{{ $type==='learning' ? route('learningContent.show',$item) : ($type==='notices' ? route('editNotice',$item) : route('governmentNotices')) }}">#{{ $item->id }} {{ $item->title }}</a></td><td>{{ $admins->firstWhere('id',$item->assigned_to)?->name ?? 'Unassigned' }}</td></tr>@endforeach</tbody></table>
+<label for="bulk-action">Action</label><select id="bulk-action" name="action" class="form-control mb-2">@if($type==='notices')<option value="archive">Archive</option>@else<option value="claim">Mark as being reviewed by me</option><option value="release">Release my assignment</option><option value="assign">Assign to admin</option><option value="reject">Reject</option>@if($type==='learning')<option value="category">Set licence category</option>@endif @endif</select>
+@if($type!=='notices')<label for="assigned-admin">Admin (for assignment)</label><select id="assigned-admin" name="admin_id" class="form-control"><option value="">Choose admin</option>@foreach($admins as $admin)<option value="{{ $admin->id }}">{{ $admin->name }}</option>@endforeach</select>
+@if($type==='learning')<label for="bulk-category">Licence category (for category action)</label><select id="bulk-category" name="category" class="form-control"><option value="">Choose category</option>@foreach(['A/K','B','All','Other','Unknown'] as $category)<option>{{ $category }}</option>@endforeach</select>@endif
+<label for="bulk-reason">Reason (required for rejection)</label><textarea id="bulk-reason" name="reason" class="form-control" maxlength="1000"></textarea>@endif
+<label class="my-3"><input type="checkbox" name="confirmed" value="1" required> I checked the selected items and confirm this action.</label> <button class="btn btn-primary">Apply to selected items</button></form>{{ $items->links() }}</div>
+@endsection
