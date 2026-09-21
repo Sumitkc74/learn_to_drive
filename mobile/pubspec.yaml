@@ -44,6 +44,7 @@ dependencies:
   url_launcher: ^6.1.10
   google_fonts: ^4.0.3
   syncfusion_flutter_pdfviewer: ^21.1.37
+  archive: ^3.3.8
   get_storage: ^2.1.1
   image_picker: ^0.8.7+1
   flutter_localizations:
