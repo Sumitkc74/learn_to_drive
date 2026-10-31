@@ -1,3 +1,4 @@
+import 'package:app_links/app_links.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
@@ -12,9 +13,20 @@ import 'package:first_app/Screens/AuthScreen/login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Return links only wake the app; they never authenticate or select resources.
+  AppLinks().uriLinkStream.listen((uri) {
+    if (uri.scheme != 'learntodrive' ||
+        uri.host != 'return' ||
+        uri.hasQuery ||
+        uri.hasFragment) {
+      return;
+    }
+  }, onError: (_) {});
   await StorageHelper.removeLegacySession();
+  await Session.restore();
   learnerNepali = Map<String, String>.from(
-      jsonDecode(await rootBundle.loadString('assets/i18n/ne.json')));
+    jsonDecode(await rootBundle.loadString('assets/i18n/ne.json')),
+  );
   final language = GetStorage().read('learner_language') ?? 'en';
   final dark = GetStorage().read('learner_dark');
   Session.onClear = () {
@@ -23,24 +35,30 @@ Future<void> main() async {
   apiClient.onUnauthorized = () {
     Get.offAll(() => const LoginScreen());
   };
-  runApp(GetMaterialApp(
-    title: 'Learn to Drive',
-    debugShowCheckedModeBanner: false,
-    themeMode: dark == null
-        ? ThemeMode.system
-        : (dark ? ThemeMode.dark : ThemeMode.light),
-    theme: ThemeData(
+  runApp(
+    GetMaterialApp(
+      title: 'Learn to Drive',
+      debugShowCheckedModeBanner: false,
+      themeMode: dark == null
+          ? ThemeMode.system
+          : (dark ? ThemeMode.dark : ThemeMode.light),
+      theme: ThemeData(
         colorScheme: const ColorScheme.light(
-            primary: Color(0xFFFACC15),
-            onPrimary: Colors.black,
-            secondary: Color(0xFF30343B))),
-    darkTheme: ThemeData(
+          primary: Color(0xFFFACC15),
+          onPrimary: Colors.black,
+          secondary: Color(0xFF30343B),
+        ),
+      ),
+      darkTheme: ThemeData(
         colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFFACC15),
-            onPrimary: Colors.black,
-            secondary: Color(0xFFFACC15))),
-    translations: LocaleString(),
-    locale: Locale(language, language == 'ne' ? 'NP' : 'US'),
-    home: const SplashScreen(),
-  ));
+          primary: Color(0xFFFACC15),
+          onPrimary: Colors.black,
+          secondary: Color(0xFFFACC15),
+        ),
+      ),
+      translations: LocaleString(),
+      locale: Locale(language, language == 'ne' ? 'NP' : 'US'),
+      home: const SplashScreen(),
+    ),
+  );
 }

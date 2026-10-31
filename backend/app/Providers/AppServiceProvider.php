@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+        \Illuminate\Support\Facades\URL::forceScheme(parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https');
         Queue::looping(function (Looping $event) {
             if ($event->connectionName === 'pdf-extraction') {
                 app(AdminSystemHealth::class)->heartbeat();

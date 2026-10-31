@@ -1,12 +1,12 @@
 {
-    "name": "first_app",
-    "short_name": "first_app",
+    "name": "Learn to Drive",
+    "short_name": "Learn to Drive",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#30343B",
+    "theme_color": "#30343B",
+    "description": "Learning resources, practice and driving schools.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

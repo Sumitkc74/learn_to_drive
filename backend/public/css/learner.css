@@ -70,6 +70,24 @@ body{background:#fff}
 .language-switch summary,.dialog-close{min-width:44px;min-height:44px}.study-chat-panel header #study-chat-close{min-width:44px;min-height:44px}.language-options button,.account-menu-panel a,.account-menu-panel button{min-height:44px}.bookmark-action{margin-bottom:20px}.next-step{margin-bottom:20px}.button{min-height:44px}.muted,.field-help{color:#58616e}summary:focus-visible{outline:3px solid #a38b00;outline-offset:4px}.option{min-height:48px}.option strong,.option input{flex-shrink:0}.option{overflow-wrap:anywhere}.prose{max-width:100%}
 @media(max-width:600px){.container,.nav-wrap{width:calc(100% - 32px)}.nav-wrap{gap:16px}.nav-wrap nav{width:100%;gap:10px 16px}.nav-wrap nav>a{min-height:44px;display:inline-flex;align-items:center}.brand{font-size:18px;max-width:100%}.brand-tag{display:none}.filters{flex-wrap:wrap;align-items:stretch}.filters label{width:100%;min-width:0}.two-column,.grid{grid-template-columns:minmax(0,1fr)}.notice-row{flex-wrap:wrap;gap:12px}.notice-row>strong{flex-basis:100%}.section-heading{flex-wrap:wrap}.auth-dialog{padding:20px}.study-chat-panel{max-height:calc(100dvh - 100px - env(safe-area-inset-bottom))}.study-chat-toggle{bottom:calc(16px + env(safe-area-inset-bottom))}.study-chat-panel{bottom:calc(76px + env(safe-area-inset-bottom))}.footer{padding-bottom:80px}.page-heading h1{overflow-wrap:anywhere;font-size:34px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* Keep intrinsic form widths and long bilingual content inside their columns. */
+.container,.card,.stack,.grid>*,.two-column>*,.settings-layout>*,.engagement-grid>*{min-width:0}
+.container{overflow-wrap:anywhere}
+input,select,textarea,fieldset{min-width:0;max-width:100%}
+fieldset{margin-inline:0}
+.button,summary,button{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+img,video,iframe{max-width:100%}
+.pagination ul,.actions,.progress-totals,.activity-week{flex-wrap:wrap}
+.account-menu-panel{max-height:70dvh;overflow-y:auto}
+@media(max-width:600px){
+  .card{padding:18px}.stack{gap:16px}
+  input,select,textarea{font-size:16px}
+  .container button,.container summary{min-height:44px}
+  .account-menu-panel{position:fixed;left:16px;right:16px;top:auto;width:auto;max-width:none;min-width:0}
+  .language-options{position:fixed;left:16px;right:16px;top:auto;min-width:0}
+  .stats{flex-wrap:wrap}.brand{white-space:normal}.brand-icon{flex-shrink:0}
+}
+@media(max-height:500px){.study-chat-panel{bottom:12px;max-height:calc(100dvh - 24px)}.study-chat-messages{min-height:0;flex:1}.widget-intro{display:none}}
 
 /* Shared learner appearance preference, matching the mobile yellow/charcoal theme. */
 .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:inherit;font-size:22px;cursor:pointer}

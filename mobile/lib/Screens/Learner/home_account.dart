@@ -14,6 +14,7 @@ import 'common.dart';
 import 'practice.dart';
 import 'resources.dart';
 import 'support_premium.dart';
+import 'schools.dart';
 
 class BrowserLoginPage extends StatefulWidget {
   const BrowserLoginPage({super.key});
@@ -63,6 +64,7 @@ class _BrowserLoginPageState extends State<BrowserLoginPage>
       Session.clear();
       currentUser = CurrentUser.fromJson(r['user']);
       accessToken = AccessToken.fromJson(r['token']);
+      await Session.persist();
       Get.offAll(() => const NavigationPage());
     });
     if (mounted) setState(() => busy = false);
@@ -98,6 +100,7 @@ Widget accountPage() => LearnerDataPage(
       return [
         Text(user['name'], style: const TextStyle(fontSize: 24)),
         Text(user['email']),
+        learnerTile('School centre', () => Get.to(() => schoolCentrePage())),
         for (final field in {
           'name': 'Name',
           'email': 'Email',

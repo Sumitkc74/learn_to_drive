@@ -8,6 +8,7 @@
 <a href="{{ route('learn.home') }}">{{ __('Home') }}</a>
 @endauth
 <a href="{{ route('learn.library.home') }}" @if($libraryActive) aria-current="page" @endif>{{ __('Library') }}</a>
+<a href="{{ route('learn.schools') }}" @if(request()->routeIs('learn.schools')) aria-current="page" @endif>{{ __('Find schools') }}</a>
 <a href="{{ route('learn.practice') }}" @if(request()->routeIs('learn.practice','learn.practice.*','learn.flashcards')) aria-current="page" @endif>{{ __('Practice') }}</a>
 <a href="{{ route('learn.library','notice') }}" @if(request()->route('type')==='notice') aria-current="page" @endif>{{ __('Notices') }}</a>
 @guest
@@ -15,17 +16,22 @@
 @endguest
 @auth
 @if(auth()->user()->role==='Admin')<a href="{{ route('adminDashboard') }}">{{ __('Admin dashboard') }}</a>@endif
+@if(auth()->user()->is_active && auth()->user()->schoolMembershipsForStaff()->whereHas('school', fn ($q) => $q->where('status', 'Approved'))->exists())
+<a href="{{ route('learn.school.dashboard') }}" @if(request()->routeIs('learn.school.*')) aria-current="page" @endif>{{ __('My school') }}</a>
+@endif
 
 <details class="account-menu">
 <summary @if(request()->routeIs('learn.settings','learn.settings.*','learn.premium','learn.premium.*','learn.payments*','learn.support*','learn.report')) class="account-menu-active" @endif>{{ __('Account') }} <span aria-hidden="true">▾</span></summary>
 <div class="account-menu-panel"><span class="account-menu-name">{{ auth()->user()->name }}</span><a href="{{ route('learn.settings') }}" @if(request()->routeIs('learn.settings','learn.settings.*')) aria-current="page" @endif>{{ __('Account settings') }}</a><a href="{{ route('learn.premium') }}" @if(request()->routeIs('learn.premium','learn.premium.*','learn.payments*')) aria-current="page" @endif>{{ __('Premium') }}</a>
+<a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a>
+<a href="{{ route('learn.school.centre') }}">{{ __('School centre') }}</a>
 <a href="{{ route('learn.support') }}" @if(request()->routeIs('learn.support*','learn.report')) aria-current="page" @endif>{{ __('Help & feedback') }}</a><form action="{{ route('learn.logout') }}" method="post">@csrf<button type="submit">{{ __('Sign out') }}</button></form></div>
 </details>
 @else
 <a class="button small" href="{{ route('learn.login') }}" data-auth-open="signin">{{ __('Sign in') }}</a>
 @endauth
 <button type="button" class="theme-toggle" data-theme-toggle aria-label="{{ __('Toggle dark mode') }}" title="{{ __('Toggle dark mode') }}"><span aria-hidden="true">◐</span></button>@include('learner.language-switch')</nav></div></header>
-<main id="main" class="container">@if(session('success'))<div class="alert" role="status">{{ __(session('success')) }}</div>@endif @if(session('error'))<div class="alert error" role="alert">{{ __(session('error')) }}</div>@endif @if($errors->any())<div class="alert error" role="alert"><strong>{{ __('Please check the following:') }}</strong><ul>@foreach($errors->all() as $error)<li>{{ __($error) }}</li>@endforeach</ul></div>@endif @auth @if(session('mobile_login_id'))<p class="alert"><a href="{{ route('learn.mobile.connect',session('mobile_login_id')) }}">{{ __('Review pending mobile sign-in') }}</a></p>@endif @endauth @yield('content')</main>
+<main id="main" class="container">@if(session('success'))<div class="alert" role="status">{{ __(session('success')) }}</div>@endif @if(session('error'))<div class="alert error" role="alert">{{ __(session('error')) }}</div>@endif @if($errors->any())<div class="alert error" role="alert"><strong>{{ __('Please check the following:') }}</strong><ul>@foreach($errors->all() as $error)<li>{{ __($error) }}</li>@endforeach</ul></div>@endif @auth @if(session('mobile_login_id'))<p class="alert"><a href="{{ route('learn.mobile.connect',session('mobile_login_id')) }}">{{ __('Review pending mobile sign-in') }}</a></p>@endif @endauth @if(session('mobile_return_available') || session('mobile_login_id'))<p><a href="learntodrive://return">{{ __('Return to mobile app') }}</a></p>@endif @yield('content')</main>
 <footer class="container footer"><div><strong>Learn to Drive</strong><p>{{ __('Small steps. Safer journeys.') }}</p></div><div>@guest<a href="{{ route('learn.support') }}">{{ __('Help & feedback') }}</a><a href="{{ route('login') }}">{{ __('Admin sign in') }}</a>@endguest</div><p>{{ __('Study resources for Nepal. Check official notices for current exam requirements.') }}</p></footer>@guest @unless(request()->routeIs('learn.login','learn.register')) @include('learner.auth-dialogs') @endunless @endguest
 @if(auth()->check() && auth()->user()->hasPremium() && !request()->routeIs('learn.premium.chat','learn.mfa.*'))
 @include('learner.chat-widget')

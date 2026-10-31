@@ -13,7 +13,8 @@ import 'package:first_app/Screens/AuthScreen/login.dart';
 class AuthController extends GetxController {
   // Do not display HTML error pages or raw exception details from the transport.
   Future<http.Response> _request(
-      Future<http.Response> Function() action) async {
+    Future<http.Response> Function() action,
+  ) async {
     try {
       final response = await action();
       final data = jsonDecode(response.body);
@@ -23,12 +24,13 @@ class AuthController extends GetxController {
       return http.Response(jsonEncode(data), response.statusCode);
     } catch (_) {
       return http.Response(
-          jsonEncode({
-            'status': false,
-            'message':
-                'Unable to complete the request. Check your connection and try again.',
-          }),
-          503);
+        jsonEncode({
+          'status': false,
+          'message':
+              'Unable to complete the request. Check your connection and try again.',
+        }),
+        503,
+      );
     }
   }
 
@@ -40,7 +42,9 @@ class AuthController extends GetxController {
         data['token']['access_token'] is! String ||
         (data['token']['access_token'] as String).isEmpty) {
       Get.snackbar(
-          'Sign-in failed', 'The server returned an invalid sign-in response.');
+        'Sign-in failed',
+        'The server returned an invalid sign-in response.',
+      );
       return false;
     }
     return true;
@@ -48,28 +52,36 @@ class AuthController extends GetxController {
 
   var loading = false.obs;
 
-  Future<void> login(
-      {required String email,
-      required String password,
-      String? mfaCode}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    String? mfaCode,
+  }) async {
     if (email.isNotEmpty && password.isNotEmpty) {
       http.Response response = await _request(
-          () => AuthServicesRepo.login(email, password, mfaCode: mfaCode));
+        () => AuthServicesRepo.login(email, password, mfaCode: mfaCode),
+      );
       Map responseMap = jsonDecode(response.body);
       if (responseMap['mfa_required'] == true) {
         final codeController = TextEditingController();
-        final code = await Get.dialog<String>(AlertDialog(
+        final code = await Get.dialog<String>(
+          AlertDialog(
             title: Text('Two-step verification'.tr),
             content: TextField(
-                controller: codeController,
-                decoration: InputDecoration(
-                    labelText: 'Authenticator or recovery code'.tr)),
+              controller: codeController,
+              decoration: InputDecoration(
+                labelText: 'Authenticator or recovery code'.tr,
+              ),
+            ),
             actions: [
               TextButton(onPressed: () => Get.back(), child: Text('Cancel'.tr)),
               TextButton(
-                  onPressed: () => Get.back(result: codeController.text.trim()),
-                  child: Text('Continue'.tr))
-            ]));
+                onPressed: () => Get.back(result: codeController.text.trim()),
+                child: Text('Continue'.tr),
+              ),
+            ],
+          ),
+        );
         codeController.dispose();
         if (code != null && code.isNotEmpty) {
           await login(email: email, password: password, mfaCode: code);
@@ -81,9 +93,13 @@ class AuthController extends GetxController {
         Session.clear();
         currentUser = CurrentUser.fromJson(responseMap['user']);
         accessToken = AccessToken.fromJson(responseMap['token']);
+        await Session.persist();
         Get.offAll(() => const NavigationPage());
-        Get.snackbar("Success", responseMap["message"],
-            backgroundColor: Colors.green);
+        Get.snackbar(
+          "Success",
+          responseMap["message"],
+          backgroundColor: Colors.green,
+        );
       } else {
         Get.snackbar("Failed", responseMap["message"]);
       }
@@ -92,30 +108,36 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> register(
-      {required String firstName,
-      required String lastName,
-      required String email,
-      required String phoneNumber,
-      required String password,
-      required String confirmPassword}) async {
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phoneNumber,
+    required String password,
+    required String confirmPassword,
+  }) async {
     bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(email);
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(email);
     if (emailValid) {
       if (password == confirmPassword) {
         String name = "$firstName $lastName";
-        final http.Response response = await _request(() =>
-            AuthServicesRepo.register(name, email, phoneNumber, password));
+        final http.Response response = await _request(
+          () => AuthServicesRepo.register(name, email, phoneNumber, password),
+        );
         Map responseMap = jsonDecode(response.body);
         if (response.statusCode == 200 && responseMap['status'] != false) {
           if (!_validateSession(responseMap['data'])) return;
           Session.clear();
           currentUser = CurrentUser.fromJson(responseMap['data']['user']);
           accessToken = AccessToken.fromJson(responseMap['data']['token']);
+          await Session.persist();
           Get.offAll(() => const NavigationPage());
-          Get.snackbar("Registration Successful", responseMap["message"],
-              backgroundColor: Colors.green);
+          Get.snackbar(
+            "Registration Successful",
+            responseMap["message"],
+            backgroundColor: Colors.green,
+          );
         } else {
           Get.snackbar("Failed", responseMap["message"]);
         }
@@ -132,61 +154,80 @@ class AuthController extends GetxController {
     Session.clear();
     Get.offAll(() => const LoginScreen());
     Get.snackbar(
-        'Signed out',
-        response.statusCode == 200
-            ? 'You have been signed out.'
-            : 'Signed out on this device. Server sign-out could not be confirmed.');
+      'Signed out',
+      response.statusCode == 200
+          ? 'You have been signed out.'
+          : 'Signed out on this device. Server sign-out could not be confirmed.',
+    );
   }
 
-  Future<void> changePassword(
-      {required String currentPassword,
-      required String newPassword,
-      required String confirmNewPassword}) async {
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
     if (currentPassword.isNotEmpty &&
         newPassword.isNotEmpty &&
         confirmNewPassword.isNotEmpty) {
       if (newPassword == confirmNewPassword) {
         if (newPassword != currentPassword) {
-          http.Response response = await _request(() =>
-              AuthServicesRepo.changePassword(currentPassword, newPassword));
+          http.Response response = await _request(
+            () => AuthServicesRepo.changePassword(currentPassword, newPassword),
+          );
           Map responseMap = jsonDecode(response.body);
           if (response.statusCode == 200 && responseMap['status'] != false) {
             Get.back();
-            Get.snackbar("Success", responseMap["message"],
-                backgroundColor: Colors.green);
+            Get.snackbar(
+              "Success",
+              responseMap["message"],
+              backgroundColor: Colors.green,
+            );
           } else {
             Get.snackbar("Failed", responseMap["message"]);
           }
         } else {
           Get.snackbar(
-              "Failed", 'Current password and new password cannot be same');
+            "Failed",
+            'Current password and new password cannot be same',
+          );
         }
       } else {
         Get.snackbar(
-            "Failed", 'Please enter same password in confirm password');
+          "Failed",
+          'Please enter same password in confirm password',
+        );
       }
     } else {
       Get.snackbar("Failed", 'Enter all the required fields');
     }
   }
 
-  Future<void> updateProfile(
-      {required String name,
-      required String email,
-      required String phoneNumber,
-      required String profileImage}) async {
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String phoneNumber,
+    required String profileImage,
+  }) async {
     if (name.isNotEmpty &&
         email.isNotEmpty &&
         phoneNumber.isNotEmpty &&
         profileImage.isNotEmpty) {
-      http.Response response = await _request(() =>
-          AuthServicesRepo.updateProfile(
-              name, email, phoneNumber, profileImage));
+      http.Response response = await _request(
+        () => AuthServicesRepo.updateProfile(
+          name,
+          email,
+          phoneNumber,
+          profileImage,
+        ),
+      );
       Map responseMap = jsonDecode(response.body);
       if (response.statusCode == 200 && responseMap['status'] != false) {
         Get.back();
-        Get.snackbar("Success", responseMap["message"],
-            backgroundColor: Colors.green);
+        Get.snackbar(
+          "Success",
+          responseMap["message"],
+          backgroundColor: Colors.green,
+        );
       } else {
         Get.snackbar("Failed", responseMap["message"]);
       }
@@ -197,13 +238,16 @@ class AuthController extends GetxController {
 
   Future<void> forgotPassword({required String email}) async {
     if (email.isNotEmpty) {
-      http.Response response =
-          await _request(() => AuthServicesRepo.resetPassword(email));
+      http.Response response = await _request(
+        () => AuthServicesRepo.resetPassword(email),
+      );
       Map responseMap = jsonDecode(response.body);
       if (response.statusCode == 200 && responseMap['status'] != false) {
         Get.offAll(() => const LoginScreen());
-        Get.snackbar('Check your email',
-            'If your account is eligible, follow the reset instructions sent to your email.');
+        Get.snackbar(
+          'Check your email',
+          'If your account is eligible, follow the reset instructions sent to your email.',
+        );
       } else {
         Get.snackbar('Failed', responseMap["message"]);
       }

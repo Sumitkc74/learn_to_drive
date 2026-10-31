@@ -34,7 +34,8 @@ history are available through the app. Google sign-in/linking and payment checko
 use explicit browser handoffs; provider secrets remain on the server.
 
 See [learner feature parity](../docs/learner-feature-parity.md) for the feature
-matrix, migration, language sync and verification details. Tokens are memory-only.
+matrix, migration, language sync and verification details. Native tokens use
+platform encrypted storage; Flutter web tokens remain in memory only.
 The original Flutter/platform dependencies still require modernization before
 store distribution. Device and live provider testing are not implied by automated
 unit/feature tests.

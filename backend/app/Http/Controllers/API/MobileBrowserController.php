@@ -54,7 +54,7 @@ class MobileBrowserController extends Controller
     }
     public function handoff(Request $request)
     {
-        $data=$request->validate(['destination'=>'required|in:premium,payments,settings,account,practice.attempt','attempt_id'=>'required_if:destination,practice.attempt|nullable|integer','language'=>'nullable|in:en,ne','practice_language'=>'nullable|in:en,ne']);
+        $data=$request->validate(['destination'=>'required|in:premium,payments,settings,account,practice.attempt,school.centre,schools,lessons,lessons.bookings,instructor.lessons','attempt_id'=>'required_if:destination,practice.attempt|nullable|integer','language'=>'nullable|in:en,ne','practice_language'=>'nullable|in:en,ne']);
         if($data['destination']==='practice.attempt')\App\Models\LearnerPracticeAttempt::where('user_id',$request->user()->id)->findOrFail($data['attempt_id']);
         $id=bin2hex(random_bytes(32));
         Cache::put('mobile-handoff:'.$id,['user'=>$request->user()->id,'destination'=>$data['destination'],'attempt_id'=>$data['attempt_id'] ?? null,'language'=>$data['language'] ?? 'en','practice_language'=>$data['practice_language'] ?? null,'marker'=>$this->marker($request->user()),'token_id'=>$request->user()->currentAccessToken()?->getKey()],now()->addMinute());
@@ -76,6 +76,7 @@ class MobileBrowserController extends Controller
             Auth::guard('web')->login($user);$request->session()->regenerate();
             $request->session()->put('mfa_verified',AccountMfa::marker($user));
             $request->session()->put('learner_locale',$flow['language'] ?? 'en');
+            $request->session()->put('mobile_return_available', true);
             if(!empty($flow['practice_language']))$request->session()->put('practice_language',$flow['practice_language']);
             if($flow['destination']==='practice.attempt')\App\Models\LearnerPracticeAttempt::where('user_id',$user->id)->findOrFail($flow['attempt_id']);
             return redirect()->route('learn.'.$flow['destination'],$flow['destination']==='practice.attempt'?['id'=>$flow['attempt_id']]:[]);

@@ -1,4 +1,22 @@
 <?php
+// School web and mobile workflows use the same controller and authorization rules.
+\Illuminate\Support\Facades\Route::prefix('school-centre')->middleware(['auth:sanctum', \App\Http\Middleware\MobileLearner::class, 'throttle:60,1'])->group(function () {
+    $progress=\App\Http\Controllers\School\ProgressController::class;
+    \Illuminate\Support\Facades\Route::get('{school}/report',[$progress,'report'])->whereNumber('school');
+    \Illuminate\Support\Facades\Route::get('{school}/students/{student}/readiness',[$progress,'readiness'])->whereNumber('school')->whereNumber('student');
+    \Illuminate\Support\Facades\Route::post('{school}/students/{student}/feedback',[$progress,'feedback'])->whereNumber('school')->whereNumber('student');
+    $records=\App\Http\Controllers\School\StudentRecordController::class;
+    \Illuminate\Support\Facades\Route::get('{school}/students',[$records,'index'])->whereNumber('school');
+    \Illuminate\Support\Facades\Route::get('{school}/students/{student}',[$records,'show'])->whereNumber('school')->whereNumber('student');
+    \Illuminate\Support\Facades\Route::post('{school}/students/{student}/{kind}',[$records,'save'])->whereNumber('school')->whereNumber('student');
+    $c=\App\Http\Controllers\School\PartnerController::class;
+    \Illuminate\Support\Facades\Route::get('/',[$c,'index']);
+    \Illuminate\Support\Facades\Route::post('apply',[$c,'apply'])->middleware('throttle:3,60,school-applications');
+    \Illuminate\Support\Facades\Route::post('invitations/{invitation}',[$c,'invitation'])->whereNumber('invitation');
+    \Illuminate\Support\Facades\Route::post('read',[$c,'read']);
+    \Illuminate\Support\Facades\Route::get('{school}',[$c,'show'])->whereNumber('school');
+    \Illuminate\Support\Facades\Route::post('{school}/{action}',[$c,'action'])->whereNumber('school');
+});
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

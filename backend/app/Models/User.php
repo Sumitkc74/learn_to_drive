@@ -89,4 +89,14 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         return $this->hasMany(UserHistory::class);
     }
+
+    public function schoolMemberships()
+    {
+        return $this->hasMany(SchoolMembership::class);
+    }
+
+    public function schoolMembershipsForStaff()
+    {
+        return $this->schoolMemberships()->whereIn('role', ['Owner', 'Manager', 'Instructor']);
+    }
 }

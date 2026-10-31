@@ -56,4 +56,33 @@ class PremiumGateway {
             $payment->update(['status'=>'Paid','transaction_id'=>$transaction,'paid_at'=>now(),'access_until'=>$until]);
         });return true;
     }
+
+    public function refund(PremiumPayment $payment, ?string $reason = null): bool
+    {
+        if ($payment->gateway === 'khalti') {
+            if (!$payment->provider_id) {
+                throw new \RuntimeException('No provider transaction was captured for this Khalti payment.');
+            }
+
+            $response = $this->http()
+                ->withHeaders(['Authorization' => 'Key '.config('payments.khalti_key')])
+                ->post($this->khaltiBase($payment->live).'/refund/', [
+                    'pidx' => $payment->provider_id,
+                    'amount' => $payment->amount_paisa,
+                    'remarks' => $reason ?: 'Refund requested via Learn to Drive admin workflow',
+                ]);
+
+            if (!$response->successful()) {
+                throw new \RuntimeException('Refund request failed with the payment provider.');
+            }
+
+            return true;
+        }
+
+        if ($payment->gateway === 'esewa') {
+            throw new \RuntimeException('eSewa refunds must be handled in the merchant dashboard; this app does not support automated eSewa refund calls.');
+        }
+
+        throw new \RuntimeException('Unsupported gateway for refunds.');
+    }
 }

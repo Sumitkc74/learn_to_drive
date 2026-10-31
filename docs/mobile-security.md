@@ -5,8 +5,9 @@ local storage, private-data logging, and Android release defaults.
 
 ## Implemented safeguards
 
-- Tokens and profile data are memory-only. Startup removes legacy GetStorage
-  token/profile values; local profile records cannot establish authentication.
+- Native tokens and profiles use platform encrypted storage scoped to the API
+  origin. Startup removes legacy plaintext GetStorage credentials and rejects
+  expired saved sessions. Flutter web keeps credentials in memory only.
 - Logout clears tokens, the profile, attempted questions, and registered
   controllers even if server logout fails. Failed server revocation is reported
   honestly: it does not mean the remote token was revoked.
@@ -66,9 +67,9 @@ Run `flutter test` and `dart analyze` from `mobile/`. Regression tests cover
 origin/path/HTTPS enforcement, redirect policy, public authentication headers,
 session clearing, and responses from a previous account.
 
-This is code hardening, not a penetration-test certification. No Android/iOS
-device build, live account or payment test was performed. Flutter 3.7 and its
-dependencies still need a planned upgrade before production distribution.
+This is code hardening, not a penetration-test certification. Live account,
+payment and physical device flows still require verification. Flutter and its
+direct plugins have been upgraded; see `mobile-toolchain.md` for native setup.
 Mobile MFA and shared learner features are documented in `learner-feature-parity.md`.
-Login tokens remain memory-only. Server authorization and premium access
+Server authorization and premium access
 must remain enforced by Laravel; client role checks are not a security boundary.

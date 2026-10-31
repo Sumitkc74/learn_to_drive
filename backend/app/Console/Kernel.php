@@ -12,6 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command('schools:send-reminders')->hourly()->withoutOverlapping();
         $schedule->command('content:check-revisions')->dailyAt('03:00')->timezone('Asia/Kathmandu')->withoutOverlapping();
         $schedule->command('content:recover-screening')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('notices:archive-old')->dailyAt('02:20')->timezone('Asia/Kathmandu')->withoutOverlapping();

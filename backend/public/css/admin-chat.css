@@ -1,0 +1,18 @@
+.admin-chat { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 1040; color: var(--text); }
+.admin-chat__panel { width: min(360px, calc(100vw - 32px)); height: min(520px, calc(100dvh - 100px)); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 32px #0003; overflow: hidden; margin-bottom: 10px; }
+.admin-chat__panel[hidden] { display: none; }
+.admin-chat__header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface-secondary); border-bottom: 1px solid var(--border); }
+.admin-chat__header button { background: transparent; color: var(--text); border: 0; font-size: 26px; width: 36px; height: 36px; }
+.admin-chat__history { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px; }
+.admin-chat__message { margin-bottom: 12px; overflow-wrap: anywhere; }
+.admin-chat__message strong { font-size: 12px; color: var(--text-muted); }
+.admin-chat__message p { white-space: pre-wrap; margin: 4px 0; padding: 10px; border-radius: 8px; background: var(--surface-secondary); }
+.admin-chat form { padding: 12px 16px; border-top: 1px solid var(--border); overflow-y: auto; }
+.admin-chat textarea { width: 100%; background: var(--surface-secondary); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: none; }
+.admin-chat__hint { font-size: 12px; color: var(--text-muted); margin: 6px 0; }
+.admin-chat__toggle, #adminChatSend { border: 0; background: #ffde17; color: #2a2a2a; padding: 10px 16px; border-radius: 24px; font-weight: 700; }
+.admin-chat__toggle { display: flex; align-items: center; gap: 8px; margin-left: auto; box-shadow: 0 4px 16px #0002; }
+.admin-chat button { cursor: pointer; }
+.admin-chat button:disabled { opacity: .6; cursor: wait; }
+.admin-chat :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+#adminChatStatus { font-size: 13px; margin: 6px 0; }

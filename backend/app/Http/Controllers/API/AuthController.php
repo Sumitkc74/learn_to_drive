@@ -59,7 +59,7 @@ class AuthController extends BaseController
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $expiresAt
-            )->toDateTimeString()
+            )->toIso8601String()
         ];
         return response()->json([
             'status' => true,
@@ -127,7 +127,7 @@ class AuthController extends BaseController
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $expiresAt
-            )->toDateTimeString()
+            )->toIso8601String()
         ];
 
         return response()->json([

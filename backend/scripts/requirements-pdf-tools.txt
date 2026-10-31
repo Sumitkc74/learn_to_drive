@@ -1,2 +1,2 @@
 pypdfium2==5.13.0
-Pillow==12.3.0
+Pillow>=13.0.0

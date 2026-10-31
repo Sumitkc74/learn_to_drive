@@ -10,7 +10,9 @@ class SafeLinks {
     final uri = parse(url);
     if (uri == null) {
       Get.snackbar(
-          'Link blocked', 'This link is not an approved secure destination.');
+        'Link blocked',
+        'This link is not an approved secure destination.',
+      );
       return;
     }
     try {
@@ -19,7 +21,9 @@ class SafeLinks {
       // Do not expose URLs or platform exception details in logs.
     }
     Get.snackbar(
-        'Link unavailable', 'Unable to open this link. Please try again.');
+      'Link unavailable',
+      'Unable to open this link. Please try again.',
+    );
   }
 
   static Uri? parse(String value, {bool media = false}) {
@@ -30,14 +34,17 @@ class SafeLinks {
         !uri.hasAuthority ||
         uri.userInfo.isNotEmpty ||
         uri.host.isEmpty ||
-        uri.hasFragment) return null;
+        uri.hasFragment) {
+      return null;
+    }
     final own = uri.origin == api.origin;
     if (uri.scheme != 'https' && !(kDebugMode && own && uri.scheme == 'http')) {
       return null;
     }
     if (media) return own ? uri : null;
     final host = uri.host.toLowerCase();
-    final trusted = own ||
+    final trusted =
+        own ||
         host == 'dotm.gov.np' ||
         host.endsWith('.dotm.gov.np') ||
         host == 'youtube.com' ||
@@ -53,8 +60,9 @@ class SafeLinks {
     try {
       final request = http.Request('GET', uri)..followRedirects = false;
       // Public library documents never receive a bearer token.
-      final response =
-          await client.send(request).timeout(const Duration(seconds: 20));
+      final response = await client
+          .send(request)
+          .timeout(const Duration(seconds: 20));
       if (response.statusCode != 200) {
         throw const FormatException('Document unavailable.');
       }

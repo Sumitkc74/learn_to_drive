@@ -25,33 +25,22 @@ class SettingsWidget extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(10),
             onTap: onTap,
-            splashColor: Colors.grey.withOpacity(0.1),
+            splashColor: Colors.grey.withValues(alpha: 0.1),
             child: SizedBox(
               height: 80,
-              width: Get.width/1.15,
+              width: Get.width / 1.15,
               child: Center(
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   spacing: 10.0,
                   children: [
-                    Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+                    Icon(icon, color: Colors.white, size: 30),
                     Text(
                       label,
-                      style: const TextStyle(
-                        color: Colors.white, 
-                        fontSize: 25
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 25),
                     ),
-                    Icon(
-                      arrowIcon,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+                    Icon(arrowIcon, color: Colors.white, size: 30),
                   ],
                 ),
               ),

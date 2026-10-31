@@ -24,18 +24,28 @@ class DotmNoticeImporter
     {
         $sourceUrl = config('services.dotm.notices_url', 'https://dotm.gov.np/');
         $host = strtolower((string) parse_url($sourceUrl, PHP_URL_HOST));
-        if (parse_url($sourceUrl, PHP_URL_SCHEME) !== 'https' || !in_array($host, self::ALLOWED_HOSTS, true)) {
+        if (parse_url($sourceUrl, PHP_URL_USER)!==null || parse_url($sourceUrl, PHP_URL_PASS)!==null || !in_array(parse_url($sourceUrl, PHP_URL_PORT),[null,443],true) || parse_url($sourceUrl, PHP_URL_SCHEME) !== 'https' || !in_array($host, self::ALLOWED_HOSTS, true)) {
             throw new RuntimeException('The configured DoTM source is not on the official allowlist.');
         }
 
         $response = Http::withOptions([
+            'allow_redirects' => false, 'stream' => true,
             'verify' => config('official-content.ca_bundle') ?: true,
         ])->timeout(20)->retry(2, 1000)->withHeaders([
             'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (one-page public notice check)',
             'Accept' => 'text/html,application/xhtml+xml',
         ])->get($sourceUrl)->throw();
 
-        $links = $this->extractLinks($response->body(), $sourceUrl);
+        $stream=$response->toPsrResponse()->getBody();
+        $html='';
+        try {
+            if(!$response->successful())throw new RuntimeException('Official source redirects are not followed.');
+            while(!$stream->eof()){
+                $html.=$stream->read(65536);
+                if(strlen($html)>2*1024*1024)throw new RuntimeException('Official source exceeds the 2 MB limit.');
+            }
+        } finally { $stream->close(); }
+        $links = $this->extractLinks($html, $sourceUrl);
         $created = 0;
         foreach ($links as $link) {
             $hash = hash('sha256', $link['url'].'|'.$link['title']);

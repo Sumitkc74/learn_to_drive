@@ -56,7 +56,7 @@ class GovernmentNoticeImportTest extends TestCase
 
     public function test_repeated_fetch_does_not_duplicate_imports(): void
     {
-        Http::fake(['https://dotm.gov.np/' => Http::response('<a href="/license">Driving license notice</a>')]);
+        Http::fake(['https://dotm.gov.np/' => fn () => Http::response('<a href="/license">Driving license notice</a>')]);
         $importer = app(DotmNoticeImporter::class);
         $importer->fetch();
         $result = $importer->fetch();

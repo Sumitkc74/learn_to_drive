@@ -51,8 +51,8 @@ synchronized between independent browser/device sessions.
 Practice offers English and Nepali on both clients, with the most recent choice
 remembered locally. Mobile My learning uses the shared next-step recommendation,
 and resource details support both saving and removing bookmarks. Website password
-changes and reset links revoke existing mobile API tokens. Mobile login remains
-memory-only until encrypted device credential storage is implemented.
+changes and reset links revoke existing mobile API tokens. Native login restores
+unexpired sessions from platform encrypted storage, scoped to the API origin.
 
 Most new API endpoints are under `/api/learner`; support continues using the
 existing support API. Published/visible content checks, ownership, active-account
@@ -91,6 +91,15 @@ MFA, browser exchange, and native draft/submission behavior.
 
 Native device behavior and live Google/mail/Gemini/payment provider flows still
 need deployment/device verification. The old Flutter SDK and Android/iOS build
-configuration still need modernization before store distribution. Tokens remain
-memory-only, so restarting the app requires sign-in; practice drafts and learner
-data remain on the server and are available after signing in again.
+configuration have been updated, but store distribution still requires native
+device testing and production signing. Native sessions now survive app restarts;
+practice drafts and learner data remain on the server.
+
+## School centre
+
+Account now includes School centre. Native mobile screens support applications,
+invitations, school membership, batch enrollment, schedules, attendance viewing,
+notifications and opt-in progress sharing. School staff forms, the school map,
+private lesson booking and payments use the authenticated browser handoff.
+See [school workflows](driving-schools.md) for roles, privacy and setup, and
+[lesson payments](private-driving-lessons.md) for merchant setup and manual refunds.

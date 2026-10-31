@@ -3,7 +3,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-use App\Models\{User,Question,LearnerPracticeAttempt,PremiumChatTurn,SupportTicket};
+use App\Models\{User,Question,LearnerPracticeAttempt,Notice,PremiumChatTurn,SupportTicket};
 class LearnerPremiumTest extends TestCase {
     use RefreshDatabase;
     private function question(){return Question::create(['question'=>'A sample study question','option1'=>'One','option2'=>'Two','option3'=>'Three','option4'=>'Four','correctOption'=>'A','explanation'=>'Explanation to study','status'=>'Published','category'=>'General','difficulty'=>'Easy']);}
@@ -40,7 +40,7 @@ class LearnerPremiumTest extends TestCase {
         $this->post(route('learn.premium.message'),['message'=>'Explain a concept'])->assertRedirect();
         $this->get(route('learn.premium.chat'))->assertOk()->assertSee('A helpful explanation')->assertDontSee('<script>bad()</script>',false);
         Http::assertSent(fn($r)=>!str_contains($r->body(),$user->email) && isset($r['systemInstruction']));
-        
+
         $this->post(route('learn.premium.message'),['message'=>'Try again'])->assertSessionHas('error');
         $this->assertSame(1,PremiumChatTurn::where('status','Failed')->count());
         $this->post(route('learn.premium.message'),['message'=>'Above limit'])->assertSessionHasErrors('message');
@@ -74,5 +74,14 @@ class LearnerPremiumTest extends TestCase {
         $user->update(['role'=>'User']);
         $this->get('/learn/practice')->assertDontSee('id="study-chat-toggle"',false);
         $this->postJson(route('learn.premium.message'),['message'=>'Hello'])->assertRedirect(route('learn.premium'));
+    }
+    public function test_chat_retrieves_active_notices_as_reference_context(): void {
+        config(['pdf-translation.gemini_key'=>'notice-key']);
+        Notice::create(['title'=>'New driving test booking guidance','description'=>'Book your driving test through the official process.','nepaliTitle'=>'परीक्षा सूचना','nepaliDescription'=>'आधिकारिक प्रक्रिया','status'=>'Published']);
+        Http::fake(['*'=>Http::response(['candidates'=>[['finishReason'=>'STOP','content'=>['parts'=>[['text'=>'Use the official booking process.']]]]]])]);
+        $user=User::factory()->create(['is_active'=>true,'role'=>'PremiumUser']);
+        $this->actingAs($user)->post(route('learn.premium.message'),['message'=>'How do I book a driving test?'])->assertRedirect();
+        Http::assertSent(fn($request)=>str_contains($request['systemInstruction']['parts'][0]['text'],'New driving test booking guidance')
+            && str_contains($request['systemInstruction']['parts'][0]['text'],'"type":"notice"'));
     }
 }

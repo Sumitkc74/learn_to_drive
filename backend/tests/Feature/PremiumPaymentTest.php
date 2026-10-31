@@ -44,4 +44,30 @@ class PremiumPaymentTest extends TestCase {
         $expected=base64_encode(hash_hmac('sha256','total_amount=499.00,transaction_uuid='.$p->id.',product_code=TEST','test-secret',true));
         $this->assertSame($expected,$form['fields']['signature']);
     }
+    public function test_admin_can_refund_paid_premium_and_revoke_access():void {
+        $admin=User::factory()->create(['role'=>'Admin','is_active'=>true]);
+        $user=User::factory()->create(['is_active'=>true,'premium_until'=>now()->addDays(30)]);
+        $p=PremiumPayment::create(['id'=>(string)Str::uuid(),'user_id'=>$user->id,'gateway'=>'khalti','live'=>false,'merchant'=>'TEST','amount_paisa'=>49900,'access_days'=>30,'status'=>'Paid','provider_id'=>'pidx-refund','transaction_id'=>'txn-refund','paid_at'=>now(),'access_until'=>now()->addDays(30)]);
+        Http::fake(['https://dev.khalti.com/api/v2/refund/' => Http::response(['message' => 'Refund request successful'])]);
+        $this->actingAs($admin)->post(route('admin.payments.refund',$p),['reason'=>'Customer requested refund'])->assertRedirect();
+        $p=$p->fresh();
+        $this->assertSame('Refunded',$p->status);
+        $this->assertSame('refunded',$p->refund_status);
+        $this->assertNotNull($p->refunded_at);
+        $this->assertFalse($user->fresh()->hasPremium());
+        $this->assertTrue($user->fresh()->premium_until->isPast());
+    }
+
+    public function test_admin_can_view_premium_payment_history_and_refund_actions():void {
+        $admin=User::factory()->create(['role'=>'Admin','is_active'=>true]);
+        $user=User::factory()->create(['is_active'=>true]);
+        $p=PremiumPayment::create(['id'=>(string)Str::uuid(),'user_id'=>$user->id,'gateway'=>'khalti','live'=>false,'merchant'=>'TEST','amount_paisa'=>49900,'access_days'=>30,'status'=>'Paid','provider_id'=>'pidx-page','transaction_id'=>'txn-page','paid_at'=>now(),'access_until'=>now()->addDays(30)]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.premium-payments.index'))
+            ->assertOk()
+            ->assertSee($user->name)
+            ->assertSee('Refund reason')
+            ->assertSee(route('admin.payments.refund', $p));
+    }
 }

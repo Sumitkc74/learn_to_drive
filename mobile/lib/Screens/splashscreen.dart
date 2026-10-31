@@ -1,3 +1,5 @@
+import 'package:first_app/Services/session.dart';
+import 'package:first_app/Screens/navigator.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,7 +20,13 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _navigationTimer = Timer(const Duration(seconds: 3), () {
-      if (mounted) Get.off(() => const LoginScreen());
+      if (mounted) {
+        Get.off(
+          () => Session.isAuthenticated
+              ? const NavigationPage()
+              : const LoginScreen(),
+        );
+      }
     });
   }
 

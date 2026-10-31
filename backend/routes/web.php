@@ -51,6 +51,15 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/school-payments',[\App\Http\Controllers\Admin\SchoolPaymentController::class,'index'])->name('admin.school-payments');
+    Route::post('/admin/school-payments/{payment}/refund',[\App\Http\Controllers\Admin\SchoolPaymentController::class,'refund'])->middleware('throttle:5,1')->name('admin.school-payments.refund');
+    Route::get('/admin/bulk-import', [\App\Http\Controllers\Admin\BulkImportController::class, 'index'])->name('bulkImport');
+    Route::get('/admin/bulk-import/{type}/template', [\App\Http\Controllers\Admin\BulkImportController::class, 'template'])->name('bulkImport.template');
+    Route::post('/admin/bulk-import/{type}', [\App\Http\Controllers\Admin\BulkImportController::class, 'store'])->middleware('throttle:5,1')->name('bulkImport.store');
+    Route::get('/admin/schools', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'index'])->name('admin.schools.index');
+    Route::post('/admin/schools', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'store'])->middleware('throttle:20,1')->name('admin.schools.store');
+    Route::get('/admin/schools/{school}/edit', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'edit'])->whereNumber('school')->name('admin.schools.edit');
+    Route::patch('/admin/schools/{school}', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'update'])->whereNumber('school')->name('admin.schools.update');
     Route::get('/admin/media-library', [\App\Http\Controllers\Admin\MediaLibraryController::class, 'index'])->name('mediaLibrary');
     Route::get('/admin/import-progress', [\App\Http\Controllers\Admin\ImportProgressController::class, 'index'])->name('importProgress');
     Route::get('/admin/website-import', [\App\Http\Controllers\Admin\WebsiteImportController::class, 'index'])->name('websiteImport');
@@ -82,6 +91,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/support', [\App\Http\Controllers\Admin\SupportController::class, 'index'])->name('support.index');
     Route::get('/admin/support/{ticket}', [\App\Http\Controllers\Admin\SupportController::class, 'show'])->whereNumber('ticket')->name('support.show');
     Route::post('/admin/support/{ticket}', [\App\Http\Controllers\Admin\SupportController::class, 'update'])->whereNumber('ticket')->name('support.update');
+    Route::get('/admin/ai-chat', [\App\Http\Controllers\Admin\AiChatController::class, 'index'])->name('admin.ai-chat');
+    Route::post('/admin/ai-chat', [\App\Http\Controllers\Admin\AiChatController::class, 'send'])->name('admin.ai-chat.send');
+    Route::get('/admin/premium-payments', [\App\Http\Controllers\Admin\PaymentRefundController::class, 'index'])->name('admin.premium-payments.index');
+    Route::post('/admin/payments/{payment}/refund', [\App\Http\Controllers\Admin\PaymentRefundController::class, 'refund'])->whereUuid('payment')->name('admin.payments.refund');
     Route::get('/admin/learning-content', [\App\Http\Controllers\Admin\LearningContentController::class, 'index'])->name('learningContent');
     Route::get('/admin/content-readiness',[\App\Http\Controllers\Admin\ContentReadinessController::class,'index'])->name('contentReadiness');
     Route::post('/admin/content-readiness/{question}/verify',[\App\Http\Controllers\Admin\ContentReadinessController::class,'verify'])->whereNumber('question')->name('contentReadiness.verify');

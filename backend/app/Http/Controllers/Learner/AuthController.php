@@ -3,7 +3,11 @@ namespace App\Http\Controllers\Learner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,Hash};
 class AuthController extends \App\Http\Controllers\Controller {
-    private function dashboard(){return redirect()->route(auth()->user()->role==='Admin'?'adminDashboard':'learn.account');}
+    private function dashboard(){
+        if (auth()->user()->role === 'Admin') return redirect()->route('adminDashboard');
+        if (auth()->user()->schoolMembershipsForStaff()->exists()) return redirect()->route('learn.school.dashboard');
+        return redirect()->route('learn.account');
+    }
     public function loginForm(){return auth()->check()?$this->dashboard():view('learner.auth',['register'=>false]);}
     public function registerForm(){return auth()->check()?$this->dashboard():view('learner.auth',['register'=>true]);}
     public function login(Request $request){
