@@ -1,0 +1,12 @@
+.git
+.env
+# .env.example is intentionally kept: the Dockerfile copies it to .env
+# for the build only; Render's real env vars override it at runtime.
+node_modules
+vendor
+public/build
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+*.log

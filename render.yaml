@@ -1,0 +1,49 @@
+# Render Blueprint for the Learn to Drive demo.
+# The database is NOT defined here on purpose: Render's free PostgreSQL
+# expires after 30 days, so the demo uses a free Aiven MySQL database
+# instead (see docs/render-aiven-deployment.md). Create that first, then
+# fill in the DB_* values below in the Render dashboard — they are marked
+# sync: false so they are never committed to the repo.
+services:
+  - type: web
+    name: learn-to-drive
+    env: docker
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: APP_NAME
+        value: Learn to Drive
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: https://learn-to-drive.onrender.com
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: MAIL_MAILER
+        value: log
+      - key: TRUSTED_PROXIES
+        value: "*"
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
