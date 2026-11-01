@@ -8,7 +8,7 @@
 PRODUCT_NAME = learn_to_drive
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.learn_to_drive
+PRODUCT_BUNDLE_IDENTIFIER = com.sumitkc74.learn_to_drive
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 com.sumitkc74. All rights reserved.

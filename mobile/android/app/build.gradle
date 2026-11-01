@@ -3,7 +3,7 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 android {
-    namespace "com.example.learn_to_drive"
+    namespace "com.sumitkc74.learn_to_drive"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
     compileOptions {
@@ -11,7 +11,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     defaultConfig {
-        applicationId "com.example.learn_to_drive"
+        applicationId "com.sumitkc74.learn_to_drive"
         minSdk flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion
         versionCode flutter.versionCode
