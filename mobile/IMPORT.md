@@ -9,7 +9,7 @@
 This is a source snapshot managed by the Laravel repository, not a submodule.
 The upstream Git history and root IDE configuration were not imported. Existing
 platform projects, assets, dependency lockfile and application screens are kept.
-The Dart package name remains `first_app` to preserve package imports.
+The Dart package name is now `learn_to_drive`, renamed from the template name `first_app` in November 2026; all Dart package imports and platform identifiers (Android, iOS, macOS, Windows, Linux) were updated together.
 
 Import adjustments:
 

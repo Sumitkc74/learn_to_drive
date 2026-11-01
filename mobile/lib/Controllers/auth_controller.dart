@@ -1,14 +1,14 @@
 import 'dart:convert';
-import 'package:first_app/Services/session.dart';
+import 'package:learn_to_drive/Services/session.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:first_app/models/access_token_model.dart';
-import 'package:first_app/models/current_user_model.dart';
-import 'package:first_app/Services/Repo/auth_services_repo.dart';
-import 'package:first_app/Screens/navigator.dart';
-import 'package:first_app/Screens/AuthScreen/login.dart';
+import 'package:learn_to_drive/models/access_token_model.dart';
+import 'package:learn_to_drive/models/current_user_model.dart';
+import 'package:learn_to_drive/Services/Repo/auth_services_repo.dart';
+import 'package:learn_to_drive/Screens/navigator.dart';
+import 'package:learn_to_drive/Screens/AuthScreen/login.dart';
 
 class AuthController extends GetxController {
   // Do not display HTML error pages or raw exception details from the transport.

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Services/globals.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Services/globals.dart';
 
 class AuthServicesRepo {
   static Future<http.Response> register(

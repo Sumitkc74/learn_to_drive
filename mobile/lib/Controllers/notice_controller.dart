@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:first_app/models/notice_model.dart';
-import 'package:first_app/Services/Repo/notice_repo.dart';
+import 'package:learn_to_drive/models/notice_model.dart';
+import 'package:learn_to_drive/Services/Repo/notice_repo.dart';
 
 class NoticeController extends GetxController {
   RxList<Notice> notices = RxList();

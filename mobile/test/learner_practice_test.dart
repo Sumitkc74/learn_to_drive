@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:first_app/Services/learner_api.dart';
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Screens/Learner/practice.dart';
+import 'package:learn_to_drive/Services/learner_api.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Screens/Learner/practice.dart';
 
 void main() {
   tearDown(() {

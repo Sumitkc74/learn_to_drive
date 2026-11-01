@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:first_app/Services/Repo/vision_test_repo.dart';
-import 'package:first_app/models/vision_test.dart';
+import 'package:learn_to_drive/Services/Repo/vision_test_repo.dart';
+import 'package:learn_to_drive/models/vision_test.dart';
 
 class VisionTestController extends GetxController {
   RxList<VisionTest> visionTests = RxList();

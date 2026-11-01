@@ -6,9 +6,9 @@ changes and outstanding API integration work.
 
 ## Development
 
-The imported project requires Dart >=2.18.5 <3.0.0. Dependencies were resolved
-using the installed Flutter 3.7.0 / Dart 2.19.0 SDK. Do not assume this legacy
-project builds on current Flutter without a separate SDK/dependency migration.
+Use the SDK range in `pubspec.yaml` (currently Dart >=3.10.0 <4.0.0; the
+committed `pubspec.lock` was resolved with Dart >=3.13.0 and Flutter >=3.47.0).
+Do not use the legacy Flutter 3.7.0 / Dart 2.19.0 setup for this lockfile.
 
 From the repository root, start the local API:
 
@@ -41,8 +41,9 @@ the Flutter project. No nested Git repository or separate push is needed.
 
 ## Flutter dependency command compatibility
 
-Flutter 3.7 / Dart 2.19 requires Dart and Flutter VS Code extensions **3.104.0**.
-Both extensions are installed at that version and pinned on this machine.
+The legacy Flutter 3.7 / Dart 2.19 setup required Dart and Flutter VS Code extensions **3.104.0**.
+That pin does not apply to the current SDK range in `pubspec.yaml`; use extensions
+compatible with the Flutter/Dart SDK you actually install.
 See the [official SDK compatibility table](https://dartcode.org/sdk-version-compatibility/).
 Newer extensions reject this SDK and may pass unsupported `--no-example` arguments.
 Normal Get Packages and automatic package fetching are enabled again. Alternatively,

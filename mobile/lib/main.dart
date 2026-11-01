@@ -2,14 +2,14 @@ import 'package:app_links/app_links.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:first_app/Screens/splashscreen.dart';
-import 'package:first_app/Services/locale_string.dart';
+import 'package:learn_to_drive/Screens/splashscreen.dart';
+import 'package:learn_to_drive/Services/locale_string.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Services/storage_helper.dart';
-import 'package:first_app/Services/session.dart';
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Screens/AuthScreen/login.dart';
+import 'package:learn_to_drive/Services/storage_helper.dart';
+import 'package:learn_to_drive/Services/session.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Screens/AuthScreen/login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

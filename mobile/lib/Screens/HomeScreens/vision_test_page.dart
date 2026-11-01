@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:first_app/Controllers/vision_test_controller.dart';
-import 'package:first_app/models/vision_test.dart';
-import 'package:first_app/utils/flip_image.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/Controllers/vision_test_controller.dart';
+import 'package:learn_to_drive/models/vision_test.dart';
+import 'package:learn_to_drive/utils/flip_image.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
 
 class VisionTestPage extends StatelessWidget {
   VisionTestPage({super.key});

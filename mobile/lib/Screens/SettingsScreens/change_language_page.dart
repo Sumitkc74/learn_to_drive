@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Controllers/setting_controller.dart';
-import 'package:first_app/utils/widgets/button_widget.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/Controllers/setting_controller.dart';
+import 'package:learn_to_drive/utils/widgets/button_widget.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
 
 class ChangeLanguageScreen extends StatelessWidget {
   ChangeLanguageScreen({super.key});

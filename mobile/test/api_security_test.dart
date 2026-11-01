@@ -2,12 +2,12 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Services/globals.dart';
-import 'package:first_app/Services/session.dart';
-import 'package:first_app/models/access_token_model.dart';
-import 'package:first_app/models/current_user_model.dart';
-import 'package:first_app/models/question_model.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Services/globals.dart';
+import 'package:learn_to_drive/Services/session.dart';
+import 'package:learn_to_drive/models/access_token_model.dart';
+import 'package:learn_to_drive/models/current_user_model.dart';
+import 'package:learn_to_drive/models/question_model.dart';
 
 void main() {
   setUp(() {

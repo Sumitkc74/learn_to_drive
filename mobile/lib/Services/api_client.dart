@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart';
 import 'session.dart';
-import 'package:first_app/models/access_token_model.dart';
+import 'package:learn_to_drive/models/access_token_model.dart';
 
 /// Only the configured API receives credentials; redirects are never followed.
 class ApiClient extends http.BaseClient {

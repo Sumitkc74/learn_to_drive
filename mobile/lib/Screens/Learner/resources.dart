@@ -1,10 +1,10 @@
-import 'package:first_app/Services/session.dart';
-import 'package:first_app/Screens/AuthScreen/login.dart';
+import 'package:learn_to_drive/Services/session.dart';
+import 'package:learn_to_drive/Screens/AuthScreen/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Services/learner_api.dart';
-import 'package:first_app/Services/safe_links.dart';
-import 'package:first_app/utils/pdf_reader.dart';
+import 'package:learn_to_drive/Services/learner_api.dart';
+import 'package:learn_to_drive/Services/safe_links.dart';
+import 'package:learn_to_drive/utils/pdf_reader.dart';
 import 'common.dart';
 
 class FlashcardsPage extends StatefulWidget {

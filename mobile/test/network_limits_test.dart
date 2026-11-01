@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Services/safe_links.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Services/safe_links.dart';
 
 void main() {
   test('rejects chunked response over the byte limit', () async {

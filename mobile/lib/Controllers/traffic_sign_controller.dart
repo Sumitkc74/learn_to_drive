@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:first_app/Services/Repo/traffic_sign_repo.dart';
-import 'package:first_app/models/traffic_sign.dart';
+import 'package:learn_to_drive/Services/Repo/traffic_sign_repo.dart';
+import 'package:learn_to_drive/models/traffic_sign.dart';
 
 class TrafficSignController extends GetxController {
   RxList<TrafficSign> trafficSigns = RxList();

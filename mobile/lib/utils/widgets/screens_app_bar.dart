@@ -1,6 +1,6 @@
-import 'package:first_app/Controllers/notice_controller.dart';
+import 'package:learn_to_drive/Controllers/notice_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/utils/colors.dart';
+import 'package:learn_to_drive/utils/colors.dart';
 import 'package:get/get.dart';
 
 import 'notification_button_widget.dart';

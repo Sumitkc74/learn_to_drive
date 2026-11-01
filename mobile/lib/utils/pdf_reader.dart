@@ -1,9 +1,9 @@
 import 'dart:typed_data';
-import 'package:first_app/Services/safe_links.dart';
+import 'package:learn_to_drive/Services/safe_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
 
 class PdfReaderScreen extends StatefulWidget {
   final String title;

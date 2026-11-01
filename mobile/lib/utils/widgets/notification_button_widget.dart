@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Controllers/notice_controller.dart';
-import 'package:first_app/Screens/HomeScreens/notifications.dart';
+import 'package:learn_to_drive/Controllers/notice_controller.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/notifications.dart';
 
 class NotificationBellButton extends StatelessWidget {  
   final noticeController = Get.put(NoticeController());

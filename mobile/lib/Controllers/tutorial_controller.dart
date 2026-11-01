@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:first_app/models/tutorial_model.dart';
-import 'package:first_app/Services/Repo/tutorial_repo.dart';
+import 'package:learn_to_drive/models/tutorial_model.dart';
+import 'package:learn_to_drive/Services/Repo/tutorial_repo.dart';
 
 class TutorialController extends GetxController {
   final tutorials = <Tutorial>[];

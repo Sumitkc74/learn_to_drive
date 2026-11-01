@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:first_app/Services/Repo/exam_information_repo.dart';
-import 'package:first_app/models/exam_information_model.dart';
+import 'package:learn_to_drive/Services/Repo/exam_information_repo.dart';
+import 'package:learn_to_drive/models/exam_information_model.dart';
 
 class ExamInformationController extends GetxController {
   RxList<ExamInformation> examInformations = RxList();

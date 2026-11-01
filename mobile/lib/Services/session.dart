@@ -1,6 +1,6 @@
-import 'package:first_app/models/access_token_model.dart';
-import 'package:first_app/models/current_user_model.dart';
-import 'package:first_app/models/question_model.dart';
+import 'package:learn_to_drive/models/access_token_model.dart';
+import 'package:learn_to_drive/models/current_user_model.dart';
+import 'package:learn_to_drive/models/question_model.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

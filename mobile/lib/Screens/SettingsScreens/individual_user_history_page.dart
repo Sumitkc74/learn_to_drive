@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:first_app/models/user_history_model.dart';
-import 'package:first_app/Controllers/user_history_controller.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/models/user_history_model.dart';
+import 'package:learn_to_drive/Controllers/user_history_controller.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
 
 class IndividualUserHistory extends StatelessWidget {
   final UserHistory userHistory;

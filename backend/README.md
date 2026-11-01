@@ -9,9 +9,8 @@ Learn to Drive is a web application that helps users prepare for their driving t
 
 ## Current Status
 
-🚧 **In Development**
-
 - ✅ Admin panel (web) — manage questions, content, and users
+- ✅ Learner website — library, practice sessions, flashcards, support, schools, and premium pages (see `../docs/learner-web.md` and `routes/learner.php`)
 - Flutter mobile client imported under `mobile/`; API modernization remains in progress
 
 ## Features
@@ -21,7 +20,7 @@ Learn to Drive is a web application that helps users prepare for their driving t
 - Organize content into categories/topics
 - Manage users
 
-### Planned (client-side)
+### Learner website (available now)
 - Browse and study driving test material
 - Take practice quizzes/mock tests
 - Track progress and scores
@@ -85,10 +84,9 @@ The app should now be running at `http://localhost:8000`.
 
 ## Roadmap
 
-- [ ] Build client-facing frontend
-- [ ] Practice test / quiz mode
-- [ ] User progress tracking
-- [ ] Mobile-friendly UI
+- [ ] Modernize mobile dependencies before store distribution
+- [ ] Server-side payment-provider verification (see below)
+- [ ] Device and live-provider testing for the mobile client
 
 > Payment upgrades are temporarily disabled until server-side payment-provider
 > verification is implemented. Never grant premium access from a client-provided

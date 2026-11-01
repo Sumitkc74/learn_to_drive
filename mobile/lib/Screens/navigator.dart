@@ -1,9 +1,9 @@
-import 'package:first_app/Services/learner_api.dart';
+import 'package:learn_to_drive/Services/learner_api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Screens/Learner/home_account.dart';
-import 'package:first_app/Screens/Learner/practice.dart';
-import 'package:first_app/Screens/Learner/support_premium.dart';
+import 'package:learn_to_drive/Screens/Learner/home_account.dart';
+import 'package:learn_to_drive/Screens/Learner/practice.dart';
+import 'package:learn_to_drive/Screens/Learner/support_premium.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});

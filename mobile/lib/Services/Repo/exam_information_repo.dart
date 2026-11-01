@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:first_app/Services/api_client.dart';
-import 'package:first_app/Services/globals.dart';
-import 'package:first_app/models/exam_information_model.dart';
+import 'package:learn_to_drive/Services/api_client.dart';
+import 'package:learn_to_drive/Services/globals.dart';
+import 'package:learn_to_drive/models/exam_information_model.dart';
 
 class ExamInformationRepo {
   static Future<void> getExamInformation(

@@ -1,10 +1,10 @@
-import 'package:first_app/Services/session.dart';
-import 'package:first_app/Screens/navigator.dart';
+import 'package:learn_to_drive/Services/session.dart';
+import 'package:learn_to_drive/Screens/navigator.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Screens/AuthScreen/login.dart';
-import 'package:first_app/utils/colors.dart';
+import 'package:learn_to_drive/Screens/AuthScreen/login.dart';
+import 'package:learn_to_drive/utils/colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

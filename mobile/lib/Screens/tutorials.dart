@@ -1,11 +1,11 @@
-import 'package:first_app/Services/safe_links.dart';
+import 'package:learn_to_drive/Services/safe_links.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:first_app/Controllers/notice_controller.dart';
+import 'package:learn_to_drive/Controllers/notice_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Controllers/tutorial_controller.dart';
-import 'package:first_app/models/tutorial_model.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/Controllers/tutorial_controller.dart';
+import 'package:learn_to_drive/models/tutorial_model.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
 
 // import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 

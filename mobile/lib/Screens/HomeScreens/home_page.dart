@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:first_app/models/current_user_model.dart';
-import 'package:first_app/utils/widgets/home_widget.dart';
-import 'package:first_app/utils/widgets/screens_app_bar.dart';
-import 'package:first_app/Screens/HomeScreens/exam_information_page.dart';
-import 'package:first_app/Screens/HomeScreens/reading_materials_page.dart';
-import 'package:first_app/Screens/HomeScreens/traffic_sign_page.dart';
-import 'package:first_app/Screens/HomeScreens/vision_test_page.dart';
-import 'package:first_app/Screens/HomeScreens/mock_exam_page.dart';
+import 'package:learn_to_drive/models/current_user_model.dart';
+import 'package:learn_to_drive/utils/widgets/home_widget.dart';
+import 'package:learn_to_drive/utils/widgets/screens_app_bar.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/exam_information_page.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/reading_materials_page.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/traffic_sign_page.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/vision_test_page.dart';
+import 'package:learn_to_drive/Screens/HomeScreens/mock_exam_page.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

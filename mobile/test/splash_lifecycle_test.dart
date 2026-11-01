@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:first_app/Screens/splashscreen.dart';
+import 'package:learn_to_drive/Screens/splashscreen.dart';
 
 void main() {
   testWidgets('closing splash cancels pending navigation and animation',

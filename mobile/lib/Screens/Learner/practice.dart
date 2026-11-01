@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Services/learner_api.dart';
+import 'package:learn_to_drive/Services/learner_api.dart';
 import 'common.dart';
 import 'resources.dart';
 

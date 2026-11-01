@@ -1,8 +1,8 @@
-import 'package:first_app/Screens/Learner/home_account.dart';
+import 'package:learn_to_drive/Screens/Learner/home_account.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:first_app/Controllers/auth_controller.dart';
-import 'package:first_app/utils/widgets/text_field_widget.dart';
+import 'package:learn_to_drive/Controllers/auth_controller.dart';
+import 'package:learn_to_drive/utils/widgets/text_field_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);

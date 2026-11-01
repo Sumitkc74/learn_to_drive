@@ -1,5 +1,5 @@
-name: first_app
-description: A new Flutter project.
+name: learn_to_drive
+description: Learn to Drive mobile client.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.

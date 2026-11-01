@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:first_app/models/question_model.dart';
-import 'package:first_app/models/user_history_model.dart';
-import 'package:first_app/Services/Repo/user_history_repo.dart';
-import 'package:first_app/Screens/navigator.dart';
+import 'package:learn_to_drive/models/question_model.dart';
+import 'package:learn_to_drive/models/user_history_model.dart';
+import 'package:learn_to_drive/Services/Repo/user_history_repo.dart';
+import 'package:learn_to_drive/Screens/navigator.dart';
 
 class UserHistoryController extends GetxController {
   Map<String, List<String>> buildHistorySubmission() => {

@@ -20,7 +20,7 @@ from `backend/`; run Flutter commands from `mobile/`.
 - Composer
 - Node.js and npm
 - MySQL or another database supported by the configured Laravel connection
-- Flutter 3.7.0 / Dart 2.19.0 for the current mobile dependency lockfile
+- Flutter/Dart matching `mobile/pubspec.yaml` (currently Dart >=3.10.0 <4.0.0; the committed lockfile was resolved with Dart >=3.13.0 and Flutter >=3.47.0)
 
 ## Backend setup
 
