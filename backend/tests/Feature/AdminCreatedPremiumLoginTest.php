@@ -18,7 +18,10 @@ class AdminCreatedPremiumLoginTest extends TestCase
         $this->get(route('learn.account'))->assertOk();
         $this->get(route('learn.premium.modules'))->assertOk();
         $this->post('/learn/logout');
-        $this->post('/login',['email'=>$user->email,'password'=>'test-password-123'])->assertRedirect(route('learn.login'))->assertSessionHas('error');
-        $this->assertGuest();
+        // Single sign-in: a premium account signing in at /login now
+        // reaches its learner account instead of being bounced.
+        $this->post('/login',['email'=>$user->email,'password'=>'test-password-123'])->assertRedirect(route('learn.account'));
+        $this->assertAuthenticatedAs($user);
+        $this->get(route('learn.account'))->assertOk();
     }
 }

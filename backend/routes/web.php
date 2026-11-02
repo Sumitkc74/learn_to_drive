@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\QuestionImportController;
 use App\Http\Controllers\Admin\GovernmentNoticeImportController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Learner\AuthController as LearnerAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
@@ -44,7 +45,10 @@ Route::get('/password/reset/{token}', [ResetPasswordController::class, 'showRese
 Route::post('/password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::post('/login', [LoginController::class, 'login'])->name('login');
+// Single sign-in: POST /login is kept as an alias of the learner sign-in
+// (same controller, same login throttling) so old links and bookmarks
+// keep working. GET /login forwards to the learner sign-in page.
+Route::post('/login', [LearnerAuthController::class, 'login'])->middleware('throttle:api-login')->name('login');
 
 // Route::get('/admin', [HomeController::class, 'index'])->middleware('admin');
 
