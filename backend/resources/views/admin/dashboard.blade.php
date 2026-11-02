@@ -15,6 +15,7 @@
         </ul>
     </div>
 
+    @include('admin.dashboard-components.stat-boxes')
     @include('admin.dashboard-components.import-alerts')
     @include('admin.dashboard-components.start-here')
     @include('admin.dashboard-components.review-workload')

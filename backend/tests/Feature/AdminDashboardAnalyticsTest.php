@@ -12,7 +12,7 @@ class AdminDashboardAnalyticsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_dashboard_focuses_on_management_and_quick_actions(): void
+    public function test_dashboard_shows_key_stats_and_management_sections(): void
     {
         $admin = User::factory()->create(['role' => 'Admin']);
         $learner = User::factory()->create(['role' => 'PremiumUser', 'email_verified_at' => now(), 'phone_verified_at' => now()]);
@@ -20,13 +20,14 @@ class AdminDashboardAnalyticsTest extends TestCase
         UserHistory::create(['user_id' => $learner->id, 'attempted_questions' => json_encode([$question->id]), 'optionA' => '[]', 'optionB' => '[]', 'optionC' => '[]', 'optionD' => '[]', 'correct_options' => json_encode(['A']), 'selected_options' => json_encode(['B'])]);
         $this->actingAs($admin)->get(route('adminDashboard'))
             ->assertOk()
+            ->assertSee('Total users')
+            ->assertSee('Published questions')
             ->assertSee('Start here')
             ->assertSee('Respond to users')
             ->assertDontSee('Quick Actions')
             ->assertDontSee('Admin Tools')
-            ->assertDontSee('Total users')
             ->assertDontSee('Learning Health')
-            ->assertSeeInOrder(['Start here', 'Content Review Workload', 'Content Readiness', 'Recent Admin Activity'])
+            ->assertSeeInOrder(['Total users', 'Start here', 'Content Review Workload', 'Content Readiness', 'Recent Admin Activity'])
             ->assertViewHas('users', fn ($users) => $users['premium'] === 1 && $users['verified'] === 1)
             ->assertViewHas('performance', fn ($performance) => $performance['attempts'] === 1 && $performance['average'] === 0);
     }

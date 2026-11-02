@@ -21,7 +21,7 @@ class AdminFoundationCompletionTest extends TestCase
         $dom = new \DOMDocument;
         @$dom->loadHTML($response->getContent());
         $xpath = new \DOMXPath($dom);
-        $this->assertSame(0, $xpath->query('//div[@class="ltd-stat-card"]')->length);
+        $this->assertSame(8, $xpath->query('//div[@class="ltd-stat-card"]')->length);
         $this->assertSame(0, $xpath->query('//div[@class="ltd-stat-card"]//a | //a[.//div[@class="ltd-stat-card"]]')->length);
         $this->assertSame(1, $xpath->query('//main/div[last()][contains(@class,"ltd-activity")]')->length);
         $response->assertSee($question->question);

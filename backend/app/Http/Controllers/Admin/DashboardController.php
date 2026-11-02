@@ -13,6 +13,7 @@ use App\Models\UserHistory;
 use App\Services\AdminSystemHealth;
 use App\Services\ContentReadiness;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -34,32 +35,43 @@ class DashboardController extends Controller
         $users = ['total' => User::count(), 'premium' => User::where('role', 'PremiumUser')->count(), 'verified' => User::whereNotNull('email_verified_at')->whereNotNull('phone_verified_at')->count(), 'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count()];
         $questions = ['total' => Question::count(), 'published' => Question::where('status', 'Published')->count(), 'draft' => Question::where('status', 'Draft')->count(), 'archived' => Question::where('status', 'Archived')->count()];
         $passingScore = AppSetting::read('exam_passing_score');
-        $attemptCount = 0;
-        $scoreTotal = 0;
-        $passed = 0;
-        $learners = [];
-        $misses = [];
-        foreach (UserHistory::select(['id', 'user_id', 'attempted_questions', 'correct_options', 'selected_options'])->cursor() as $attempt) {
-            $questionIds = $this->decode($attempt->attempted_questions);
-            $correct = $this->decode($attempt->correct_options);
-            $selected = $this->decode($attempt->selected_options);
-            $score = $attempt->score_percentage;
-            $attemptCount++;
-            $scoreTotal += $score;
-            $passed += (int) ($score >= $passingScore);
-            $learners[$attempt->user_id] = true;
-            foreach ($questionIds as $index => $id) {
-                if (isset($correct[$index],$selected[$index]) && $correct[$index] !== $selected[$index] && is_numeric($id)) {
-                    $misses[(int) $id] = ($misses[(int) $id] ?? 0) + 1;
+        // The attempt scan decodes every learner attempt in PHP, so cache
+        // the aggregates for 5 minutes instead of recomputing them on
+        // every dashboard and analytics load. Only the miss counts are
+        // cached; the most-missed questions themselves are re-queried
+        // fresh below, so an edited or deleted question never lingers.
+        $cached = Cache::remember('admin_dashboard_performance', 300, function () use ($passingScore) {
+            $attemptCount = 0;
+            $scoreTotal = 0;
+            $passed = 0;
+            $learners = [];
+            $misses = [];
+            foreach (UserHistory::select(['id', 'user_id', 'attempted_questions', 'correct_options', 'selected_options'])->cursor() as $attempt) {
+                $questionIds = $this->decode($attempt->attempted_questions);
+                $correct = $this->decode($attempt->correct_options);
+                $selected = $this->decode($attempt->selected_options);
+                $score = $attempt->score_percentage;
+                $attemptCount++;
+                $scoreTotal += $score;
+                $passed += (int) ($score >= $passingScore);
+                $learners[$attempt->user_id] = true;
+                foreach ($questionIds as $index => $id) {
+                    if (isset($correct[$index],$selected[$index]) && $correct[$index] !== $selected[$index] && is_numeric($id)) {
+                        $misses[(int) $id] = ($misses[(int) $id] ?? 0) + 1;
+                    }
                 }
             }
-        }
-        $performance = ['attempts' => $attemptCount, 'average' => $attemptCount ? (int) round($scoreTotal / $attemptCount) : 0, 'pass_rate' => $attemptCount ? (int) round($passed / $attemptCount * 100) : 0, 'active_learners' => count($learners)];
+            return [
+                'performance' => ['attempts' => $attemptCount, 'average' => $attemptCount ? (int) round($scoreTotal / $attemptCount) : 0, 'pass_rate' => $attemptCount ? (int) round($passed / $attemptCount * 100) : 0, 'active_learners' => count($learners)],
+                'misses' => $misses,
+            ];
+        });
+        $performance = $cached['performance'];
         $months = collect(range(5, 0))->map(fn ($offset) => Carbon::now()->startOfMonth()->subMonths($offset));
         $signupLabels = $months->map(fn ($month) => $month->format('M Y'));
         $signupCounts = $months->map(fn ($month) => User::where('created_at', '>=', $month)->where('created_at', '<', $month->copy()->addMonth())->count());
         $recentActivity = AuditLog::with('actor')->latest()->take(8)->get();
-        $mostMissed = $this->mostMissedQuestions($misses);
+        $mostMissed = $this->mostMissedQuestions($cached['misses']);
         $reviewWorkload = PdfQuestionImport::where('status', 'Pending')->selectRaw('COUNT(*) AS pending, COALESCE(SUM(needs_answer),0) AS answers, COALESCE(SUM(needs_diagram),0) AS diagrams, COALESCE(SUM(is_ocr),0) AS ocr')->first();
         $reviewBanks = PdfQuestionImport::where('status', 'Pending')->select('learning_content_import_id')->selectRaw('COUNT(*) AS pending')->groupBy('learning_content_import_id')->orderByDesc('pending')->limit(6)->with('resource:id,title')->get();
         $extractionIssues = PdfExtractionRun::whereIn('status', ['Queued', 'Running', 'Failed'])->with('resource:id,title')->latest('id')->limit(5)->get();
