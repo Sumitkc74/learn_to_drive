@@ -15,7 +15,7 @@ WORKDIR /var/www/html
 
 # System libraries for the PHP extensions Laravel and its packages need.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git unzip curl libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
+    git unzip curl libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
     libonig-dev libxml2-dev libicu-dev libexif-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
