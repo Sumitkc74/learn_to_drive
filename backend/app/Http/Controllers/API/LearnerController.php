@@ -16,7 +16,7 @@ class LearnerController extends Controller
             'types'=>collect(LibraryController::TYPES)->map(fn($entry,$type)=>['type'=>$type,'title'=>__($entry[1])])->values(),
             'categories'=>Question::where('status','Published')->distinct()->orderBy('category')->pluck('category'),
             'languages'=>['en','ne'],
-            'premium'=>['active'=>(bool)($request->user('sanctum')?->is_active && $request->user('sanctum')?->hasPremium()),'amount_paisa'=>config('payments.amount_paisa'),'days'=>config('payments.days'),'daily_chat_limit'=>config('premium.daily_chat_limit')],
+            'premium'=>['active'=>(bool)($request->user('sanctum')?->is_active && $request->user('sanctum')?->hasPremium()),'amount_paisa'=>config('payments.amount_paisa'),'days'=>config('payments.days'),'lifetime'=>(bool)config('payments.lifetime'),'daily_chat_limit'=>config('premium.daily_chat_limit')],
         ]]);
     }
 

@@ -4,7 +4,7 @@ use App\Models\{PremiumPayment,User};
 use Illuminate\Support\Facades\{Http,DB};
 class PremiumGateway {
     public function ready(string $gateway):bool {
-        return config('payments.enabled') && config('payments.amount_paisa')>=1000 && config('payments.days')>0
+        return config('payments.enabled') && config('payments.amount_paisa')>=1000 && (config('payments.lifetime') || config('payments.days')>0)
             && (config('payments.live') || !app()->environment('production'))
             && match($gateway){'khalti'=>(bool)config('payments.khalti_key'),'esewa'=>(bool)(config('payments.esewa_code') && config('payments.esewa_secret')),default=>false};
     }
@@ -14,7 +14,7 @@ class PremiumGateway {
     public function startKhalti(PremiumPayment $payment):string {
         $response=$this->http()->withHeaders(['Authorization'=>'Key '.config('payments.khalti_key')])->post($this->khaltiBase($payment->live).'/epayment/initiate/',[
             'return_url'=>route('learn.payments.return',$payment),'website_url'=>url('/'),
-            'amount'=>$payment->amount_paisa,'purchase_order_id'=>$payment->id,'purchase_order_name'=>'Learn to Drive Premium - '.$payment->access_days.' days',
+            'amount'=>$payment->amount_paisa,'purchase_order_id'=>$payment->id,'purchase_order_name'=>'Learn to Drive Premium - '.($payment->access_days>0 ? $payment->access_days.' days' : 'Lifetime access'),
         ]);
         $url=$response->json('payment_url');$id=$response->json('pidx');
         if(!$response->successful() || !is_string($id) || !$id || !is_string($url) || parse_url($url,PHP_URL_SCHEME)!=='https' || !in_array(parse_url($url,PHP_URL_HOST),['pay.khalti.com','test-pay.khalti.com']))throw new \RuntimeException('Checkout unavailable.');
@@ -51,7 +51,12 @@ class PremiumGateway {
             $payment=PremiumPayment::lockForUpdate()->findOrFail($p->id);
             if($payment->status==='Paid')return;
             $user=User::lockForUpdate()->findOrFail($payment->user_id);
-            $until=($user->premium_until?->isFuture()?$user->premium_until->copy():now())->addDays($payment->access_days);
+            // access_days 0 means lifetime: a 100-year expiry, which
+            // hasPremium() treats as active. Timed access stacks onto
+            // any existing future expiry; lifetime resets to now + 100y.
+            $until=$payment->access_days>0
+                ? ($user->premium_until?->isFuture()?$user->premium_until->copy():now())->addDays($payment->access_days)
+                : now()->addYears(100);
             $user->forceFill(['premium_until'=>$until])->save();
             $payment->update(['status'=>'Paid','transaction_id'=>$transaction,'paid_at'=>now(),'access_until'=>$until]);
         });return true;

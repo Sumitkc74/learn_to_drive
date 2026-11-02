@@ -246,8 +246,9 @@ Widget premiumPage() => LearnerDataPage(
                               .tr,
                           style: const TextStyle(fontSize: 22)),
                       if ((plan['amount_paisa'] ?? 0) > 0)
-                        Text(
-                            'NPR ${(plan['amount_paisa'] / 100).toStringAsFixed(2)} / ${plan['days']} ${'days'.tr}')
+                        Text(plan['lifetime'] == true
+                            ? 'NPR ${(plan['amount_paisa'] / 100).toStringAsFixed(2)} / Lifetime access'
+                            : 'NPR ${(plan['amount_paisa'] / 100).toStringAsFixed(2)} / ${plan['days']} ${'days'.tr}')
                       else
                         Text(
                             'Pricing will be available when checkout is configured.'

@@ -9,7 +9,7 @@ class PaymentController extends \App\Http\Controllers\Controller {
     public function checkout(Request $r,PremiumGateway $gateway){
         $data=$r->validate(['gateway'=>'required|in:khalti,esewa']);
         abort_unless($gateway->ready($data['gateway']),503,__('This payment option is not configured.'));
-        $p=PremiumPayment::create(['id'=>(string)Str::uuid(),'user_id'=>$r->user()->id,'gateway'=>$data['gateway'],'live'=>config('payments.live'),'merchant'=>$data['gateway']==='esewa'?config('payments.esewa_code'):null,'amount_paisa'=>config('payments.amount_paisa'),'access_days'=>config('payments.days')]);
+        $p=PremiumPayment::create(['id'=>(string)Str::uuid(),'user_id'=>$r->user()->id,'gateway'=>$data['gateway'],'live'=>config('payments.live'),'merchant'=>$data['gateway']==='esewa'?config('payments.esewa_code'):null,'amount_paisa'=>config('payments.amount_paisa'),'access_days'=>config('payments.lifetime')?0:config('payments.days')]);
         try {
             if($p->gateway==='khalti')return redirect()->away($gateway->startKhalti($p));
             return response()->view('learner.checkout',['payment'=>$p]+$gateway->esewaForm($p))->header('Cache-Control','private, no-store');
