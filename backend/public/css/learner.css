@@ -100,3 +100,38 @@ html[data-theme=dark] :is(.button.secondary,.button.outline){background:#29323d;
 html[data-theme=dark] :is(.button:not(.secondary):not(.outline),.tabs .active){background:#facc15;color:#171717}
 html[data-theme=dark] :is(.alert,.option.correct){background:#173c2c;color:#dcfce7;border-color:#4ade80}
 html[data-theme=dark] :is(.alert.error,.option.incorrect){background:#482521;color:#fee2e2;border-color:#fca5a5}
+
+/* Homepage upper half follows light/dark mode too. Previously the header
+   and hero were hardcoded charcoal (#292929) in both modes, so only the
+   lower half (body/cards, which use theme variables) visibly changed.
+   Light mode now gets a light header/hero; dark mode keeps the charcoal
+   band, made explicit here so it is not just the near-identical #20262e
+   header change from the block above. Yellow accents are darkened to a
+   readable gold on light backgrounds. */
+html:not([data-theme=dark]) .header{background:#fff;color:var(--ink);border-bottom:1px solid var(--line)}
+html:not([data-theme=dark]) .header .brand-tag{color:var(--muted)}
+html:not([data-theme=dark]) .header nav>a:not(.button):hover{color:#a38b00}
+html:not([data-theme=dark]) .header nav a[aria-current=page]:not(.button){color:#a38b00}
+html:not([data-theme=dark]) .header .account-menu-active{color:#a38b00}
+html:not([data-theme=dark]) .header .google-signin{color:var(--ink);border-color:var(--line)}
+html:not([data-theme=dark]) .header .google-signin:hover{background:#f5f5f5}
+html:not([data-theme=dark]) .language-switch summary:hover,html:not([data-theme=dark]) .language-switch[open] summary{color:#a38b00;border-color:#a38b00}
+html:not([data-theme=dark]) .hero{color:var(--ink)}
+html:not([data-theme=dark]) .hero::before{background:#fff}
+html:not([data-theme=dark]) .hero .eyebrow{color:#a38b00}
+html:not([data-theme=dark]) .hero .accent{color:#c9a400}
+html:not([data-theme=dark]) .hero .lead,html:not([data-theme=dark]) .hero .stats span{color:var(--muted)}
+html:not([data-theme=dark]) .hero .stats strong{color:var(--ink)}
+html:not([data-theme=dark]) .hero .text-link{color:var(--ink)}
+html:not([data-theme=dark]) .road-art{background:#e5e7eb;border:1px solid var(--line)}
+html:not([data-theme=dark]) .road-art svg path:first-child{stroke:#3b3b3b}
+html:not([data-theme=dark]) .art-note{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+html[data-theme=dark] .hero{color:#f1f5f9}
+html[data-theme=dark] .hero::before{background:#20262e}
+html[data-theme=dark] .hero .eyebrow{color:#ffde17}
+html[data-theme=dark] .hero .accent{color:#ffde17}
+html[data-theme=dark] .hero .lead,html[data-theme=dark] .hero .stats span{color:#cbd5e1}
+html[data-theme=dark] .hero .stats strong{color:#fff}
+html[data-theme=dark] .hero .text-link{color:#fff}
+html[data-theme=dark] .road-art{background:#29323d;border-color:#475569}
+html[data-theme=dark] .art-note{background:#20262e;color:#ffde17;border-color:#475569}
