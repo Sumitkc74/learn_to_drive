@@ -23,11 +23,13 @@ email verification links go to the app log instead of an inbox.
    - Environment: Docker, root directory `backend/`, Dockerfile
      `Dockerfile` (in the dashboard, the Dockerfile path is resolved
      relative to the root directory), plan **Free**.
-   - Note the difference: in `render.yaml` itself, `dockerfilePath` and
-     `dockerContext` are relative to the repo root, so the Blueprint
-     uses `./backend/Dockerfile` and `./backend` — do not change those
-     to bare `Dockerfile`, or Render will look for a Dockerfile at the
-     repo root and the build will fail.
+   - Note: in `render.yaml`, `dockerfilePath` and `dockerContext`
+     are resolved relative to `rootDir`, not the repo root, in
+     practice — Render combined `rootDir: backend` with
+     `dockerContext: ./backend` into `backend/backend` and failed.
+     So the Blueprint keeps `rootDir: backend` with
+     `dockerfilePath: Dockerfile` and `dockerContext: .`. Do not
+     re-add the `backend/` prefix to those two fields.
 2. Set these environment variables in the Render dashboard (never in the
    repo):
    - `APP_KEY`: generate locally with `php artisan key:generate --show`

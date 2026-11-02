@@ -9,8 +9,8 @@ services:
     name: learn-to-drive
     runtime: docker
     rootDir: backend
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
     plan: free
     autoDeployTrigger: commit
     envVars:
