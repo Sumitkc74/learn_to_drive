@@ -9,6 +9,11 @@ sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT>/" /etc/apache2/sites-availab
 
 cd /var/www/html
 
+# Belt and braces for the Dockerfile mkdir: the compiled-view path is
+# resolved with realpath() when config is cached below, so these
+# directories must exist before config:cache runs.
+mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs
+
 # Render sets env vars at runtime, so cache config on boot, not at build time.
 php artisan config:cache
 

@@ -35,6 +35,14 @@ COPY --from=frontend /app/public/build /var/www/html/public/build
 # Render's runtime env vars override it when the container boots.
 RUN cp .env.example .env
 
+# .dockerignore excludes storage/framework/views (and cache/sessions/logs),
+# and git does not track empty directories, so the image would otherwise
+# have no storage/framework/views at all. config/view.php computes the
+# compiled-view path with realpath(), which returns false for a missing
+# directory — and Blade then throws "Please provide a valid cache path"
+# on every page render. Create the directories explicitly.
+RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs
+
 RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
