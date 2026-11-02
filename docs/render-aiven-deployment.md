@@ -61,7 +61,12 @@ email verification links go to the app log instead of an inbox.
 3. Deploy. The container entrypoint (`backend/docker/entrypoint.sh`)
    binds Apache to Render's `$PORT`, caches config, runs
    `php artisan migrate --force`, seeds, and links storage, then serves
-   the app from `backend/public/`.
+   the app from `backend/public/`. It also runs
+   `php artisan db:seed --class=RealContentSeeder --force` on every boot,
+   which populates the real learning content (questions, tutorials, exam
+   information). That seeder is idempotent, so re-runs never duplicate
+   rows; it is deliberately not wired into `DatabaseSeeder`, because the
+   test suite seeds that for every test and assumes an admin-only baseline.
 
 ## 3. Verify
 

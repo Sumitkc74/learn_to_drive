@@ -22,6 +22,13 @@ php artisan config:cache
 # does nothing at all unless SEED_ADMIN_PASSWORD is set).
 php artisan migrate --force
 php artisan db:seed --force || true
+# Populate the real learning content (questions, tutorials, exam info).
+# Deliberately NOT wired into DatabaseSeeder: the test suite seeds
+# DatabaseSeeder for every test and assumes an admin-only baseline, so
+# seeding content there breaks 25 tests. This seeder is idempotent
+# (firstOrCreate on natural keys), so re-running it on every boot never
+# duplicates rows.
+php artisan db:seed --class=RealContentSeeder --force || true
 php artisan storage:link || true
 
 # AI screening and PDF jobs pin the pdf-extraction database connection, so
