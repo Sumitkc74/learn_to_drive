@@ -51,3 +51,8 @@ services:
         value: "*"
       - key: SEED_ADMIN_PASSWORD
         sync: false
+      - key: GEMINI_API_KEY
+        # Required for government-notice AI screening and admin AI chat.
+        # Without it, screening jobs fail and freshly fetched notices can
+        # never be approved (approve requires a Ready/Flagged screening).
+        sync: false

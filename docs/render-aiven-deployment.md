@@ -42,6 +42,14 @@ email verification links go to the app log instead of an inbox.
      creates `admin@admin.com` with this password (and does nothing if
      that admin already exists). Change the admin password after your
      first login; the seeder will not overwrite an existing admin.
+   - `GEMINI_API_KEY`: your Google Gemini API key. Required for
+     government-notice AI screening and admin AI chat. Without it,
+     screening jobs fail and freshly fetched government notices can
+     never be approved, because approve requires a Ready or Flagged
+     screening. The entrypoint also starts a background worker for the
+     `pdf-extraction` queue in the same container (Render free has no
+     worker service), so no separate worker service is needed — but
+     the worker can only complete screening once this key is set.
    - `APP_URL`: after Render assigns the real `.onrender.com` URL,
      set this to exactly that URL (https) and redeploy, otherwise
      asset and link URLs will be wrong. The placeholder in

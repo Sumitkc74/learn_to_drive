@@ -24,4 +24,11 @@ php artisan migrate --force
 php artisan db:seed --force || true
 php artisan storage:link || true
 
+# AI screening and PDF jobs pin the pdf-extraction database connection, so
+# they never run on the default sync queue. Render free has no worker
+# service, so run that worker in this same container. The loop restarts it
+# if it ever exits, and it keeps running after the exec below because it
+# is no longer a child of this shell once Apache replaces it.
+( while true; do php artisan queue:work pdf-extraction --queue=pdf-extraction --timeout=180 --sleep=3 || true; sleep 5; done ) &
+
 exec "$@"

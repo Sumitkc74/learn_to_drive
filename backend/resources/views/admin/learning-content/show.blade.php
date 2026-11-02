@@ -118,7 +118,8 @@
             <label class="d-flex" style="gap:.5rem"><input type="checkbox" name="confirmed" value="1" required><span>I inspected the saved file and recorded any edition, accuracy, or reuse concerns in my notes.</span></label>
             <p class="small text-muted mb-0">Approval retains a reference for content preparation. It does not publish questions, exam papers, or traffic signs.</p>
         </div>
-        <div class="ltd-settings-card__actions"><button class="btn btn-success" type="submit" @disabled(!$hasFile)>Approve Reference</button></div>
+        @if(in_array($resource->ai_status, ['Queued', 'Running']))<p class="small text-muted mb-0">AI screening is still running — approval becomes available when it reads Ready or Flagged. Use Run / retry AI screening above if it stalls.</p>@elseif($resource->ai_status === 'Failed')<p class="small text-muted mb-0">AI screening failed — run / retry AI screening above before approving.</p>@endif
+        <div class="ltd-settings-card__actions"><button class="btn btn-success" type="submit" @disabled(!$hasFile || in_array($resource->ai_status, ['Queued', 'Running', 'Failed']))>Approve Reference</button></div>
     </form>
     <form class="ltd-settings-card" action="{{ route('learningContent.review', $resource) }}" method="POST">
         @csrf<input type="hidden" name="decision" value="Rejected">
