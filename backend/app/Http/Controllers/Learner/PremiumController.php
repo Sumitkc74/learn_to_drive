@@ -5,7 +5,23 @@ use App\Services\{PracticeRevision,LearnerChat};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class PremiumController extends \App\Http\Controllers\Controller {
-    public function index(){return view('learner.premium');}
+    public function index(\App\Services\PremiumGateway $gateway){
+        // Auto-update after payment, without a manual "check status" tap:
+        // if the payer closed the gateway tab instead of returning, their
+        // next Premium visit re-checks recent pending payments against
+        // the gateway and credits Premium if one is paid. Throttled to
+        // once per 5 minutes per session so page loads don't hammer
+        // the gateways. Guests have no payments, so this is a no-op.
+        if(auth()->check()){
+            $last=session('premium_auto_verify_at');
+            if(!$last || now()->diffInMinutes($last)>=5){
+                session(['premium_auto_verify_at'=>now()]);
+                $pending=\App\Models\PremiumPayment::where('user_id',auth()->id())->where('status','Pending')->where('created_at','>=',now()->subDay())->latest()->limit(3)->get();
+                foreach($pending as $p){try{$gateway->verify($p);}catch(\Throwable $e){}}
+            }
+        }
+        return view('learner.premium');
+    }
     public function requestUpgrade(Request $request){
         if($request->user()->hasPremium())return $request->expectsJson()?response()->json(['message'=>__('Premium is active')]):redirect()->route('learn.premium');
         $ticket=DB::transaction(function()use($request){

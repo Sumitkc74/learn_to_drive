@@ -12,6 +12,19 @@ class LearnerController extends Controller
 {
     public function catalog(Request $request)
     {
+        // Same auto-update as the web Premium page, for the mobile app:
+        // the app refreshes this endpoint when it resumes, so a payment
+        // made on the website (or a closed gateway tab) is verified here
+        // and Premium flips on in the app without a manual check.
+        // Throttled to once per 10 minutes per user.
+        if($user=$request->user('sanctum')){
+            $key='catalog_auto_verify:'.$user->id;
+            if(!\Illuminate\Support\Facades\Cache::has($key)){
+                \Illuminate\Support\Facades\Cache::put($key,true,600);
+                $pending=\App\Models\PremiumPayment::where('user_id',$user->id)->where('status','Pending')->where('created_at','>=',now()->subDay())->latest()->limit(3)->get();
+                foreach($pending as $p){try{app(\App\Services\PremiumGateway::class)->verify($p);}catch(\Throwable $e){}}
+            }
+        }
         return response()->json(['data'=>[
             'types'=>collect(LibraryController::TYPES)->map(fn($entry,$type)=>['type'=>$type,'title'=>__($entry[1])])->values(),
             'categories'=>Question::where('status','Published')->distinct()->orderBy('category')->pluck('category'),

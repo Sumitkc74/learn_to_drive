@@ -18,7 +18,11 @@ class PaymentController extends \App\Http\Controllers\Controller {
     public function show(Request $r,string $id){return view('learner.payment',['payment'=>PremiumPayment::where('user_id',$r->user()->id)->findOrFail($id)]);}
     public function verify(Request $r,string $id,PremiumGateway $gateway){
         $p=PremiumPayment::where('user_id',$r->user()->id)->findOrFail($id);
-        try{$paid=$gateway->verify($p);}catch(\Throwable $e){return redirect()->route('learn.payments.show',$p)->with('error',__('Payment could not be verified yet. If money was deducted, do not pay again; check the status later or contact support.'));}
+        try{$paid=$gateway->verify($p);}catch(\Throwable $e){
+            if($r->expectsJson())return response()->json(['paid'=>false,'status'=>$p->status],200);
+            return redirect()->route('learn.payments.show',$p)->with('error',__('Payment could not be verified yet. If money was deducted, do not pay again; check the status later or contact support.'));
+        }
+        if($r->expectsJson())return response()->json(['paid'=>$paid,'status'=>$p->fresh()->status]);
         return redirect()->route('learn.payments.show',$p)->with($paid?'success':'error',$paid?__('Payment verified. Premium access is active.'):__('Payment is not confirmed yet. Check again later if money was deducted.'));
     }
 }
