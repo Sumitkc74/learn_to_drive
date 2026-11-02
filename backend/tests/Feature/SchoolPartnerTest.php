@@ -96,6 +96,25 @@ class SchoolPartnerTest extends TestCase {
         $school->update(['status'=>'Suspended']);
         $this->getJson('/api/school-centre/'.$school->id)->assertNotFound();
     }
+    public function test_school_can_create_a_student_account_or_invite_an_existing_one():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        // Way 2: create a brand-new student account, enrolled immediately.
+        $this->action($owner,$school,'create-student',['name'=>'New Student','email'=>'newstudent@example.com','phoneNumber'=>'9800000001','password'=>'initial-pass-1','password_confirmation'=>'initial-pass-1'])->assertOk();
+        $created=User::where('email','newstudent@example.com')->firstOrFail();
+        $this->assertSame('User',$created->role);
+        $this->assertDatabaseHas('school_memberships',['driving_school_id'=>$school->id,'user_id'=>$created->id,'role'=>'Student']);
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('initial-pass-1',$created->password));
+        // The new student can sign in with the initial password (web guard).
+        $this->assertTrue(\Illuminate\Support\Facades\Auth::guard('web')->attempt(['email'=>'newstudent@example.com','password'=>'initial-pass-1','is_active'=>true]));
+        // Way 2 refuses an email that already exists: use Invite instead.
+        $this->action($owner,$school,'create-student',['name'=>'Again','email'=>'newstudent@example.com','phoneNumber'=>'9800000002','password'=>'initial-pass-2','password_confirmation'=>'initial-pass-2'])->assertUnprocessable();
+        // Students cannot create accounts for others.
+        $this->action($student,$school,'create-student',['name'=>'Nope','email'=>'nope@example.com','phoneNumber'=>'9800000003','password'=>'initial-pass-3','password_confirmation'=>'initial-pass-3'])->assertForbidden();
+        // Way 1 still works: invite an existing account, no membership yet.
+        $existing=User::factory()->create(['is_active'=>true]);
+        $this->action($owner,$school,'invite',['email'=>$existing->email,'role'=>'Student'])->assertOk();
+        $this->assertDatabaseMissing('school_memberships',['user_id'=>$existing->id]);
+    }
     public function test_weekly_schedule_is_atomic_and_teacher_must_remain_eligible():void {
         [$school,$owner,$teacher,$student]=$this->school();
         $course=DB::table('school_courses')->insertGetId(['driving_school_id'=>$school->id,'title'=>'Course','description'=>'Basics']);

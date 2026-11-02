@@ -6,6 +6,7 @@ use App\Models\{DrivingSchool,SchoolMembership,User,DrivingLesson};
 use App\Services\SchoolNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
@@ -109,8 +110,22 @@ class PartnerController extends Controller
                 DB::table('school_batch_members')->insert(['school_batch_id'=>$batch->id,'user_id'=>$r->user()->id,'created_at'=>now(),'updated_at'=>now()]); return;
             }
             abort_unless(in_array($member->role,['Owner','Manager','Instructor']),403);
-            if(in_array($action,['invite','course','batch','close-batch','role','transfer'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
+            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
             switch($action) {
+                case 'create-student':
+                    // Second way to add a student: the school creates the
+                    // account itself, instead of inviting an existing one.
+                    // The student signs in with this email and initial
+                    // password, then changes it in Account settings. The
+                    // account is a plain learner account (role User) that
+                    // is a Student member of this school only — it cannot
+                    // be used to create staff or admin accounts. If the
+                    // email is already registered, validation fails and
+                    // staff should use Invite instead.
+                    $d=$r->validate(['name'=>'required|string|max:100','email'=>'required|email|max:255|unique:users,email','phoneNumber'=>'required|digits:10','password'=>'required|string|min:8|confirmed']);
+                    $user=User::create(['name'=>$d['name'],'email'=>$d['email'],'phoneNumber'=>$d['phoneNumber'],'password'=>Hash::make($d['password']),'role'=>'User','profileImage'=>'dist/img/avatar.png','is_active'=>true]);
+                    SchoolMembership::create(['driving_school_id'=>$school,'user_id'=>$user->id,'role'=>'Student']);
+                    SchoolNotifications::send($user->id,'You have been added as a student. Sign in with the account details your school gave you, then change your password in Account settings.'); break;
                 case 'invite':
                     $d=$r->validate(['email'=>'required|email|max:255','role'=>'required|in:Student,Instructor,Manager']);
                     if($d['role']==='Manager' && $member->role!=='Owner') throw ValidationException::withMessages(['role'=>__('Only the owner can invite managers.')]);

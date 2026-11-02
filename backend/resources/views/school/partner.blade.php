@@ -7,6 +7,8 @@
 @if($manager)
 <p><a class="button" href="{{ route('learn.school.report',$school->id) }}">{{ __('School reports') }}</a></p>
 @include('school.action-form',['title'=>'Invite member','action'=>'invite','fields'=>['email'=>['Account email','email'],'role'=>['School role',$member->role==='Owner'?['Student'=>'Student','Instructor'=>'Instructor','Manager'=>'Manager']:['Student'=>'Student','Instructor'=>'Instructor']]]])
+<p>{{ __('If the student does not have an account yet, create one for them instead — they sign in with the email and initial password below, then change the password in Account settings. If the email is already registered, use Invite member above.') }}</p>
+@include('school.action-form',['title'=>'Create student account','action'=>'create-student','fields'=>['name'=>['Student name','text'],'email'=>['Student email','email'],'phoneNumber'=>['Phone number (10 digits)','text'],'password'=>['Initial password (at least 8 characters)','password'],'password_confirmation'=>['Confirm initial password','password']]])
 @include('school.action-form',['title'=>'Create course','action'=>'course','fields'=>['title'=>['Course title','text'],'description'=>['Description','text']]])
 @if($courses->isNotEmpty() && $staff->isNotEmpty())
 @include('school.action-form',['title'=>'Create batch','action'=>'batch','fields'=>['school_course_id'=>['Course',$courses->pluck('title','id')->all()],'instructor_id'=>['Instructor',$staff->mapWithKeys(fn($m)=>[$m->user_id=>$m->user->name])->all()],'name'=>['Batch name','text'],'starts_on'=>['Start date','date'],'ends_on'=>['End date','date'],'capacity'=>['Capacity','number']]])
