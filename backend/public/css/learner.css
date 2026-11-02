@@ -135,3 +135,11 @@ html[data-theme=dark] .hero .stats strong{color:#fff}
 html[data-theme=dark] .hero .text-link{color:#fff}
 html[data-theme=dark] .road-art{background:#29323d;border-color:#475569}
 html[data-theme=dark] .art-note{background:#20262e;color:#ffde17;border-color:#475569}
+
+/* No horizontal scrolling. The hero band is deliberately full-bleed: its
+   ::before uses 100vw, and 100vw includes the vertical scrollbar width,
+   so the band extends a scrollbar-width past the viewport edge and the
+   browser offers a horizontal scrollbar. overflow-x: clip (not hidden)
+   trims that excess at the viewport edge without creating a scroll
+   container, so sticky elements elsewhere on the site keep working. */
+html,body{overflow-x:clip}
