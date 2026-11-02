@@ -21,7 +21,13 @@ email verification links go to the app log instead of an inbox.
 1. In Render, create a **Web Service** from this repo using the Blueprint
    in `render.yaml` at the repo root, or create it manually with:
    - Environment: Docker, root directory `backend/`, Dockerfile
-     `backend/Dockerfile`, plan **Free**.
+     `Dockerfile` (in the dashboard, the Dockerfile path is resolved
+     relative to the root directory), plan **Free**.
+   - Note the difference: in `render.yaml` itself, `dockerfilePath` and
+     `dockerContext` are relative to the repo root, so the Blueprint
+     uses `./backend/Dockerfile` and `./backend` — do not change those
+     to bare `Dockerfile`, or Render will look for a Dockerfile at the
+     repo root and the build will fail.
 2. Set these environment variables in the Render dashboard (never in the
    repo):
    - `APP_KEY`: generate locally with `php artisan key:generate --show`

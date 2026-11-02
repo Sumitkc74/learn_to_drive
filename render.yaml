@@ -7,11 +7,12 @@
 services:
   - type: web
     name: learn-to-drive
-    env: docker
+    runtime: docker
     rootDir: backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     plan: free
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
       - key: APP_NAME
         value: Learn to Drive
