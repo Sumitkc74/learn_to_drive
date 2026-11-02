@@ -47,7 +47,7 @@ email verification links go to the app log instead of an inbox.
      asset and link URLs will be wrong. The placeholder in
      `render.yaml` must be replaced with the real URL.
    - The rest (`APP_ENV=production`, `APP_DEBUG=false`,
-     `SESSION_DRIVER=file`, `CACHE_DRIVER=file`,
+     `SESSION_DRIVER=cookie`, `CACHE_DRIVER=file`,
      `QUEUE_CONNECTION=sync`, `MAIL_MAILER=log`,
      `TRUSTED_PROXIES=*`) are already in `render.yaml`.
 3. Deploy. The container entrypoint (`backend/docker/entrypoint.sh`)

@@ -37,7 +37,10 @@ services:
       - key: DB_PASSWORD
         sync: false
       - key: SESSION_DRIVER
-        value: file
+        # Cookie sessions, not file sessions: Render's free filesystem is
+        # ephemeral, so file sessions vanish when the service sleeps or
+        # redeploys and the next login submit then fails with 419.
+        value: cookie
       - key: CACHE_DRIVER
         value: file
       - key: QUEUE_CONNECTION
