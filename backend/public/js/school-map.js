@@ -1,14 +1,16 @@
 (() => {
     const container = document.getElementById('school-map');
     const status = document.getElementById('school-map-status');
-    if (!container || !window.L) return;
+    if (!container) return;
+    if (!window.L) {
+        if (status) status.textContent = 'Map could not load. Use the school list below.';
+        return;
+    }
     const map = L.map(container, {scrollWheelZoom: false}).setView([28.3949, 84.1240], 7);
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    const fallback = status.textContent;
-    tiles.on('tileerror', () => { status.textContent = fallback; });
     const points = [];
     document.querySelectorAll('[data-school-marker][data-lat][data-lng]').forEach(card => {
         const point = [Number(card.dataset.lat), Number(card.dataset.lng)];
@@ -17,7 +19,8 @@
         // School names are text, never popup HTML.
         const popup = document.createElement('strong');
         popup.textContent = name;
-        const marker = L.marker(point, {title: name, alt: name}).addTo(map).bindPopup(popup);
+        const icon = L.divIcon({className: 'school-marker', html: '<span></span>', iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]});
+        const marker = L.marker(point, {title: name, alt: name, icon: icon}).addTo(map).bindPopup(popup);
         const button = card.querySelector('[data-show-school]');
         button.hidden = false;
         button.addEventListener('click', () => {
