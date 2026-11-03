@@ -48,7 +48,12 @@ class PdfTranslationController extends Controller {
     public function preview(Request $request, PdfTranslation $translation) {
         $data = $request->validate(['page' => ['required','integer','min:1','max:100']]);
         abort_unless(hash_equals($translation->source_hash, (string) $translation->resource->file_hash), 409);
-        $path = app(LocalPdfTools::class)->preview($translation->resource, $data['page']);
+        try {
+            $path = app(LocalPdfTools::class)->preview($translation->resource, $data['page']);
+        } catch (\Throwable $exception) {
+            report($exception);
+            abort(422, 'Translation page preview unavailable. Check the page number or download the source PDF.');
+        }
         return Storage::disk('learning-content')->response($path, null, ['Content-Type' => 'image/png', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
     public function savePage(Request $request, PdfTranslation $translation) {

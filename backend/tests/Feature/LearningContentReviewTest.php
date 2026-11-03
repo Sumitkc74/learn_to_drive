@@ -290,4 +290,24 @@ class LearningContentReviewTest extends TestCase
         $this->artisan('content:fetch-official', ['--source' => 'https://example.com'])->assertFailed();
         Http::assertSentCount(1);
     }
+
+    public function test_detail_page_degrades_when_file_size_and_download_date_are_missing(): void
+    {
+        Storage::fake('learning-content');
+        $this->admin();
+        $item = $this->resource();
+        Storage::disk('learning-content')->put('doc.pdf', '%PDF-1.4 fixture');
+        $item->forceFill(['file_path' => 'doc.pdf', 'file_hash' => hash('sha256', '%PDF-1.4 fixture'), 'file_size' => null, 'downloaded_at' => null])->save();
+        $this->get(route('learningContent.show', $item))->assertOk()->assertSee('Size unknown')->assertSee('Saved Unknown');
+    }
+
+    public function test_translation_preview_returns_422_when_rendering_fails(): void
+    {
+        Storage::fake('learning-content');
+        $admin = $this->admin();
+        $item = $this->resource();
+        $item->forceFill(['file_path' => 'missing.pdf', 'file_hash' => str_repeat('b', 64)])->save();
+        $translation = \App\Models\PdfTranslation::create(['learning_content_import_id' => $item->id, 'source_hash' => str_repeat('b', 64), 'source_language' => 'en', 'target_language' => 'ne', 'created_by' => $admin->id, 'status' => 'Review', 'next_page' => 1, 'total_pages' => 1]);
+        $this->get(route('pdfTranslations.preview', $translation) . '?page=1')->assertStatus(422);
+    }
 }

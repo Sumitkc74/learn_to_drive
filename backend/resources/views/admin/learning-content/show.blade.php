@@ -54,7 +54,7 @@
             </figure>
         @endif
         <a class="btn btn-primary" href="{{ route('learningContent.file', $resource) }}">Download Private Copy</a>
-        <span class="small text-muted ml-2">{{ number_format($resource->file_size / 1024) }} KB · Saved {{ $resource->downloaded_at->format('M j, Y') }}</span>
+        <span class="small text-muted ml-2">{{ $resource->file_size !== null ? number_format($resource->file_size / 1024).' KB' : 'Size unknown' }} · Saved {{ $resource->downloaded_at?->format('M j, Y') ?? 'Unknown' }}</span>
         <details class="mt-3"><summary>File verification details</summary><p class="small mt-2 mb-0">SHA-256: {{ $resource->file_hash }}</p></details>
     @elseif($resource->status === 'Pending')
         <form method="POST" action="{{ route('learningContent.download', $resource) }}">@csrf<button class="btn btn-primary" type="submit">Save Private Copy for Review</button></form>
