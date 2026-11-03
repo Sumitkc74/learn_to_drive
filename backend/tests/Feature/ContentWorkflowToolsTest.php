@@ -31,6 +31,18 @@ class ContentWorkflowToolsTest extends TestCase {
         $this->actingAs($admin)->post(route('reviewOperations.update'),$data+['action'=>'reject','reason'=>'Duplicate'])->assertRedirect();
         $this->assertSame('Rejected',$item->fresh()->status);
     }
+    public function test_only_seed_admin_can_assign_items_to_other_admins(): void
+    {
+        $admin=User::factory()->create(['role'=>'Admin']);$seed=User::factory()->create(['role'=>'Admin','is_seed_admin'=>true]);$target=User::factory()->create(['role'=>'Admin']);
+        $item=LearningContentImport::create(['source_key'=>'sample','source_name'=>'Sample','source_url'=>'https://example.org','asset_url'=>'https://example.org/a.pdf','url_hash'=>hash('sha256','seed-assign'),'title'=>'Sample','kind'=>'question-bank-document','fetched_at'=>now()]);
+        $data=['type'=>'learning','ids'=>[$item->id],'confirmed'=>1,'admin_id'=>$target->id];
+        $this->actingAs($admin)->get(route('reviewOperations'))->assertOk()->assertDontSee('Assign to admin');
+        $this->actingAs($admin)->post(route('reviewOperations.update'),$data+['action'=>'assign'])->assertForbidden();
+        $this->assertNull($item->fresh()->assigned_to);
+        $this->actingAs($seed)->get(route('reviewOperations'))->assertOk()->assertSee('Assign to admin');
+        $this->actingAs($seed)->post(route('reviewOperations.update'),$data+['action'=>'assign'])->assertRedirect();
+        $this->assertSame($target->id,$item->fresh()->assigned_to);
+    }
     public function test_source_pause_prevents_fetch_and_settings_validate_time(): void {
         $this->actingAs(User::factory()->create(['role'=>'Admin']));Http::fake();
         $this->get(route('scrapingSources'))->assertOk();

@@ -16,6 +16,10 @@ class ReviewOperationsController extends \App\Http\Controllers\Controller {
             'category'=>['required_if:action,category','nullable','in:A/K,B,All,Other,Unknown'],'admin_id'=>['required_if:action,assign','nullable','integer']]);
         $type=$data['type']; $action=$data['action'];
         abort_unless(($type==='notices' && $action==='archive') || ($type!=='notices' && in_array($action,['reject','assign','claim','release'])) || ($type==='learning' && $action==='category'),422);
+        // Assigning to another admin is a supervisor action: only the
+        // seed admin may do it. Everyone else can still claim items for
+        // themselves and release their own assignments.
+        if($action==='assign') abort_unless(auth()->user()->is_seed_admin,403,'Only the seed admin can assign items to other admins.');
         if($action==='assign') abort_unless(\App\Models\User::where('role','Admin')->whereKey($data['admin_id'])->exists(),422);
         DB::transaction(function() use($data,$type,$action){
             $class=self::TYPES[$type]; $items=$class::whereIn('id',$data['ids'])->orderBy('id')->lockForUpdate()->get();
