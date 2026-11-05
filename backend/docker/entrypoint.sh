@@ -13,6 +13,12 @@ cd /var/www/html
 # resolved with realpath() when config is cached below, so these
 # directories must exist before config:cache runs.
 mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs
+# Apache serves requests as www-data, but the artisan commands below run as
+# root. If root creates anything under storage first (it does not today, but
+# a future command might), www-data can no longer write beside it — and the
+# file cache then fails exactly that way (see the queue worker note below).
+# So hand the whole tree to www-data on every boot.
+chown -R www-data:www-data storage bootstrap/cache || true
 
 # Render sets env vars at runtime, so cache config on boot, not at build time.
 php artisan config:cache
@@ -36,6 +42,14 @@ php artisan storage:link || true
 # service, so run that worker in this same container. The loop restarts it
 # if it ever exits, and it keeps running after the exec below because it
 # is no longer a child of this shell once Apache replaces it.
-( while true; do php artisan queue:work pdf-extraction --queue=pdf-extraction --timeout=180 --sleep=3 || true; sleep 5; done ) &
+# The worker MUST run as www-data, not root: it writes to the file cache
+# (its heartbeat does a Cache::put on every loop), and Apache serves as
+# www-data. When the worker ran as root, the cache shard directories it
+# created were root-owned 0755, so www-data could not create files inside
+# them — and the login throttle (RateLimiter on the file cache) then died
+# with "fopen(.../storage/framework/cache/data/...): No such file or
+# directory" on every login submit, before any database query ran.
+# su -s overrides www-data's nologin shell for this one command.
+( while true; do su www-data -s /bin/sh -c 'php artisan queue:work pdf-extraction --queue=pdf-extraction --timeout=180 --sleep=3' || true; sleep 5; done ) &
 
 exec "$@"
