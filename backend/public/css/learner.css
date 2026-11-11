@@ -94,6 +94,9 @@ img,video,iframe{max-width:100%}
 html[data-theme=dark]{color-scheme:dark;--ink:#f1f5f9;--muted:#cbd5e1;--line:#475569;--paper:#15191f;--white:#20262e}
 html[data-theme=dark] body{background:#15191f;color:#f1f5f9}
 html[data-theme=dark] :is(.header,.card,.auth-panel,.account-menu-panel,.language-menu-panel,.chat-panel,.auth-dialog,.chat-widget-panel){background:#20262e;color:#f1f5f9;border-color:#475569}
+html[data-theme=dark] .account-menu-panel a,html[data-theme=dark] .account-menu-panel button{color:#f1f5f9}
+html[data-theme=dark] .account-menu-panel a:hover,html[data-theme=dark] .account-menu-panel button:hover{background:#29323d}
+html[data-theme=dark] .account-menu-name{border-bottom-color:#475569}
 html[data-theme=dark] :is(.soft,.empty,.thumbnail,.badge,.chat-message,.practice-banner,.tier-card){background:#29323d;color:#f1f5f9}
 html[data-theme=dark] :is(input:not([type=radio]),select,textarea){background:#15191f;color:#f1f5f9;border-color:#64748b}
 html[data-theme=dark] :is(.button.secondary,.button.outline){background:#29323d;color:#f1f5f9;border-color:#64748b}
