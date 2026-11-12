@@ -39,7 +39,7 @@ class AdminDashboardAnalyticsTest extends TestCase
         $this->actingAs($admin)->get(route('adminAnalytics'))
             ->assertOk()
             ->assertSee('Reports &amp; Insights', false)
-            ->assertSee('Total users')
+            ->assertDontSee('Total users')
             ->assertSee('Learning Health')
             ->assertDontSee('Recent Admin Activity')
             ->assertDontSee('Content Review Workload')
