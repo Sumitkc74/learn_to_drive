@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="602mm"
+   height="602mm"
+   viewBox="0 0 602 602"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="Nepal_road_sign_A15.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.24748737"
+     inkscape:cx="2109.2257"
+     inkscape:cy="922.7064"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,305)">
+    <circle
+       r="300"
+       cy="-4"
+       cx="301"
+       id="circle12"
+       style="opacity:1;fill:#d22d2d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:15.01438236;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <circle
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:12.01150608;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="circle14"
+       cx="301"
+       cy="-4"
+       r="240" />
+    <g
+       aria-label="P"
+       transform="matrix(-1.0000064,0,0,-0.99999361,-591.97965,-61.822406)"
+       style="font-variant:normal;font-weight:bold;font-size:505.15792847px;font-family:Arial;-inkscape-font-specification:Arial-Bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.80709881;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.61299992;stroke-dasharray:none;stroke-opacity:1"
+       id="text1035">
+      <path
+         d="m -788.9746,-247.82399 v 361.60231 h -117.1631 q -66.59796,0 -86.82401,-5.42651 -31.07909,-8.13975 -52.04509,-35.518912 -20.966,-27.13251 -20.966,-70.2978601 0,-33.2989799 12.0863,-55.9916199 12.0863,-22.69265 30.8324,-35.76558 18.4994,-12.826278 37.73882,-17.019478 26.14586,-5.17984 75.72435,-5.17984 h 47.60523 v -136.40251 z m -73.0111,300.430838 v -102.61021 h -39.95879 q -43.16535,0 -57.71824,5.67316 -14.55289,5.67316 -22.69264,17.75946 -8.38641,12.0863 -8.38641,28.1191399 0,19.7327401 11.59298,32.5590101 11.59298,12.82628 29.35243,16.03285 13.07294,2.46659 52.5384,2.46659 z"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.80709881"
+         id="path1037"
+         inkscape:connector-curvature="0" />
+    </g>
+    <rect
+       style="opacity:1;fill:#d22d2d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4.73867369;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1083"
+       width="50"
+       height="580"
+       x="208.15059"
+       y="-99.585114"
+       transform="rotate(-40)" />
+  </g>
+</svg>

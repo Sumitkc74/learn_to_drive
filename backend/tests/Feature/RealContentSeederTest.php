@@ -31,10 +31,15 @@ class RealContentSeederTest extends TestCase
         $this->assertSame(0, Question::whereNull('explanation')->orWhere('explanation', '')->count());
 
         // The bank is bilingual: 44 English questions plus their 44 Nepali
-        // translations, one-to-one per category, all Published.
-        $this->assertSame(88, $first['questions']);
-        $this->assertSame(44, Question::where('language', 'en')->count());
-        $this->assertSame(44, Question::where('language', 'ne')->count());
+        // translations, one-to-one per category, all Published, plus 15
+        // traffic-sign questions (official sign diagram attached as media)
+        // in each language.
+        $this->assertSame(118, $first['questions']);
+        $this->assertSame(59, Question::where('language', 'en')->count());
+        $this->assertSame(59, Question::where('language', 'ne')->count());
+        $withDiagram = Question::where('category', 'Road Signs')->get()
+            ->filter(fn ($question) => $question->getMedia('question-images')->isNotEmpty());
+        $this->assertSame(30, $withDiagram->count(), 'Every traffic-sign question must carry its sign diagram as media.');
         foreach (['General', 'Road Signs', 'Traffic Rules', 'Road Safety', 'Vehicle Knowledge'] as $category) {
             $this->assertSame(
                 Question::where('language', 'en')->where('category', $category)->count(),

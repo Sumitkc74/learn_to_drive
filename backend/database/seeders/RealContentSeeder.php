@@ -64,6 +64,31 @@ class RealContentSeeder extends Seeder
             ]);
         }
 
+        // Traffic-sign questions: one per sign, with the official sign
+        // diagram attached as question media. Diagrams are the Nepal
+        // Department of Roads signs from the Traffic Signs Manual,
+        // via Wikimedia Commons (public domain, PD-Nepal); the SVG files
+        // live in database/seeders/data/traffic-signs/ so the seeder can
+        // attach them on every boot. The media attach is idempotent:
+        // a question that already has its diagram is left alone.
+        foreach (array_merge($this->signQuestions(), $this->nepaliSignQuestions()) as [$question, $options, $correct, $category, $difficulty, $explanation, $svg]) {
+            $model = Question::firstOrCreate(['question' => $question], [
+                'option1' => $options[0],
+                'option2' => $options[1],
+                'option3' => $options[2],
+                'option4' => $options[3],
+                'correctOption' => $correct,
+                'category' => $category,
+                'difficulty' => $difficulty,
+                'explanation' => $explanation,
+                'status' => 'Published',
+            ]);
+            $path = database_path('seeders/data/traffic-signs/'.$svg);
+            if ($model->getMedia('question-images')->isEmpty() && is_file($path)) {
+                $model->addMedia($path)->preservingOriginal()->toMediaCollection('question-images');
+            }
+        }
+
         foreach ($this->tutorials() as [$title, $description]) {
             Tutorial::firstOrCreate(['title' => $title], [
                 'description' => $description,
@@ -364,6 +389,110 @@ class RealContentSeeder extends Seeder
             ['ह्यान्डब्रेक (पार्किङ ब्रेक) केका लागि हो?',
                 ['सवारीलाई स्थिर राख्न, विशेष गरी ढलानमा', 'गतिमै छिटो रोकिन', 'खुट्टाको ब्रेकको ठाउँमा', 'स्टेरिङ लक गर्न'], 'A', 'Vehicle Knowledge', 'Easy',
                 'ह्यान्डब्रेकले पार्क गरेको सवारीलाई अड्याउँछ; गतिमै खुट्टाको ब्रेकको ठाउँमा यो प्रयोग हुँदैन।'],
+        ];
+    }
+
+    /** @return array<int, array{string, array<int, string>, string, string, string, string, string}> */
+    private function signQuestions(): array
+    {
+        return [
+            ['What does traffic sign A1 mean?',
+                ['Slow down and keep going if the road looks clear', 'Stop completely and give way to traffic on the main road', 'Stop only when a traffic police officer signals you', 'Give way to pedestrians only'], 'B', 'Road Signs', 'Easy',
+                'The stop-and-give-way sign means a full stop at the line, then proceed only when the main road is clear.', 'Nepal_road_sign_A1.svg'],
+            ['What does traffic sign A2 mean?',
+                ['Stop completely, even when the main road is empty', 'You have priority over the main road', 'Give way to traffic on the main road, stopping if necessary', 'Turn back; the road ahead is closed'], 'C', 'Road Signs', 'Easy',
+                'Give way means the main road has priority; slow down and stop if traffic is coming.', 'Nepal_road_sign_A2.svg'],
+            ['What does traffic sign A3 mean?',
+                ['Vehicles must not enter from this direction', 'No vehicles may leave in this direction', 'Entry is allowed for small vehicles only', 'This road is closed to pedestrians'], 'A', 'Road Signs', 'Easy',
+                'No entry means do not drive into this road from the direction you are facing.', 'Nepal_road_sign_A3.svg'],
+            ['What does traffic sign A14 mean?',
+                ['Parking is allowed for up to 30 minutes', 'Only motorcycles may park here', 'Parking is allowed at night only', 'Parking is not allowed here'], 'D', 'Road Signs', 'Easy',
+                'The no-parking sign means you must not leave your vehicle parked here.', 'Nepal_road_sign_A14.svg'],
+            ['What does traffic sign A15 mean?',
+                ['You may stop briefly to drop someone off, but not park', 'You must not stop here at all, not even briefly', 'Stopping is allowed for up to 5 minutes', 'Only buses may stop here'], 'B', 'Road Signs', 'Medium',
+                'No stopping is stricter than no parking: not even a brief stop to drop off or pick up is allowed.', 'Nepal_road_sign_A15.svg'],
+            ['What does traffic sign A16 mean?',
+                ['Overtaking is not allowed here', 'Overtaking is allowed only for motorcycles', 'You must overtake the vehicle ahead', 'The road ahead is one-way'], 'A', 'Road Signs', 'Easy',
+                'The no-overtaking sign means stay behind the vehicle ahead until past the restriction.', 'Nepal_road_sign_A16.svg'],
+            ['What does traffic sign A21 mean?',
+                ['Sound your horn to warn others', 'Horn use is allowed at night only', 'Do not sound your horn here', 'Your horn is being tested ahead'], 'C', 'Road Signs', 'Easy',
+                'This sign marks a no-horn zone, used near hospitals, schools and similar places.', 'Nepal_road_sign_A21.svg'],
+            ['What does traffic sign A27 mean?',
+                ['You may turn left or right', 'You must go straight ahead; turning is not allowed', 'The road ahead is closed', 'Turn around and go back'], 'B', 'Road Signs', 'Medium',
+                'The straight-ahead-only sign requires you to continue straight through the junction.', 'Nepal_road_sign_A27.svg'],
+            ['What does traffic sign A31 mean?',
+                ['Go straight through the roundabout without slowing', 'Turn left before the roundabout', 'The roundabout is closed', 'Go around the mini-roundabout in the direction of the arrows, giving way to traffic from the right'], 'D', 'Road Signs', 'Medium',
+                'At a mini-roundabout, circulate in the arrow direction and give way to traffic already on it, from the right.', 'Nepal_road_sign_A31.svg'],
+            ['What does traffic sign A33 mean?',
+                ['Traffic may only travel in the direction shown; this is a one-way street', 'Traffic may travel in both directions', 'U-turns are allowed here', 'The road is closed to all traffic'], 'A', 'Road Signs', 'Easy',
+                'A one-way sign means all traffic on this road travels the same way, in the direction shown.', 'Nepal_road_sign_A33.svg'],
+            ['What does traffic sign B23 mean?',
+                ['Pedestrians are not allowed here', 'A footpath starts here', 'A pedestrian crossing is ahead; slow down and be ready to stop', 'Children are playing here'], 'C', 'Road Signs', 'Medium',
+                'This warning sign tells you a zebra crossing is ahead, so slow down and be ready to stop for pedestrians.', 'Nepal_road_sign_B23.svg'],
+            ['What does traffic sign B25 mean?',
+                ['A school parking area is ahead', 'Children may be on or crossing the road ahead; slow down', 'Children must not cross here', 'A playground is closed ahead'], 'B', 'Road Signs', 'Medium',
+                'The children-ahead sign warns of a school or play area nearby; slow down and watch for children.', 'Nepal_road_sign_B25.svg'],
+            ['What does traffic sign B38 mean?',
+                ['Roadworks are ahead; slow down and be prepared to stop or follow directions', 'The road ahead is newly paved and smooth', 'A detour ends here', 'Roadworks have finished'], 'A', 'Road Signs', 'Medium',
+                'The roadworks sign warns of workers and machinery ahead; slow down and follow any temporary signs.', 'Nepal_road_sign_B38.svg'],
+            ['What does traffic sign C3 mean?',
+                ['Parking is not allowed here', 'This is a bus stop', 'Stopping is not allowed here', 'Parking is allowed here'], 'D', 'Road Signs', 'Easy',
+                'The blue P sign marks a place where parking is allowed.', 'Nepal_road_sign_C3.svg'],
+            ['What does traffic sign C5 mean?',
+                ['A car repair workshop is ahead', 'A petrol filling station is nearby', 'Diesel is not sold here', 'A parking area is ahead'], 'B', 'Road Signs', 'Easy',
+                'This information sign tells you a filling station is nearby.', 'Nepal_road_sign_C5.svg'],
+        ];
+    }
+
+    /** @return array<int, array{string, array<int, string>, string, string, string, string, string}> */
+    private function nepaliSignQuestions(): array
+    {
+        return [
+            ['ट्राफिक चिन्ह A1 को अर्थ के हो?',
+                ['गति घटाएर सडक खाली देखिए निरन्तर जानुहोस्', 'पूर्ण रूपमा रोक्नुहोस् र मुख्य सडकको यातायातलाई बाटो दिनुहोस्', 'ट्राफिक प्रहरीले सङ्केत गरेमा मात्र रोक्नुहोस्', 'पैदलयात्रीलाई मात्र बाटो दिनुहोस्'], 'B', 'Road Signs', 'Easy',
+                'रोक्नुहोस् र बाटो दिनुहोस् चिन्हको अर्थ लाइनमा पूर्ण रूपमा रोकिनु हो, त्यसपछि मुख्य सडक खाली भएपछि मात्र अघि बढ्नु हो।', 'Nepal_road_sign_A1.svg'],
+            ['ट्राफिक चिन्ह A2 को अर्थ के हो?',
+                ['मुख्य सडक खाली भए पनि पूर्ण रूपमा रोक्नुहोस्', 'मुख्य सडकको तुलनामा तपाईंलाई प्राथमिकता छ', 'मुख्य सडकको यातायातलाई बाटो दिनुहोस्, आवश्यक भए रोक्नुहोस्', 'फर्कनुहोस्; अगाडिको सडक बन्द छ'], 'C', 'Road Signs', 'Easy',
+                'बाटो दिनुहोस् भन्नाले मुख्य सडकलाई प्राथमिकता छ; यातायात आइरहेको छ भने गति घटाउनुहोस् र रोक्नुहोस्।', 'Nepal_road_sign_A2.svg'],
+            ['ट्राफिक चिन्ह A3 को अर्थ के हो?',
+                ['यस दिशाबाट सवारी प्रवेश गर्न पाइँदैन', 'यस दिशामा कुनै सवारी बाहिर जान पाइँदैन', 'साना सवारीलाई मात्र प्रवेश गर्न पाइन्छ', 'यो सडक पैदलयात्रीका लागि बन्द छ'], 'A', 'Road Signs', 'Easy',
+                'प्रवेश निषेध भन्नाले तपाईंले सामना गरिरहेको दिशाबाट यस सडकमा सवारी नचलाउनुहोस्।', 'Nepal_road_sign_A3.svg'],
+            ['ट्राफिक चिन्ह A14 को अर्थ के हो?',
+                ['यहाँ ३० मिनेटसम्म पार्किङ गर्न पाइन्छ', 'यहाँ मोटरसाइकल मात्र पार्किङ गर्न पाइन्छ', 'यहाँ राति मात्र पार्किङ गर्न पाइन्छ', 'यहाँ पार्किङ गर्न पाइँदैन'], 'D', 'Road Signs', 'Easy',
+                'पार्किङ निषेध चिन्हको अर्थ यहाँ आफ्नो सवारी पार्क गरेर छोड्न पाइँदैन।', 'Nepal_road_sign_A14.svg'],
+            ['ट्राफिक चिन्ह A15 को अर्थ के हो?',
+                ['कसैलाई झार्न छोटो समय रोकिन पाइन्छ, तर पार्किङ गर्न पाइँदैन', 'यहाँ कुनै पनि हालतमा रोकिन पाइँदैन, छोटो समय पनि होइन', '५ मिनेटसम्म रोकिन पाइन्छ', 'यहाँ बस मात्र रोकिन पाइन्छ'], 'B', 'Road Signs', 'Medium',
+                'रोक्न निषेध पार्किङ निषेधभन्दा कडा हुन्छ: कसैलाई झार्न छोटो समय रोकिन पनि पाइँदैन।', 'Nepal_road_sign_A15.svg'],
+            ['ट्राफिक चिन्ह A16 को अर्थ के हो?',
+                ['यहाँ ओभरटेक गर्न पाइँदैन', 'यहाँ मोटरसाइकललाई मात्र ओभरटेक गर्न पाइन्छ', 'तपाईंले अगाडिको सवारीलाई ओभरटेक गर्नुपर्छ', 'अगाडिको सडक एकतर्फी छ'], 'A', 'Road Signs', 'Easy',
+                'ओभरटेक निषेध चिन्हको अर्थ प्रतिबन्ध सकिएसम्म अगाडिको सवारीको पछाडि रहनु हो।', 'Nepal_road_sign_A16.svg'],
+            ['ट्राफिक चिन्ह A21 को अर्थ के हो?',
+                ['अरूलाई चेतावनी दिन हर्न बजाउनुहोस्', 'राति मात्र हर्न बजाउन पाइन्छ', 'यहाँ हर्न नबजाउनुहोस्', 'अगाडि तपाईंको हर्न परीक्षण गरिँदैछ'], 'C', 'Road Signs', 'Easy',
+                'यो चिन्हले हर्न नबजाउने क्षेत्र जनाउँछ, जुन अस्पताल, विद्यालय र यस्तै ठाउँ नजिक प्रयोग हुन्छ।', 'Nepal_road_sign_A21.svg'],
+            ['ट्राफिक चिन्ह A27 को अर्थ के हो?',
+                ['बायाँ वा दायाँ मोड्न पाइन्छ', 'सीधा मात्र जानुपर्छ; मोड्न पाइँदैन', 'अगाडिको सडक बन्द छ', 'फर्केर पछाडि जानुहोस्'], 'B', 'Road Signs', 'Medium',
+                'सीधा मात्र जाने चिन्हले जङ्क्सन पार गर्दा सीधा जानुपर्छ भन्ने जनाउँछ।', 'Nepal_road_sign_A27.svg'],
+            ['ट्राफिक चिन्ह A31 को अर्थ के हो?',
+                ['नरोकिई गोलचक्करबाट सीधा जानुहोस्', 'गोलचक्करअघि बायाँ मोड्नुहोस्', 'गोलचक्कर बन्द छ', 'तीरको दिशामा सानो गोलचक्कर घुम्नुहोस् र दायाँबाट आउने यातायातलाई बाटो दिनुहोस्'], 'D', 'Road Signs', 'Medium',
+                'सानो गोलचक्करमा तीरको दिशामा घुम्नुहोस् र दायाँबाट आइरहेको यातायातलाई बाटो दिनुहोस्।', 'Nepal_road_sign_A31.svg'],
+            ['ट्राफिक चिन्ह A33 को अर्थ के हो?',
+                ['यातायात देखाइएको दिशामा मात्र जान पाइन्छ; यो एकतर्फी सडक हो', 'यातायात दुवै दिशामा जान पाइन्छ', 'यहाँ यु-टर्न गर्न पाइन्छ', 'सडक सबै यातायातका लागि बन्द छ'], 'A', 'Road Signs', 'Easy',
+                'एकतर्फी चिन्हको अर्थ यस सडकमा सबै यातायात देखाइएको दिशामा मात्र जान्छ।', 'Nepal_road_sign_A33.svg'],
+            ['ट्राफिक चिन्ह B23 को अर्थ के हो?',
+                ['यहाँ पैदलयात्रीलाई हिँड्न पाइँदैन', 'यहाँबाट पैदल बाटो सुरु हुन्छ', 'अगाडि पैदलयात्री क्रसिङ छ; गति घटाउनुहोस् र रोकिन तयार रहनुहोस्', 'यहाँ बच्चाहरू खेलिरहेका छन्'], 'C', 'Road Signs', 'Medium',
+                'यो चेतावनी चिन्हले अगाडि जेब्रा क्रसिङ छ भनेर जनाउँछ, त्यसैले गति घटाउनुहोस् र पैदलयात्रीका लागि रोकिन तयार रहनुहोस्।', 'Nepal_road_sign_B23.svg'],
+            ['ट्राफिक चिन्ह B25 को अर्थ के हो?',
+                ['अगाडि विद्यालयको पार्किङ क्षेत्र छ', 'अगाडि सडकमा बच्चाहरू हुन वा क्रस गरिरहेका हुन सक्छन्; गति घटाउनुहोस्', 'बच्चाहरूले यहाँ क्रस गर्नु हुँदैन', 'अगाडि खेल मैदान बन्द छ'], 'B', 'Road Signs', 'Medium',
+                'बच्चाहरू अगाडि छन् भन्ने चिन्हले नजिकै विद्यालय वा खेल्ने ठाउँ छ भनेर चेतावनी दिन्छ; गति घटाउनुहोस् र बच्चाहरूलाई हेर्नुहोस्।', 'Nepal_road_sign_B25.svg'],
+            ['ट्राफिक चिन्ह B38 को अर्थ के हो?',
+                ['अगाडि सडक निर्माण हुँदैछ; गति घटाउनुहोस् र रोकिन वा निर्देशन पालना गर्न तयार रहनुहोस्', 'अगाडिको सडक नयाँ र चिल्लो छ', 'यहाँ बाइपास सकिन्छ', 'सडक निर्माण सकिएको छ'], 'A', 'Road Signs', 'Medium',
+                'सडक निर्माण चिन्हले अगाडि कामदार र मेसिन छन् भनेर चेतावनी दिन्छ; गति घटाउनुहोस् र अस्थायी चिन्हहरू पालना गर्नुहोस्।', 'Nepal_road_sign_B38.svg'],
+            ['ट्राफिक चिन्ह C3 को अर्थ के हो?',
+                ['यहाँ पार्किङ गर्न पाइँदैन', 'यो बस स्टप हो', 'यहाँ रोकिन पाइँदैन', 'यहाँ पार्किङ गर्न पाइन्छ'], 'D', 'Road Signs', 'Easy',
+                'नीलो P चिन्हले पार्किङ गर्न पाइने ठाउँ जनाउँछ।', 'Nepal_road_sign_C3.svg'],
+            ['ट्राफिक चिन्ह C5 को अर्थ के हो?',
+                ['अगाडि गाडी मर्मत कार्यशाला छ', 'नजिकै पेट्रोल पम्प छ', 'यहाँ डिजेल बेचिँदैन', 'अगाडि पार्किङ क्षेत्र छ'], 'B', 'Road Signs', 'Easy',
+                'यो सूचना चिन्हले नजिकै पेट्रोल पम्प छ भनेर जनाउँछ।', 'Nepal_road_sign_C5.svg'],
         ];
     }
 
