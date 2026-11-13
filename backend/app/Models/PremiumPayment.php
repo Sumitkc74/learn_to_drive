@@ -4,7 +4,12 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 
 class PremiumPayment extends \Illuminate\Database\Eloquent\Model {
-    public $incrementing=false;protected $keyType='string';protected $guarded=[];
+    public $incrementing=false;protected $keyType='string';
+    // Explicit allow-list (not $guarded = []): every field the app
+    // mass-assigns on a payment, and nothing else. Creation sets the
+    // server-side fields; verify() and refund() set the rest. No
+    // user-controlled field may ever be mass-assigned onto a payment.
+    protected $fillable=['id','user_id','gateway','live','merchant','amount_paisa','access_days','status','provider_id','transaction_id','paid_at','access_until','refund_status','refund_reason','refunded_at'];
     protected $casts=['live'=>'boolean','paid_at'=>'datetime','access_until'=>'datetime','refunded_at'=>'datetime'];
 
     public function user()

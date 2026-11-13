@@ -16,9 +16,9 @@ class ProtectedMediaTest extends TestCase {
         $this->get(route('media.review',$media))->assertRedirect(route('login'));
         $this->get(route('media.published',$media))->assertNotFound();
         $this->actingAs(User::factory()->create(['role'=>'User']))->get(route('media.review',$media))->assertForbidden();
-        $this->actingAs(User::factory()->create(['role'=>'Admin']))->get(route('media.review',$media))->assertOk();
+        $this->actingAs(User::factory()->create(['role'=>'Admin']))->get(route('media.review',$media))->assertOk()->assertHeader('Cache-Control','no-store, private');
         $question->update(['status'=>'Published']);
-        $this->get(route('media.published',$media))->assertOk()->assertHeader('Cache-Control','no-store, private');
+        $this->get(route('media.published',$media))->assertOk()->assertHeader('Cache-Control','max-age=3600, must-revalidate, public');
         $question->update(['status'=>'Archived']);
         $this->get(route('media.published',$media))->assertNotFound();
     }

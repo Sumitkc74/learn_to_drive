@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppSetting;
 use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
@@ -18,6 +19,15 @@ use Illuminate\Database\Seeder;
  * running this seeder repeatedly never duplicates rows. No demo markers,
  * no demo accounts, no environment restriction.
  *
+ * Version gate: the entrypoint runs this seeder on every boot, which used
+ * to re-check every row (~200 queries) on each cold start. run() now
+ * returns early when the stored real_content_version matches VERSION,
+ * so boots skip it entirely. BUMP VERSION whenever the seeded content
+ * below changes (1 = original 44 EN questions, tutorials, exam info;
+ * 2 = Nepali translations; 3 = traffic signs; 4 = 4 schools as Pending)
+ * or new rows will never seed. A deleted row is likewise not restored
+ * until the version is bumped.
+ *
  * Deliberately omitted: specific licence fees, written-exam pass marks
  * and question counts, and fine amounts. Published guides disagree on
  * those figures and they change by province and year, so the
@@ -29,8 +39,14 @@ use Illuminate\Database\Seeder;
  */
 class RealContentSeeder extends Seeder
 {
+    public const VERSION = 4;
+
     public function run(): void
     {
+        if (AppSetting::read('real_content_version') === (string) self::VERSION) {
+            return;
+        }
+
         foreach ($this->questions() as [$question, $options, $correct, $category, $difficulty, $explanation]) {
             Question::firstOrCreate(['question' => $question], [
                 'option1' => $options[0],
@@ -119,6 +135,8 @@ class RealContentSeeder extends Seeder
                 'language' => 'English',
             ]);
         }
+
+        AppSetting::updateOrCreate(['key' => 'real_content_version'], ['value' => (string) self::VERSION]);
     }
 
     /** @return array<int, array{string, array<int, string>, string, string, string, string}> */

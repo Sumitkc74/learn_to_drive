@@ -10,6 +10,11 @@
         @include('admin.schools.fields')
         <label for="school-status" class="form-label">{{ __('Status') }}</label>
         <select id="school-status" name="status" class="form-control mb-3">@foreach(['Pending','Approved','Suspended'] as $status)<option value="{{ $status }}" @selected(old('status', $school->status) === $status)>{{ __($status) }}</option>@endforeach</select>
+        @if($school->memberships->isEmpty())
+            <label for="owner-email" class="form-label">{{ __('Assign owner (optional)') }}</label>
+            <input id="owner-email" type="email" name="owner_email" value="{{ old('owner_email') }}" class="form-control mb-3" maxlength="255">
+            <p>{{ __('Enter the email of an existing active account to make them the school owner.') }}</p>
+        @endif
         <button class="btn btn-primary">{{ __('Save changes') }}</button>
     </form>
 </section>

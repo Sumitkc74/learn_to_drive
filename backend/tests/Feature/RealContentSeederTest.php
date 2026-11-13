@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AppSetting;
 use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
@@ -67,6 +68,19 @@ class RealContentSeederTest extends TestCase
             $this->assertNotNull($school->latitude);
             $this->assertNotNull($school->longitude);
         }
+    }
+
+    public function test_seeder_skips_when_version_is_current(): void
+    {
+        $this->seed(RealContentSeeder::class);
+        $this->assertSame((string) RealContentSeeder::VERSION, AppSetting::read('real_content_version'));
+
+        // With the version already current, a second run must not restore
+        // a deleted row: boots skip the seeder entirely.
+        Question::query()->limit(1)->delete();
+        $count = Question::count();
+        $this->seed(RealContentSeeder::class);
+        $this->assertSame($count, Question::count());
     }
 
     /** @return array{questions: int, tutorials: int, exam_information: int} */

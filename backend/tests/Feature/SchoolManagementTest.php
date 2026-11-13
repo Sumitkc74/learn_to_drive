@@ -64,6 +64,26 @@ class SchoolManagementTest extends TestCase
         $this->assertSame('Approved', $school->fresh()->status);
     }
 
+    public function test_admin_can_assign_owner_to_ownerless_school(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $owner = User::factory()->create(['is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'No owner yet', 'status' => 'Pending']);
+        $this->actingAs($admin)->patch(route('admin.schools.update', $school), ['name' => $school->name, 'status' => 'Pending', 'owner_email' => $owner->email])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('school_memberships', ['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
+        $this->assertSame('Pending', $school->fresh()->status);
+    }
+
+    public function test_assigning_a_second_owner_is_rejected(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [$owner, $school] = $this->staff('Owner');
+        $other = User::factory()->create(['is_active' => true]);
+        $this->actingAs($admin)->patch(route('admin.schools.update', $school), ['name' => $school->name, 'status' => $school->status, 'owner_email' => $other->email])->assertSessionHasErrors('owner_email');
+        $this->assertSame(1, $school->memberships()->where('role', 'Owner')->count());
+        $this->assertDatabaseMissing('school_memberships', ['driving_school_id' => $school->id, 'user_id' => $other->id]);
+    }
+
     public function test_enrollment_cannot_downgrade_members_or_create_managers_for_manager(): void
     {
         [$manager, $school, $membership] = $this->staff();

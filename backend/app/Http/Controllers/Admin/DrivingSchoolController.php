@@ -56,15 +56,33 @@ class DrivingSchoolController extends Controller
 
     public function update(Request $request, DrivingSchool $school)
     {
-        $data = $request->validate($this->rules() + ['status' => ['required', Rule::in(['Pending', 'Approved', 'Suspended'])]]);
+        $data = $request->validate($this->rules() + ['status' => ['required', Rule::in(['Pending', 'Approved', 'Suspended'])], 'owner_email' => ['nullable', 'email', 'max:255']]);
         DB::transaction(function () use ($request, $school, $data) {
             $school = DrivingSchool::whereKey($school->id)->lockForUpdate()->firstOrFail();
-            // Approval no longer requires an owner: an admin-curated listing
-            // can be approved and shown on Find Schools, with an owner
-            // attached later when the school joins.
-            $before = $school->only(array_keys($data));
-            $school->update($data);
-            $this->audit($request, $school, 'school.updated', $before, $data);
+            // An owner can be attached later to an ownerless school. A school
+            // that already has an owner keeps it — ownership changes go
+            // through the transfer flow, not this form.
+            $owner = null;
+            if (!empty($data['owner_email'])) {
+                $owner = User::where('email', $data['owner_email'])->where('is_active', true)
+                    ->where('role', '!=', 'Admin')->lockForUpdate()->first();
+                if (!$owner) {
+                    throw ValidationException::withMessages(['owner_email' => __('Choose an existing active non-admin account.')]);
+                }
+                $existingOwner = $school->memberships()->where('role', 'Owner')->first();
+                if ($existingOwner && $existingOwner->user_id !== $owner->id) {
+                    throw ValidationException::withMessages(['owner_email' => __('This school already has an owner. Use ownership transfer to change it.')]);
+                }
+            }
+            $after = $data;
+            unset($after['owner_email']);
+            $before = $school->only(array_keys($after));
+            $school->update($after);
+            if ($owner && !$school->memberships()->where('role', 'Owner')->where('user_id', $owner->id)->exists()) {
+                SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
+                $after['owner_id'] = $owner->id;
+            }
+            $this->audit($request, $school, 'school.updated', $before, $after);
         });
 
         return back()->with('success', __('School details updated.'));
