@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
 use App\Models\Tutorial;
@@ -49,6 +50,22 @@ class RealContentSeederTest extends TestCase
         }
         foreach (Question::where('language', 'ne')->pluck('question') as $text) {
             $this->assertMatchesRegularExpression('/\p{Devanagari}/u', $text, 'Every Nepali question must be written in Devanagari script.');
+        }
+    }
+
+    public function test_seeder_adds_approved_driving_schools_idempotently(): void
+    {
+        $this->seed(RealContentSeeder::class);
+        $this->seed(RealContentSeeder::class);
+
+        $this->assertSame(4, DrivingSchool::where('status', 'Approved')->count());
+        $this->assertSame(0, DrivingSchool::where('status', '!=', 'Approved')->count());
+        foreach (['Nepal Driving Center', 'Bagmati Driving Center', 'New Oxford Motor Driving Training Center', 'Shree Suman Motor Driving School'] as $name) {
+            $school = DrivingSchool::where('name', $name)->firstOrFail();
+            $this->assertNotNull($school->address);
+            $this->assertNotNull($school->phone);
+            $this->assertNotNull($school->latitude);
+            $this->assertNotNull($school->longitude);
         }
     }
 

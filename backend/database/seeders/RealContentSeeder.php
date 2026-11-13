@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
 use App\Models\Tutorial;
@@ -87,6 +88,20 @@ class RealContentSeeder extends Seeder
             if ($model->getMedia('question-images')->isEmpty() && is_file($path)) {
                 $model->addMedia($path)->preservingOriginal()->toMediaCollection('question-images');
             }
+        }
+
+        // Real driving schools, verified on Google Maps (all open, none
+        // closed) and seeded Approved so Find Schools is not empty. Names,
+        // addresses, phones and coordinates are the Maps listings; no
+        // invented details. firstOrCreate on the name keeps this idempotent.
+        foreach ($this->schools() as [$name, $address, $phone, $latitude, $longitude]) {
+            DrivingSchool::firstOrCreate(['name' => $name], [
+                'address' => $address,
+                'phone' => $phone,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'status' => 'Approved',
+            ]);
         }
 
         foreach ($this->tutorials() as [$title, $description]) {
@@ -493,6 +508,17 @@ class RealContentSeeder extends Seeder
             ['ट्राफिक चिन्ह C5 को अर्थ के हो?',
                 ['अगाडि गाडी मर्मत कार्यशाला छ', 'नजिकै पेट्रोल पम्प छ', 'यहाँ डिजेल बेचिँदैन', 'अगाडि पार्किङ क्षेत्र छ'], 'B', 'Road Signs', 'Easy',
                 'यो सूचना चिन्हले नजिकै पेट्रोल पम्प छ भनेर जनाउँछ।', 'Nepal_road_sign_C5.svg'],
+        ];
+    }
+
+    /** @return array<int, array{string, string, string, float, float}> */
+    private function schools(): array
+    {
+        return [
+            ['Nepal Driving Center', 'Chabahil, Kathmandu', '+97714586995', 27.72114779, 85.34210356],
+            ['Bagmati Driving Center', 'Dyabu Marg, Kathmandu', '+97714022567', 27.721515, 85.312555],
+            ['New Oxford Motor Driving Training Center', 'Ring Rd, Kathmandu', '+9779849511751', 27.72423142, 85.29857852],
+            ['Shree Suman Motor Driving School', 'Balaju Chakrapath, Kathmandu', '+9779851183032', 27.72231223, 85.29978054],
         ];
     }
 
