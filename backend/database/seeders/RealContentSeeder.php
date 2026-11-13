@@ -91,16 +91,18 @@ class RealContentSeeder extends Seeder
         }
 
         // Real driving schools, verified on Google Maps (all open, none
-        // closed) and seeded Approved so Find Schools is not empty. Names,
-        // addresses, phones and coordinates are the Maps listings; no
-        // invented details. firstOrCreate on the name keeps this idempotent.
+        // closed) and seeded Pending so they go through the system's own
+        // flow: an admin reviews and approves each one in /admin/schools
+        // before it appears on Find Schools. Names, addresses, phones and
+        // coordinates are the Maps listings; no invented details.
+        // firstOrCreate on the name keeps this idempotent.
         foreach ($this->schools() as [$name, $address, $phone, $latitude, $longitude]) {
             DrivingSchool::firstOrCreate(['name' => $name], [
                 'address' => $address,
                 'phone' => $phone,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
-                'status' => 'Approved',
+                'status' => 'Pending',
             ]);
         }
 

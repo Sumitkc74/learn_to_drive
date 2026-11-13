@@ -53,13 +53,13 @@ class RealContentSeederTest extends TestCase
         }
     }
 
-    public function test_seeder_adds_approved_driving_schools_idempotently(): void
+    public function test_seeder_adds_pending_driving_schools_idempotently(): void
     {
         $this->seed(RealContentSeeder::class);
         $this->seed(RealContentSeeder::class);
 
-        $this->assertSame(4, DrivingSchool::where('status', 'Approved')->count());
-        $this->assertSame(0, DrivingSchool::where('status', '!=', 'Approved')->count());
+        $this->assertSame(4, DrivingSchool::where('status', 'Pending')->count());
+        $this->assertSame(0, DrivingSchool::where('status', '!=', 'Pending')->count());
         foreach (['Nepal Driving Center', 'Bagmati Driving Center', 'New Oxford Motor Driving Training Center', 'Shree Suman Motor Driving School'] as $name) {
             $school = DrivingSchool::where('name', $name)->firstOrFail();
             $this->assertNotNull($school->address);

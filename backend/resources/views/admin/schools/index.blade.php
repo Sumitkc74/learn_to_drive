@@ -15,11 +15,11 @@
     </tbody></table></div>{{ $schools->links() }}
 </section>
 <details class="ltd-panel" @if($errors->any()) open @endif><summary>{{ __('Add a school') }}</summary>
-    <p>{{ __('Schools start pending. Assign an existing account as owner, then review and approve the school.') }}</p>
+    <p>{{ __('Schools start pending. You can assign an existing account as owner now, or leave it blank and add an owner later — then review and approve the school.') }}</p>
     <form method="post" action="{{ route('admin.schools.store') }}">@csrf
         @include('admin.schools.fields', ['school' => null])
-        <label for="owner-email" class="form-label">{{ __('Owner account email') }}</label>
-        <input id="owner-email" type="email" name="owner_email" value="{{ old('owner_email') }}" class="form-control mb-3" maxlength="255" required>
+        <label for="owner-email" class="form-label">{{ __('Owner account email (optional)') }}</label>
+        <input id="owner-email" type="email" name="owner_email" value="{{ old('owner_email') }}" class="form-control mb-3" maxlength="255">
         <button class="btn btn-primary">{{ __('Create school') }}</button>
     </form>
 </details>

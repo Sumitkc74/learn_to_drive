@@ -23,17 +23,25 @@ class DrivingSchoolController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules() + ['owner_email' => ['required', 'email', 'max:255']]);
+        $data = $request->validate($this->rules() + ['owner_email' => ['nullable', 'email', 'max:255']]);
         $school = DB::transaction(function () use ($data, $request) {
-            $owner = User::where('email', $data['owner_email'])->where('is_active', true)
-                ->where('role', '!=', 'Admin')->lockForUpdate()->first();
-            if (!$owner) {
-                throw ValidationException::withMessages(['owner_email' => __('Choose an existing active non-admin account.')]);
+            // The owner is optional: an admin-curated listing (e.g. a real
+            // school found on Google Maps) starts Pending with no owner, and
+            // an owner can be attached later when the school joins.
+            $owner = null;
+            if (!empty($data['owner_email'])) {
+                $owner = User::where('email', $data['owner_email'])->where('is_active', true)
+                    ->where('role', '!=', 'Admin')->lockForUpdate()->first();
+                if (!$owner) {
+                    throw ValidationException::withMessages(['owner_email' => __('Choose an existing active non-admin account.')]);
+                }
             }
             unset($data['owner_email']);
             $school = DrivingSchool::create($data + ['status' => 'Pending']);
-            SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
-            $this->audit($request, $school, 'school.created', [], ['status' => 'Pending', 'owner_id' => $owner->id]);
+            if ($owner) {
+                SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
+            }
+            $this->audit($request, $school, 'school.created', [], ['status' => 'Pending', 'owner_id' => $owner?->id]);
             return $school;
         });
 
@@ -51,10 +59,9 @@ class DrivingSchoolController extends Controller
         $data = $request->validate($this->rules() + ['status' => ['required', Rule::in(['Pending', 'Approved', 'Suspended'])]]);
         DB::transaction(function () use ($request, $school, $data) {
             $school = DrivingSchool::whereKey($school->id)->lockForUpdate()->firstOrFail();
-            if ($data['status'] === 'Approved' && !$school->memberships()->where('role', 'Owner')
-                ->whereHas('user', fn ($q) => $q->where('is_active', true)->where('role', '!=', 'Admin'))->exists()) {
-                throw ValidationException::withMessages(['status' => __('An active school owner is required before approval.')]);
-            }
+            // Approval no longer requires an owner: an admin-curated listing
+            // can be approved and shown on Find Schools, with an owner
+            // attached later when the school joins.
             $before = $school->only(array_keys($data));
             $school->update($data);
             $this->audit($request, $school, 'school.updated', $before, $data);

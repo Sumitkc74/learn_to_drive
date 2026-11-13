@@ -46,14 +46,22 @@ class SchoolManagementTest extends TestCase
         $this->patch(route('admin.schools.update', $school), ['name' => 'Changed', 'status' => 'Approved'])->assertForbidden();
     }
 
-    public function test_approval_requires_active_owner_and_invalid_creation_is_atomic(): void
+    public function test_admin_email_cannot_be_owner_and_invalid_creation_is_atomic(): void
     {
         $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
         $this->actingAs($admin)->post(route('admin.schools.store'), ['name' => 'Invalid', 'owner_email' => $admin->email])->assertSessionHasErrors('owner_email');
         $this->assertDatabaseMissing('driving_schools', ['name' => 'Invalid']);
-        $school = DrivingSchool::create(['name' => 'No owner']);
-        $this->patch(route('admin.schools.update', $school), ['name' => $school->name, 'status' => 'Approved'])->assertSessionHasErrors('status');
-        $this->assertSame('Pending', $school->fresh()->status);
+    }
+
+    public function test_admin_can_create_ownerless_school_and_approve_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $this->actingAs($admin)->post(route('admin.schools.store'), ['name' => 'No owner yet'])->assertSessionHasNoErrors();
+        $school = DrivingSchool::where('name', 'No owner yet')->firstOrFail();
+        $this->assertSame('Pending', $school->status);
+        $this->assertSame(0, $school->memberships()->count());
+        $this->patch(route('admin.schools.update', $school), ['name' => $school->name, 'status' => 'Approved'])->assertSessionHasNoErrors();
+        $this->assertSame('Approved', $school->fresh()->status);
     }
 
     public function test_enrollment_cannot_downgrade_members_or_create_managers_for_manager(): void
