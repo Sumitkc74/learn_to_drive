@@ -6,6 +6,7 @@ use App\Models\AppSetting;
 use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
+use App\Models\TrafficSign;
 use App\Models\Tutorial;
 use Illuminate\Database\Seeder;
 
@@ -24,22 +25,22 @@ use Illuminate\Database\Seeder;
  * returns early when the stored real_content_version matches VERSION,
  * so boots skip it entirely. BUMP VERSION whenever the seeded content
  * below changes (1 = original 44 EN questions, tutorials, exam info;
- * 2 = Nepali translations; 3 = traffic signs; 4 = 4 schools as Pending)
- * or new rows will never seed. A deleted row is likewise not restored
- * until the version is bumped.
+ * 2 = Nepali translations; 3 = traffic signs; 4 = 4 schools as Pending;
+ * 5 = traffic-sign library records) or new rows will never seed.
+ * A deleted row is likewise not restored until the version is bumped.
  *
  * Deliberately omitted: specific licence fees, written-exam pass marks
  * and question counts, and fine amounts. Published guides disagree on
  * those figures and they change by province and year, so the
  * ExamInformation entries below tell learners to check the current
  * DoTM notice and their province portal instead of stating a figure
- * that may be wrong. Traffic signs are also omitted: the learner signs
- * list only shows signs with an attached image, so text-only signs
- * would be invisible (a v2 item, with real sign images).
+ * that may be wrong. Traffic signs are seeded as library records with
+ * their official diagrams attached, so the signs list, flashcards
+ * and homepage sign count all show real content.
  */
 class RealContentSeeder extends Seeder
 {
-    public const VERSION = 4;
+    public const VERSION = 5;
 
     public function run(): void
     {
@@ -103,6 +104,25 @@ class RealContentSeeder extends Seeder
             $path = database_path('seeders/data/traffic-signs/'.$svg);
             if ($model->getMedia('question-images')->isEmpty() && is_file($path)) {
                 $model->addMedia($path)->preservingOriginal()->toMediaCollection('question-images');
+            }
+        }
+
+        // Traffic-sign library records: one per sign, with the official
+        // diagram attached as media, so the learner signs list, the
+        // flashcards and the homepage sign count all have real content.
+        // The SVGs are the same diagrams attached to the sign questions
+        // above. The 'image' value follows the admin's own convention
+        // (a placeholder string; the diagram is the media attachment),
+        // and the media attach is idempotent.
+        foreach ($this->trafficSigns() as [$name, $nepaliName, $description, $svg]) {
+            $sign = TrafficSign::firstOrCreate(['name' => $name], [
+                'nepaliSignName' => $nepaliName,
+                'description' => $description,
+                'image' => 'demo',
+            ]);
+            $path = database_path('seeders/data/traffic-signs/'.$svg);
+            if ($sign->getMedia()->isEmpty() && is_file($path)) {
+                $sign->addMedia($path)->preservingOriginal()->toMediaCollection();
             }
         }
 
@@ -532,6 +552,49 @@ class RealContentSeeder extends Seeder
     }
 
     /** @return array<int, array{string, string, string, float, float}> */
+    /** @return array<int, array{string, string, string, string}> */
+    private function trafficSigns(): array
+    {
+        // [English name, Nepali name, description, SVG diagram file].
+        // Names and descriptions reuse the wordings already used for the
+        // sign questions above; the Nepali names come from the Nepali
+        // question texts and explanations, so no new vocabulary is
+        // introduced. Diagrams are the official Nepal Department of
+        // Roads signs (public domain, PD-Nepal).
+        return [
+            ['Stop and give way', 'रोक्नुहोस् र बाटो दिनुहोस्',
+                'The stop-and-give-way sign means a full stop at the line, then proceed only when the main road is clear.', 'Nepal_road_sign_A1.svg'],
+            ['Give way', 'बाटो दिनुहोस्',
+                'Give way means the main road has priority; slow down and stop if traffic is coming.', 'Nepal_road_sign_A2.svg'],
+            ['No entry', 'प्रवेश निषेध',
+                'No entry means do not drive into this road from the direction you are facing.', 'Nepal_road_sign_A3.svg'],
+            ['No parking', 'पार्किङ निषेध',
+                'The no-parking sign means you must not leave your vehicle parked here.', 'Nepal_road_sign_A14.svg'],
+            ['No stopping', 'रोक्न निषेध',
+                'No stopping is stricter than no parking: not even a brief stop to drop off or pick up is allowed.', 'Nepal_road_sign_A15.svg'],
+            ['No overtaking', 'ओभरटेक निषेध',
+                'The no-overtaking sign means stay behind the vehicle ahead until past the restriction.', 'Nepal_road_sign_A16.svg'],
+            ['No horn', 'हर्न निषेध',
+                'This sign marks a no-horn zone, used near hospitals, schools and similar places.', 'Nepal_road_sign_A21.svg'],
+            ['Straight ahead only', 'सीधा मात्र',
+                'The straight-ahead-only sign requires you to continue straight through the junction.', 'Nepal_road_sign_A27.svg'],
+            ['Mini-roundabout', 'सानो गोलचक्कर',
+                'At a mini-roundabout, circulate in the arrow direction and give way to traffic already on it, from the right.', 'Nepal_road_sign_A31.svg'],
+            ['One-way street', 'एकतर्फी सडक',
+                'A one-way sign means all traffic on this road travels the same way, in the direction shown.', 'Nepal_road_sign_A33.svg'],
+            ['Pedestrian crossing ahead', 'पैदलयात्री क्रसिङ अगाडि',
+                'This warning sign tells you a zebra crossing is ahead, so slow down and be ready to stop for pedestrians.', 'Nepal_road_sign_B23.svg'],
+            ['Children ahead', 'बच्चाहरू अगाडि',
+                'The children-ahead sign warns of a school or play area nearby; slow down and watch for children.', 'Nepal_road_sign_B25.svg'],
+            ['Roadworks ahead', 'सडक निर्माण हुँदैछ',
+                'The roadworks sign warns of workers and machinery ahead; slow down and follow any temporary signs.', 'Nepal_road_sign_B38.svg'],
+            ['Parking', 'पार्किङ',
+                'The blue P sign marks a place where parking is allowed.', 'Nepal_road_sign_C3.svg'],
+            ['Filling station', 'पेट्रोल पम्प',
+                'This information sign tells you a filling station is nearby.', 'Nepal_road_sign_C5.svg'],
+        ];
+    }
+
     private function schools(): array
     {
         return [

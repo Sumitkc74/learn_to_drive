@@ -6,6 +6,7 @@ use App\Models\AppSetting;
 use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
+use App\Models\TrafficSign;
 use App\Models\Tutorial;
 use Database\Seeders\RealContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,6 +68,19 @@ class RealContentSeederTest extends TestCase
             $this->assertNotNull($school->phone);
             $this->assertNotNull($school->latitude);
             $this->assertNotNull($school->longitude);
+        }
+    }
+
+    public function test_seeder_creates_traffic_sign_library_records_with_diagrams(): void
+    {
+        $this->seed(RealContentSeeder::class);
+        $this->seed(RealContentSeeder::class);
+
+        $this->assertSame(15, TrafficSign::count(), 'Seeding twice must not duplicate signs.');
+        $this->assertSame(15, TrafficSign::whereHas('media')->count(), 'Every seeded sign must carry its diagram as media, or the signs list and flashcards stay empty.');
+        foreach (TrafficSign::all() as $sign) {
+            $this->assertNotEmpty($sign->nepaliSignName, "Sign {$sign->name} must have a Nepali name for the Nepali UI.");
+            $this->assertNotEmpty($sign->description);
         }
     }
 
