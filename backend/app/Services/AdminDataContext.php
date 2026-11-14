@@ -28,7 +28,8 @@ class AdminDataContext
         $yesterday = $start->copy()->subDay();
         $users = User::query();
         $premium = User::where('is_active', true)->where('role', '!=', 'Admin')
-            ->where(fn($q) => $q->where('role', 'PremiumUser')->orWhere('premium_until', '>', now()));
+            ->where(fn($q) => $q->where('role', 'PremiumUser')->orWhere('premium_until', '>', now())
+                ->orWhereHas('schoolMemberships', fn($m) => $m->where('role', 'Student')->whereHas('school', fn($s) => $s->where('status', 'Approved'))));
         $stats = [
             'read_at' => now()->toIso8601String(), 'reporting_timezone' => 'Asia/Kathmandu',
             'today' => now('Asia/Kathmandu')->toDateString(),
@@ -38,7 +39,7 @@ class AdminDataContext
                 'added_yesterday' => (clone $users)->where('created_at', '>=', $yesterday)->where('created_at', '<', $start)->count(),
                 'by_role' => $this->counts(User::query(), 'role'),
                 'premium_learners_with_access' => $premium->count(),
-                'premium_definition' => 'Active non-admin users with PremiumUser role OR premium_until in the future; role-granted access does not prove payment. Admins also have access but are excluded here.'],
+                'premium_definition' => 'Active non-admin users with PremiumUser role OR premium_until in the future OR an active Student membership at an Approved school; role-granted access does not prove payment. Admins also have access but are excluded here.'],
             'content_totals' => [],
             'support_by_status' => $this->counts(SupportTicket::query(), 'status'),
             'schools_by_status' => $this->counts(DrivingSchool::query(), 'status'),

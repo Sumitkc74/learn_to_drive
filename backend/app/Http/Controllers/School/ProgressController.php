@@ -56,6 +56,11 @@ class ProgressController extends StudentRecordController {
             'Present attendance'=>(clone $attendance)->where('a.status','Present')->count(),'Absent attendance'=>(clone $attendance)->where('a.status','Absent')->count(),
             'Paid live invoices (NPR)'=>(clone $payments)->where('p.live',true)->where('p.status','Paid')->sum('p.amount_paisa')/100,
             'Paid test invoices (NPR)'=>(clone $payments)->where('p.live',false)->where('p.status','Paid')->sum('p.amount_paisa')/100,
+            'Platform commission — live (NPR)'=>(clone $payments)->where('p.live',true)->where('p.status','Paid')->sum('p.commission_paisa')/100,
+            'School payout — live (NPR)'=>(clone $payments)->where('p.live',true)->where('p.status','Paid')->sum('p.school_payout_paisa')/100,
+            'Platform commission — test (NPR)'=>(clone $payments)->where('p.live',false)->where('p.status','Paid')->sum('p.commission_paisa')/100,
+            'School payout — test (NPR)'=>(clone $payments)->where('p.live',false)->where('p.status','Paid')->sum('p.school_payout_paisa')/100,
+            'Enrollment fees owed (NPR)'=>DB::table('school_memberships')->where('driving_school_id',$school)->where('role','Student')->where('enrollment_source','discovery')->sum('enrollment_fee_paisa')/100,
             'Refund requests'=>(clone $payments)->where('p.status','RefundRequested')->count()];
         if(($d['format']??null)==='csv')return response()->streamDownload(function()use($metrics,$from,$to){$f=fopen('php://output','w');fputcsv($f,['Metric','Value','From','To']);foreach($metrics as $label=>$value)fputcsv($f,[$label,$value,$from->toDateString(),$to->toDateString()]);fclose($f);},'school-report.csv',['Content-Type'=>'text/csv; charset=UTF-8','Cache-Control'=>'no-store']);
         $data=['metrics'=>$metrics,'from'=>$from->toDateString(),'to'=>$to->toDateString(),'school'=>DrivingSchool::findOrFail($school)];

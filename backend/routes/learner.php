@@ -40,6 +40,7 @@ Route::prefix('learn')->name('learn.')->group(function () {
         Route::get('school-centre/{school}/students/{student}', [\App\Http\Controllers\School\StudentRecordController::class,'show'])->whereNumber('school')->whereNumber('student')->name('school.students.show');
         Route::post('school-centre/{school}/students/{student}/{kind}', [\App\Http\Controllers\School\StudentRecordController::class,'save'])->whereNumber('school')->whereNumber('student')->middleware('throttle:30,1,school-student-records')->name('school.students.save');
         Route::get('school-centre', [\App\Http\Controllers\School\PartnerController::class,'index'])->name('school.centre');
+        Route::post('schools/{school}/join-request', [\App\Http\Controllers\Learner\SchoolMapController::class,'joinRequest'])->whereNumber('school')->middleware('throttle:10,1')->name('schools.join-request');
         Route::post('school-centre/apply', [\App\Http\Controllers\School\PartnerController::class,'apply'])->middleware('throttle:3,60,school-applications')->name('school.apply');
         Route::post('school-centre/invitations/{invitation}', [\App\Http\Controllers\School\PartnerController::class,'invitation'])->whereNumber('invitation')->name('school.invitation');
         Route::post('school-centre/read', [\App\Http\Controllers\School\PartnerController::class,'read'])->name('school.read');

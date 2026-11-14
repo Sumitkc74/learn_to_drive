@@ -43,7 +43,7 @@ class PartnerController extends Controller
             $invite=DB::table('school_invitations')->where('user_id',$r->user()->id)->where('id',$invitation)->lockForUpdate()->first();
             abort_unless($invite && $invite->status==='Pending' && Carbon::parse($invite->expires_at)->isFuture(),404);
             abort_unless(DrivingSchool::whereKey($invite->driving_school_id)->where('status','Approved')->exists(),403);
-            if($data['decision']==='accept') SchoolMembership::firstOrCreate(['driving_school_id'=>$invite->driving_school_id,'user_id'=>$r->user()->id],['role'=>$invite->role]);
+            if($data['decision']==='accept') SchoolMembership::firstOrCreate(['driving_school_id'=>$invite->driving_school_id,'user_id'=>$r->user()->id],['role'=>$invite->role,'enrollment_source'=>'school','enrollment_fee_paisa'=>0]);
             DB::table('school_invitations')->where('id',$invite->id)->update(['status'=>$data['decision']==='accept'?'Accepted':'Declined','updated_at'=>now()]);
         });
         return $this->respond($r,'Invitation updated.');
@@ -79,7 +79,9 @@ class PartnerController extends Controller
         $data=compact('member','courses','batches','sessions','roster','attendance','staff','progress');
         $data['session_pages']=['current_page'=>$sessionPages->currentPage(),'last_page'=>$sessionPages->lastPage()];
         $members=$member->role==='Owner'?DrivingSchool::findOrFail($school)->memberships()->where('role','!=','Owner')->with('user:id,name')->get():collect();
+        $joinRequests=in_array($member->role,['Owner','Manager'],true)?DB::table('school_join_requests as j')->join('users as u','u.id','=','j.user_id')->where('j.driving_school_id',$school)->where('j.status','Pending')->select('j.id','j.user_id','u.name','j.created_at')->orderBy('j.id')->get():collect();
         if(!$r->expectsJson()) $data+=compact('sessionPages','members');
+        $data+=compact('joinRequests');
         $data['school']=DrivingSchool::findOrFail($school);
         return $r->expectsJson() ? response()->json(['data'=>$data]) : view('school.partner',$data);
     }
@@ -110,8 +112,23 @@ class PartnerController extends Controller
                 DB::table('school_batch_members')->insert(['school_batch_id'=>$batch->id,'user_id'=>$r->user()->id,'created_at'=>now(),'updated_at'=>now()]); return;
             }
             abort_unless(in_array($member->role,['Owner','Manager','Instructor']),403);
-            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
+            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer','join-approve','join-decline'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
             switch($action) {
+                case 'join-approve':
+                case 'join-decline':
+                    $d=$r->validate(['request_id'=>'required|integer']);
+                    $join=DB::table('school_join_requests')->where('id',$d['request_id'])->where('driving_school_id',$school)->where('status','Pending')->lockForUpdate()->first();
+                    abort_unless($join,404);
+                    $schoolName=DrivingSchool::whereKey($school)->value('name');
+                    if($action==='join-decline') {
+                        DB::table('school_join_requests')->where('id',$join->id)->update(['status'=>'Declined','updated_at'=>now()]);
+                        SchoolNotifications::send($join->user_id,'Your request to join '.$schoolName.' was declined.');
+                        break;
+                    }
+                    SchoolMembership::firstOrCreate(['driving_school_id'=>$school,'user_id'=>$join->user_id],['role'=>'Student','enrollment_source'=>'discovery','enrollment_fee_paisa'=>(int)config('schools.enrollment_fee_paisa')]);
+                    DB::table('school_join_requests')->where('id',$join->id)->update(['status'=>'Approved','updated_at'=>now()]);
+                    SchoolNotifications::send($join->user_id,'Your request to join '.$schoolName.' was approved. You are now a student.');
+                    break;
                 case 'create-student':
                     // Second way to add a student: the school creates the
                     // account itself, instead of inviting an existing one.
@@ -124,7 +141,7 @@ class PartnerController extends Controller
                     // staff should use Invite instead.
                     $d=$r->validate(['name'=>'required|string|max:100','email'=>'required|email|max:255|unique:users,email','phoneNumber'=>'required|digits:10','password'=>'required|string|min:8|confirmed']);
                     $user=User::create(['name'=>$d['name'],'email'=>$d['email'],'phoneNumber'=>$d['phoneNumber'],'password'=>Hash::make($d['password']),'role'=>'User','profileImage'=>'dist/img/avatar.png','is_active'=>true]);
-                    SchoolMembership::create(['driving_school_id'=>$school,'user_id'=>$user->id,'role'=>'Student']);
+                    SchoolMembership::create(['driving_school_id'=>$school,'user_id'=>$user->id,'role'=>'Student','enrollment_source'=>'school','enrollment_fee_paisa'=>0]);
                     SchoolNotifications::send($user->id,'You have been added as a student. Sign in with the account details your school gave you, then change your password in Account settings.'); break;
                 case 'invite':
                     $d=$r->validate(['email'=>'required|email|max:255','role'=>'required|in:Student,Instructor,Manager']);

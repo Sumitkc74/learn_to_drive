@@ -55,7 +55,13 @@ class SchoolLessonGateway {
             $booking=\App\Models\LessonBooking::whereKey($p->lesson_booking_id)->lockForUpdate()->firstOrFail();
             $locked=SchoolLessonPayment::whereKey($p->id)->lockForUpdate()->firstOrFail();
             if($locked->status!=='Pending')return;
-            $locked->update(['transaction_id'=>$transaction,'status'=>$booking->status==='Booked'?'Paid':'RefundRequested','paid_at'=>now()]);
+            $status=$booking->status==='Booked'?'Paid':'RefundRequested';
+            $split=[];
+            if($status==='Paid'){
+                $split['commission_paisa']=(int)round($locked->amount_paisa*(int)config('schools.commission_percent')/100);
+                $split['school_payout_paisa']=$locked->amount_paisa-$split['commission_paisa'];
+            }
+            $locked->update(['transaction_id'=>$transaction,'status'=>$status,'paid_at'=>now()]+$split);
             SchoolNotifications::send($booking->learner_id,'Your school lesson payment was verified. Check your booking receipt.');
         });return true;
     }

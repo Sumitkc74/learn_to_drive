@@ -73,7 +73,8 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
 
     public function hasPremium(): bool
     {
-        return $this->is_active && (in_array($this->role,['Admin','PremiumUser']) || $this->premium_until?->isFuture());
+        return $this->is_active && (in_array($this->role,['Admin','PremiumUser']) || $this->premium_until?->isFuture()
+            || $this->schoolMemberships()->where('role','Student')->whereHas('school',fn($q)=>$q->where('status','Approved'))->exists());
     }
 
     public function canBeManagedBy(User $actor): bool

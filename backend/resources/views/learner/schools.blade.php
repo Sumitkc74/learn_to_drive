@@ -20,6 +20,7 @@
     <article class="card" data-school-marker @if($school->latitude !== null && $school->longitude !== null) data-lat="{{ $school->latitude }}" data-lng="{{ $school->longitude }}" @endif>
         <h2 data-school-name>{{ $school->name }}</h2>
         <a class="button" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Book a private driving lesson') }}</a>
+        @auth @if(!in_array($school->id,$memberSchoolIds))<form method="post" action="{{ route('learn.schools.join-request',$school->id) }}">@csrf<button class="button small">{{ __('Request to join') }}</button></form>@endif @endauth
         @if($school->address)<p>{{ $school->address }}</p>@endif
         @if($school->phone)<p>{{ __('Phone') }}: {{ $school->phone }}</p>@endif
         @if($school->latitude !== null && $school->longitude !== null)
