@@ -35,6 +35,92 @@ class SchoolCommissionTest extends TestCase {
         $p=new SchoolLessonPayment; $p->forceFill(['id'=>(string)\Illuminate\Support\Str::uuid(),'lesson_booking_id'=>$booking->id,'amount_paisa'=>$amount,'gateway'=>'khalti','live'=>$live,'status'=>'Paid','commission_paisa'=>$commission,'school_payout_paisa'=>$payout,'paid_at'=>now()])->save();
         return $p;
     }
+    private function verifyLessonPayment(DrivingSchool $school,int $priceNpr=1500): SchoolLessonPayment {
+        config(['schools.payments_enabled'=>true,'schools.payments_live'=>false,'schools.commission_percent'=>10,'payments.khalti_key'=>'test-secret','payments.esewa_code'=>'EPAYTEST','payments.esewa_secret'=>'test-secret']);
+        Http::preventStrayRequests();
+        $learner=User::factory()->create(['is_active'=>true]);$teacher=User::factory()->create(['is_active'=>true]);
+        $school->memberships()->create(['user_id'=>$teacher->id,'role'=>'Instructor']);
+        $car=LessonVehicle::create(['driving_school_id'=>$school->id,'instructor_id'=>$teacher->id,'name'=>'Car','registration'=>'TEST-'.$teacher->id,'transmission'=>'Manual']);
+        $lesson=DrivingLesson::create(['lesson_vehicle_id'=>$car->id,'starts_at'=>now()->addDay(),'ends_at'=>now()->addDay()->addHour(),'price_npr'=>$priceNpr,'meeting_point'=>'School']);
+        $booking=LessonBooking::create(['driving_lesson_id'=>$lesson->id,'learner_id'=>$learner->id,'active_lesson_id'=>$lesson->id]);
+        $this->actingAs($learner)->post(route('learn.lesson-payment.checkout',$booking->id),['gateway'=>'khalti','amount'=>1])->assertRedirect();
+        $p=SchoolLessonPayment::where('lesson_booking_id',$booking->id)->firstOrFail();
+        $pidx='pidx-test-'.$booking->id;
+        $p->update(['provider_id'=>$pidx]);
+        // Echo the requested pidx back: Http::fake() appends stubs and the
+        // first match wins, so a static pidx from an earlier call would
+        // fail verification for a later payment.
+        Http::fake(['*/epayment/lookup/' => function ($request) use ($priceNpr) {
+            return Http::response(['status'=>'Completed','pidx'=>$request->data()['pidx'],'total_amount'=>$priceNpr*100,'transaction_id'=>'txn-'.$request->data()['pidx'],'refunded'=>false]);
+        }]);
+        $this->post(route('learn.lesson-payment.verify',$p->id))->assertSessionHas('success');
+        return $p->fresh();
+    }
+    public function test_verified_payment_uses_school_agreed_commission():void {
+        $agreed=DrivingSchool::create(['name'=>'Agreed School','status'=>'Approved','commission_percent'=>15]);
+        $p=$this->verifyLessonPayment($agreed);
+        $this->assertSame('Paid',$p->status);
+        $this->assertSame(22500,$p->commission_paisa);
+        $this->assertSame(127500,$p->school_payout_paisa);
+        $default=DrivingSchool::create(['name'=>'Default School','status'=>'Approved']);
+        $p2=$this->verifyLessonPayment($default);
+        $this->assertSame(15000,$p2->commission_paisa);
+        $this->assertSame(135000,$p2->school_payout_paisa);
+    }
+    public function test_admin_proposes_rates_and_school_accepts_or_declines():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        $admin=User::factory()->create(['is_active'=>true,'role'=>'Admin']);
+        $old=$this->paidPayment($school,150000,15000,135000,true);
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>15])->assertRedirect()->assertSessionHas('success');
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>15,'commission_percent'=>null]);
+        $this->actingAs($owner)->get(route('learn.school.partner',$school->id))->assertOk()->assertSee('Proposed rates');
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/rate-decline')->assertOk();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>null,'commission_percent'=>null]);
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>15,'enrollment_fee_paisa'=>25000])->assertRedirect();
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/rate-accept')->assertOk();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'commission_percent'=>15,'enrollment_fee_paisa'=>25000,'proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
+        $this->assertSame(15000,$old->fresh()->commission_paisa);
+        $new=$this->verifyLessonPayment($school);
+        $this->assertSame(22500,$new->commission_paisa);
+        $this->assertSame(127500,$new->school_payout_paisa);
+    }
+    public function test_join_approve_uses_school_agreed_enrollment_fee():void {
+        config(['schools.enrollment_fee_paisa'=>10000]);
+        [$school,$owner,$teacher,$student]=$this->school();
+        $school->update(['enrollment_fee_paisa'=>25000]);
+        $learner=User::factory()->create(['is_active'=>true]);
+        $this->actingAs($learner)->postJson(route('learn.schools.join-request',$school->id))->assertOk();
+        $id=SchoolJoinRequest::where('user_id',$learner->id)->value('id');
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/join-approve',['request_id'=>$id])->assertOk();
+        $this->assertDatabaseHas('school_memberships',['user_id'=>$learner->id,'enrollment_source'=>'discovery','enrollment_fee_paisa'=>25000]);
+        $default=DrivingSchool::create(['name'=>'Default School','status'=>'Approved']);
+        $owner2=User::factory()->create(['is_active'=>true]);
+        $default->memberships()->create(['user_id'=>$owner2->id,'role'=>'Owner']);
+        $learner2=User::factory()->create(['is_active'=>true]);
+        $this->actingAs($learner2)->postJson(route('learn.schools.join-request',$default->id))->assertOk();
+        $id2=SchoolJoinRequest::where('user_id',$learner2->id)->value('id');
+        $this->actingAs($owner2)->postJson('/api/school-centre/'.$default->id.'/join-approve',['request_id'=>$id2])->assertOk();
+        $this->assertDatabaseHas('school_memberships',['user_id'=>$learner2->id,'enrollment_source'=>'discovery','enrollment_fee_paisa'=>10000]);
+    }
+    public function test_only_owner_or_manager_can_accept_or_decline_rates():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        $admin=User::factory()->create(['is_active'=>true,'role'=>'Admin']);
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>20])->assertRedirect();
+        $this->actingAs($student)->postJson('/api/school-centre/'.$school->id.'/rate-accept')->assertForbidden();
+        $this->actingAs($teacher)->postJson('/api/school-centre/'.$school->id.'/rate-accept')->assertForbidden();
+        $this->actingAs($teacher)->postJson('/api/school-centre/'.$school->id.'/rate-decline')->assertForbidden();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>20,'commission_percent'=>null]);
+    }
+    public function test_propose_rates_validation():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        $admin=User::factory()->create(['is_active'=>true,'role'=>'Admin']);
+        $this->actingAs($admin)->postJson(route('admin.schools.propose-rates',$school->id),[])->assertUnprocessable();
+        $this->actingAs($admin)->postJson(route('admin.schools.propose-rates',$school->id),['commission_percent'=>101])->assertUnprocessable();
+        $this->actingAs($admin)->postJson(route('admin.schools.propose-rates',$school->id),['commission_percent'=>-1])->assertUnprocessable();
+        $this->actingAs($admin)->postJson(route('admin.schools.propose-rates',$school->id),['enrollment_fee_paisa'=>-5])->assertUnprocessable();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
+        $this->actingAs($owner)->postJson(route('admin.schools.propose-rates',$school->id),['commission_percent'=>20])->assertForbidden();
+    }
     public function test_verified_lesson_payment_records_commission_and_payout():void {
         [$user,$booking,$p]=$this->booking();$p->update(['provider_id'=>'pidx-test']);
         Http::fake(['*/epayment/lookup/'=>Http::response(['status'=>'Completed','pidx'=>'pidx-test','total_amount'=>150000,'transaction_id'=>'txn-test','refunded'=>false])]);

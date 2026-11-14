@@ -80,15 +80,17 @@ class PartnerController extends Controller
         $data['session_pages']=['current_page'=>$sessionPages->currentPage(),'last_page'=>$sessionPages->lastPage()];
         $members=$member->role==='Owner'?DrivingSchool::findOrFail($school)->memberships()->where('role','!=','Owner')->with('user:id,name')->get():collect();
         $joinRequests=in_array($member->role,['Owner','Manager'],true)?DB::table('school_join_requests as j')->join('users as u','u.id','=','j.user_id')->where('j.driving_school_id',$school)->where('j.status','Pending')->select('j.id','j.user_id','u.name','j.created_at')->orderBy('j.id')->get():collect();
+        $schoolModel=DrivingSchool::findOrFail($school);
+        $rateProposal=in_array($member->role,['Owner','Manager'],true) && ($schoolModel->proposed_commission_percent!==null || $schoolModel->proposed_enrollment_fee_paisa!==null) ? $schoolModel : null;
         if(!$r->expectsJson()) $data+=compact('sessionPages','members');
-        $data+=compact('joinRequests');
-        $data['school']=DrivingSchool::findOrFail($school);
+        $data+=compact('joinRequests','rateProposal');
+        $data['school']=$schoolModel;
         return $r->expectsJson() ? response()->json(['data'=>$data]) : view('school.partner',$data);
     }
     public function action(Request $r,int $school,string $action) {
         $member=$this->membership($r,$school);
         DB::transaction(function()use($r,$school,$action,$member){
-            DrivingSchool::whereKey($school)->lockForUpdate()->firstOrFail();
+            $schoolModel=DrivingSchool::whereKey($school)->lockForUpdate()->firstOrFail();
             // Recheck membership after acquiring the school lock.
             $member=$this->membership($r,$school);
             if($action==='consent') {
@@ -112,8 +114,23 @@ class PartnerController extends Controller
                 DB::table('school_batch_members')->insert(['school_batch_id'=>$batch->id,'user_id'=>$r->user()->id,'created_at'=>now(),'updated_at'=>now()]); return;
             }
             abort_unless(in_array($member->role,['Owner','Manager','Instructor']),403);
-            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer','join-approve','join-decline'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
+            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer','join-approve','join-decline','rate-accept','rate-decline'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
             switch($action) {
+                case 'rate-accept':
+                case 'rate-decline':
+                    // A proposed rate only applies once the school accepts
+                    // it; it then governs future lessons and enrolments,
+                    // never payments already recorded.
+                    abort_unless($schoolModel->proposed_commission_percent!==null || $schoolModel->proposed_enrollment_fee_paisa!==null,404);
+                    if($action==='rate-accept') {
+                        $updates=[];
+                        if($schoolModel->proposed_commission_percent!==null)$updates['commission_percent']=$schoolModel->proposed_commission_percent;
+                        if($schoolModel->proposed_enrollment_fee_paisa!==null)$updates['enrollment_fee_paisa']=$schoolModel->proposed_enrollment_fee_paisa;
+                        $schoolModel->update($updates+['proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
+                        break;
+                    }
+                    $schoolModel->update(['proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
+                    break;
                 case 'join-approve':
                 case 'join-decline':
                     $d=$r->validate(['request_id'=>'required|integer']);
@@ -125,7 +142,7 @@ class PartnerController extends Controller
                         SchoolNotifications::send($join->user_id,'Your request to join '.$schoolName.' was declined.');
                         break;
                     }
-                    SchoolMembership::firstOrCreate(['driving_school_id'=>$school,'user_id'=>$join->user_id],['role'=>'Student','enrollment_source'=>'discovery','enrollment_fee_paisa'=>(int)config('schools.enrollment_fee_paisa')]);
+                    SchoolMembership::firstOrCreate(['driving_school_id'=>$school,'user_id'=>$join->user_id],['role'=>'Student','enrollment_source'=>'discovery','enrollment_fee_paisa'=>$schoolModel->effectiveEnrollmentFeePaisa()]);
                     DB::table('school_join_requests')->where('id',$join->id)->update(['status'=>'Approved','updated_at'=>now()]);
                     SchoolNotifications::send($join->user_id,'Your request to join '.$schoolName.' was approved. You are now a student.');
                     break;

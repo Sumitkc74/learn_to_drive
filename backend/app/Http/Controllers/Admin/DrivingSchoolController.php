@@ -88,6 +88,32 @@ class DrivingSchoolController extends Controller
         return back()->with('success', __('School details updated.'));
     }
 
+    public function proposeRates(Request $request, DrivingSchool $school)
+    {
+        // At least one rate is required; a blank field is left out of the
+        // proposal and keeps the school's current agreed value on accept.
+        $data = $request->validate([
+            'commission_percent' => ['nullable', 'integer', 'between:0,100', 'required_without:enrollment_fee_paisa'],
+            'enrollment_fee_paisa' => ['nullable', 'integer', 'min:0', 'required_without:commission_percent'],
+        ]);
+        DB::transaction(function () use ($request, $school, $data) {
+            $school = DrivingSchool::whereKey($school->id)->lockForUpdate()->firstOrFail();
+            $before = $school->only(['proposed_commission_percent', 'proposed_enrollment_fee_paisa']);
+            $school->update([
+                'proposed_commission_percent' => $data['commission_percent'] ?? null,
+                'proposed_enrollment_fee_paisa' => $data['enrollment_fee_paisa'] ?? null,
+            ]);
+            $this->audit($request, $school, 'school.rates-proposed', $before, $school->only(['proposed_commission_percent', 'proposed_enrollment_fee_paisa']));
+            // The school must accept before anything changes; tell its
+            // Owner and Managers the proposal is waiting in their centre.
+            foreach ($school->memberships()->whereIn('role', ['Owner', 'Manager'])->pluck('user_id') as $userId) {
+                \App\Services\SchoolNotifications::send($userId, 'The platform proposed new rates for '.$school->name.'. Review them in your school centre.');
+            }
+        });
+
+        return back()->with('success', __('Rates proposed. The school must accept them before they apply.'));
+    }
+
     private function rules(): array
     {
         return ['name' => ['required', 'string', 'max:160'], 'address' => ['nullable', 'string', 'max:255'],

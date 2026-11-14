@@ -58,7 +58,10 @@ class SchoolLessonGateway {
             $status=$booking->status==='Booked'?'Paid':'RefundRequested';
             $split=[];
             if($status==='Paid'){
-                $split['commission_paisa']=(int)round($locked->amount_paisa*(int)config('schools.commission_percent')/100);
+                // The split uses the school's agreed rate at payment time;
+                // a later rate change never rewrites a recorded split.
+                $percent=$booking->lesson?->vehicle?->school?->effectiveCommissionPercent() ?? (int)config('schools.commission_percent');
+                $split['commission_paisa']=(int)round($locked->amount_paisa*$percent/100);
                 $split['school_payout_paisa']=$locked->amount_paisa-$split['commission_paisa'];
             }
             $locked->update(['transaction_id'=>$transaction,'status'=>$status,'paid_at'=>now()]+$split);

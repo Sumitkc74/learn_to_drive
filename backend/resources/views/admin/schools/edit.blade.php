@@ -18,4 +18,20 @@
         <button class="btn btn-primary">{{ __('Save changes') }}</button>
     </form>
 </section>
+<section class="ltd-panel">
+    <h2>{{ __('Platform rates') }}</h2>
+    <p>{{ __('Lesson commission') }}: {{ $school->effectiveCommissionPercent() }}% @if($school->commission_percent===null)({{ __('platform default') }})@endif</p>
+    <p>{{ __('Enrolment fee') }}: Rs {{ number_format($school->effectiveEnrollmentFeePaisa()/100) }} @if($school->enrollment_fee_paisa===null)({{ __('platform default') }})@endif</p>
+    @if($school->proposed_commission_percent!==null || $school->proposed_enrollment_fee_paisa!==null)
+        <p>{{ __('Pending proposal') }}: {{ __('Commission') }} {{ $school->proposed_commission_percent!==null ? $school->proposed_commission_percent.'%' : __('no change') }}, {{ __('enrolment fee') }} {{ $school->proposed_enrollment_fee_paisa!==null ? 'Rs '.number_format($school->proposed_enrollment_fee_paisa/100) : __('no change') }}</p>
+    @endif
+    <form method="post" action="{{ route('admin.schools.propose-rates', $school) }}">@csrf
+        <label for="propose-commission" class="form-label">{{ __('Proposed commission (%)') }}</label>
+        <input id="propose-commission" type="number" name="commission_percent" value="{{ old('commission_percent') }}" class="form-control mb-3" min="0" max="100">
+        <label for="propose-fee" class="form-label">{{ __('Proposed enrolment fee (paisa)') }}</label>
+        <input id="propose-fee" type="number" name="enrollment_fee_paisa" value="{{ old('enrollment_fee_paisa') }}" class="form-control mb-3" min="0">
+        <p>{{ __('Leave a field blank to leave that rate out of the proposal. The school must accept the proposal before it applies to future lessons and enrolments.') }}</p>
+        <button class="btn btn-primary">{{ __('Propose rates') }}</button>
+    </form>
+</section>
 @endsection
