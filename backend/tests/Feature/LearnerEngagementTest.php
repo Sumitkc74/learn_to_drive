@@ -28,12 +28,26 @@ class LearnerEngagementTest extends TestCase
         $this->assertSame(3,$progress['sessions']);
         $this->assertSame(6,$progress['answered']);
         $this->assertSame(50,$progress['accuracy']);
-        $this->actingAs($user)->get('/learn/account')->assertOk()->assertSee('Today’s goal? Done.')->assertSee('First step');
+        $this->actingAs($user)->get('/learn/account')->assertOk()->assertSee('Today’s goal? Done.')->assertSee('First step')->assertSee('2 days in a row')->assertSee('3 completed sessions');
         $this->travelTo(\Carbon\Carbon::parse('2026-09-18 19:00:00','UTC'));
         $this->assertSame(2,app(LearnerProgress::class)->forUser($user->id)['streak']);
         $this->assertFalse(app(LearnerProgress::class)->forUser($user->id)['todayDone']);
         $this->travelTo(\Carbon\Carbon::parse('2026-09-19 19:00:00','UTC'));
         $this->assertSame(0,app(LearnerProgress::class)->forUser($user->id)['streak']);
+    }
+
+    public function test_account_page_uses_singular_labels_for_one_session_and_one_day(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-09-17 19:00:00', 'UTC'));
+        $user=User::factory()->create(['is_active'=>true]);
+        LearnerPracticeAttempt::create(['user_id'=>$user->id,'questions'=>[['id'=>1],['id'=>2]],'score'=>2,'completed_at'=>'2026-09-17 18:30:00','expires_at'=>now()]);
+        $this->actingAs($user)->get('/learn/account')->assertOk()
+            ->assertSee('1 day in a row')
+            ->assertSee('1 completed session')
+            ->assertSee('</strong> session</span>', false)
+            ->assertDontSee('1 days in a row')
+            ->assertDontSee('1 completed sessions')
+            ->assertDontSee('</strong> sessions</span>', false);
     }
 
     public function test_public_flashcards_reveal_real_signs_and_skip_signs_without_media(): void

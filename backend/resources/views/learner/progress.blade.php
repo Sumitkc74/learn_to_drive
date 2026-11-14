@@ -22,12 +22,12 @@
         <article class="card activity-card">
             <p class="eyebrow">{{ __('YOUR MOMENTUM') }}</p>
             @auth
-            <h3>{{ __(':count days in a row',['count'=>$progress['streak']]) }}</h3>
+            <h3>{{ trans_choice(':count day in a row|:count days in a row', $progress['streak'], ['count' => $progress['streak']]) }}</h3>
             <p>{{ __('Complete a session each day to build your streak. Missing a day starts a fresh streak.') }}</p>
             <div class="activity-week" aria-label="{{ __('Practice activity for the past seven days') }}">
                 @foreach($progress['week'] as $day)<div><span @class(['activity-dot','completed'=>$day['done']]) aria-label="{{ $day['date'] }}: {{ __($day['done'] ? 'practice completed' : 'no completed practice') }}">@include('learner.icon',['icon'=>$day['done']?'check':'dot'])</span><small>{{ __($day['label']) }}</small></div>@endforeach
             </div>
-            <div class="progress-totals"><span><strong>{{ $progress['sessions'] }}</strong> {{ __('sessions') }}</span><span><strong>{{ $progress['answered'] }}</strong> {{ __('answered') }}</span><span><strong>{{ $progress['accuracy'] !== null ? $progress['accuracy'].'%' : '—' }}</strong> {{ __('accuracy') }}</span></div>
+            <div class="progress-totals"><span><strong>{{ $progress['sessions'] }}</strong> {{ trans_choice('session|sessions', $progress['sessions']) }}</span><span><strong>{{ $progress['answered'] }}</strong> {{ __('answered') }}</span><span><strong>{{ $progress['accuracy'] !== null ? $progress['accuracy'].'%' : '—' }}</strong> {{ __('accuracy') }}</span></div>
             @else
             <h3>{{ __('Watch your progress grow.') }}</h3><p>{{ __('Create an account to track your practice streak, see your accuracy, and earn milestones as you learn.') }}</p><a class="text-link" href="{{ route('learn.register') }}">{{ __('Start your learning journey →') }}</a>
             @endauth
