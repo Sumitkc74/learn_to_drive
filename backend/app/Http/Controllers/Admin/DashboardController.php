@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use App\Models\AuditLog;
+use App\Models\DrivingSchool;
+use App\Models\LessonBooking;
 use App\Models\PdfExtractionRun;
 use App\Models\PdfQuestionImport;
+use App\Models\PremiumPayment;
 use App\Models\Question;
+use App\Models\SchoolLessonPayment;
 use App\Models\User;
 use App\Models\UserHistory;
 use App\Services\AdminSystemHealth;
@@ -34,6 +38,7 @@ class DashboardController extends Controller
     {
         $users = ['total' => User::count(), 'premium' => User::where('role', 'PremiumUser')->count(), 'verified' => User::whereNotNull('email_verified_at')->whereNotNull('phone_verified_at')->count(), 'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count()];
         $questions = ['total' => Question::count(), 'published' => Question::where('status', 'Published')->count(), 'draft' => Question::where('status', 'Draft')->count(), 'archived' => Question::where('status', 'Archived')->count()];
+        $operations = ['schools' => DrivingSchool::count(), 'schools_pending' => DrivingSchool::where('status', 'Pending')->count(), 'lesson_bookings' => LessonBooking::count(), 'school_payments' => SchoolLessonPayment::count(), 'school_paid_paisa' => SchoolLessonPayment::where('status', 'Paid')->sum('amount_paisa'), 'premium_payments' => PremiumPayment::count()];
         $passingScore = AppSetting::read('exam_passing_score');
         // The attempt scan decodes every learner attempt in PHP, so cache
         // the aggregates for 5 minutes instead of recomputing them on
@@ -76,7 +81,7 @@ class DashboardController extends Controller
         $reviewBanks = PdfQuestionImport::where('status', 'Pending')->select('learning_content_import_id')->selectRaw('COUNT(*) AS pending')->groupBy('learning_content_import_id')->orderByDesc('pending')->limit(6)->with('resource:id,title')->get();
         $extractionIssues = PdfExtractionRun::whereIn('status', ['Queued', 'Running', 'Failed'])->with('resource:id,title')->latest('id')->limit(5)->get();
 
-        return compact('users', 'questions', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'mostMissed', 'reviewWorkload', 'reviewBanks', 'extractionIssues');
+        return compact('users', 'questions', 'operations', 'performance', 'signupLabels', 'signupCounts', 'recentActivity', 'mostMissed', 'reviewWorkload', 'reviewBanks', 'extractionIssues');
     }
 
     private function mostMissedQuestions(array $misses)

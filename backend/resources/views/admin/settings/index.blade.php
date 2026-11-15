@@ -39,5 +39,17 @@
         <div class="ltd-settings-card__body"><div class="form-group mb-0"><label class="ltd-field-label" for="maintenance_notice">Learner-facing message</label><textarea id="maintenance_notice" name="maintenance_notice" rows="3" maxlength="500" class="form-control @error('maintenance_notice') is-invalid @enderror" placeholder="Leave empty when there is no service notice.">{{ old('maintenance_notice', $settings['maintenance_notice']) }}</textarea>@error('maintenance_notice')<div class="invalid-feedback">{{ $message }}</div>@enderror</div></div>
         <div class="ltd-settings-card__actions"><button class="btn btn-primary" type="submit"><i class="fas fa-save mr-1"></i>Save General Settings</button></div>
     </form>
+
+    <div class="ltd-settings-card ltd-settings-card--wide">
+        <div class="ltd-settings-card__heading"><i class="fas fa-info-circle"></i><div><h2>Configuration</h2><p>Read-only values from the server configuration. Change them in the Render dashboard, not here; no secrets are shown.</p></div></div>
+        <div class="ltd-settings-card__body">
+            <p><strong>Premium price:</strong> {{ (int) config('payments.amount_paisa') > 0 ? 'NPR '.number_format((int) config('payments.amount_paisa') / 100, 2) : 'Not set' }}</p>
+            <p><strong>Premium payments:</strong> {{ config('payments.enabled') ? 'Enabled' : 'Disabled' }}{{ config('payments.live') ? ' (live)' : ' (test)' }}</p>
+            <p><strong>School lesson payments:</strong> {{ config('schools.payments_enabled') ? 'Enabled' : 'Disabled' }}{{ config('schools.payments_live') ? ' (live)' : ' (test)' }}</p>
+            <p><strong>Gemini API key:</strong> {{ !empty(config('pdf-translation.gemini_key')) ? 'Configured' : 'Not configured — AI screening and the study chatbot cannot run' }}</p>
+            <p><strong>Gemini model:</strong> {{ config('pdf-translation.gemini_model') }}</p>
+            <p class="mb-0"><strong>AI screening daily limit:</strong> {{ (int) config('content-screening.daily_limit') }} checks</p>
+        </div>
+    </div>
 </div>
 @endsection

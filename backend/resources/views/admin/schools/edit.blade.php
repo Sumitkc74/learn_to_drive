@@ -25,6 +25,9 @@
     @if($school->proposed_commission_percent!==null || $school->proposed_enrollment_fee_paisa!==null)
         <p>{{ __('Pending proposal') }}: {{ __('Commission') }} {{ $school->proposed_commission_percent!==null ? $school->proposed_commission_percent.'%' : __('no change') }}, {{ __('enrolment fee') }} {{ $school->proposed_enrollment_fee_paisa!==null ? 'Rs '.number_format($school->proposed_enrollment_fee_paisa/100) : __('no change') }}</p>
     @endif
+    @if($school->rates_declined_at!==null)
+        <p>{{ __('Last decline') }}: {{ $school->rates_declined_at }}@if($school->ratesDeclinedBy) ({{ $school->ratesDeclinedBy->name }})@endif @if($school->rates_declined_reason) — {{ $school->rates_declined_reason }}@endif</p>
+    @endif
     <form method="post" action="{{ route('admin.schools.propose-rates', $school) }}">@csrf
         <label for="propose-commission" class="form-label">{{ __('Proposed commission (%)') }}</label>
         <input id="propose-commission" type="number" name="commission_percent" value="{{ old('commission_percent') }}" class="form-control mb-3" min="0" max="100">

@@ -52,4 +52,11 @@ php artisan storage:link || true
 # su -s overrides www-data's nologin shell for this one command.
 ( while true; do su www-data -s /bin/sh -c 'php artisan queue:work pdf-extraction --queue=pdf-extraction --timeout=180 --sleep=3' || true; sleep 5; done ) &
 
+# The scheduler drives the five-minute AI-screening recovery, the
+# hourly school reminders and the daily revision/archive/fetch jobs.
+# Without it those commands never run: failed screenings sit at 0/3
+# retries forever even though the admin UI promises an automatic retry
+# after 10 minutes. Same www-data rule as the queue worker above.
+( while true; do su www-data -s /bin/sh -c 'php artisan schedule:work' || true; sleep 5; done ) &
+
 exec "$@"

@@ -10,6 +10,8 @@ use App\Models\TrafficSign;
 use App\Models\Tutorial;
 use Database\Seeders\RealContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Tests\TestCase;
 
 class RealContentSeederTest extends TestCase
@@ -82,6 +84,33 @@ class RealContentSeederTest extends TestCase
             $this->assertNotEmpty($sign->nepaliSignName, "Sign {$sign->name} must have a Nepali name for the Nepali UI.");
             $this->assertNotEmpty($sign->description);
         }
+    }
+
+    public function test_seeder_restores_missing_seeded_media_files_without_duplicating(): void
+    {
+        $this->seed(RealContentSeeder::class);
+        $before = Media::count();
+        $this->assertGreaterThan(0, $before, 'Seeded sign diagrams must exist as media records.');
+
+        // Simulate Render's ephemeral disk being wiped: delete every
+        // seeded media FILE, keep the database records.
+        foreach (Media::all() as $media) {
+            Storage::disk($media->disk)->delete($media->getPathRelativeToRoot());
+        }
+        foreach (Media::all() as $media) {
+            $this->assertFalse(Storage::disk($media->disk)->exists($media->getPathRelativeToRoot()));
+        }
+
+        // The version is already current, so the row seeding is skipped —
+        // but the media repair must still run on this boot.
+        $this->seed(RealContentSeeder::class);
+        $this->assertSame($before, Media::count(), 'Repair must not duplicate media records.');
+        foreach (Media::all() as $media) {
+            $this->assertTrue(Storage::disk($media->disk)->exists($media->getPathRelativeToRoot()), 'Missing seeded file was not restored.');
+        }
+
+        $this->seed(RealContentSeeder::class);
+        $this->assertSame($before, Media::count(), 'A second run must not duplicate media records.');
     }
 
     public function test_seeder_skips_when_version_is_current(): void

@@ -10,7 +10,7 @@
     </form>
 </div>
 @if($search === '')
-    <p class="text-muted">Enter a keyword to search across all eight management sections.</p>
+    <p class="text-muted">Enter a keyword to search across all nine management sections.</p>
 @elseif(count($sections) === 0)
     <p class="text-muted" role="status">No results for “{{ $search }}”. Try a different keyword.</p>
 @else

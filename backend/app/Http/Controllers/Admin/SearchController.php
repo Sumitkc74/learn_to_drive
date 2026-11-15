@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\ExamPaper;
 use App\Models\Notice;
@@ -30,6 +31,7 @@ class SearchController extends Controller
                 ['Question Banks', ExamPaper::class, 'allExamPaper', 'name', ['name', 'description']],
                 ['Exam Information', ExamInformation::class, 'allExamInformation', 'name', ['name', 'description']],
                 ['Tutorials', Tutorial::class, 'allTutorial', 'title', ['title', 'description', 'videoLink']],
+                ['Driving Schools', DrivingSchool::class, 'admin.schools.index', 'name', ['name', 'address', 'email', 'phone']],
             ] as [$title, $model, $route, $label, $columns]) {
                 $query = $model::query()->where(function ($builder) use ($columns, $search) {
                     foreach ($columns as $column) {

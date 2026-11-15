@@ -10,11 +10,13 @@ class DrivingSchool extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'address', 'phone', 'email', 'status', 'latitude', 'longitude',
-        'commission_percent', 'enrollment_fee_paisa', 'proposed_commission_percent', 'proposed_enrollment_fee_paisa'];
+        'commission_percent', 'enrollment_fee_paisa', 'proposed_commission_percent', 'proposed_enrollment_fee_paisa',
+        'rates_declined_at', 'rates_declined_reason', 'rates_declined_by'];
 
     protected $casts = ['latitude' => 'float', 'longitude' => 'float',
         'commission_percent' => 'integer', 'enrollment_fee_paisa' => 'integer',
-        'proposed_commission_percent' => 'integer', 'proposed_enrollment_fee_paisa' => 'integer'];
+        'proposed_commission_percent' => 'integer', 'proposed_enrollment_fee_paisa' => 'integer',
+        'rates_declined_at' => 'datetime', 'rates_declined_by' => 'integer'];
 
     // Agreed rates are per school. A null agreed value means the school
     // uses the platform default from config — the platform cannot change
@@ -28,6 +30,11 @@ class DrivingSchool extends Model
     public function effectiveEnrollmentFeePaisa(): int
     {
         return $this->enrollment_fee_paisa ?? (int)config('schools.enrollment_fee_paisa');
+    }
+
+    public function ratesDeclinedBy()
+    {
+        return $this->belongsTo(User::class, 'rates_declined_by');
     }
 
     public function memberships()

@@ -52,6 +52,7 @@
         <li><a href="{{ route('admin.schools.index') }}" class="ltd-nav__item {{ Request::is('admin/schools*') ? 'is-active' : '' }}"><i class="fas fa-school"></i> Driving Schools</a></li>
         <li><a href="{{ route('allUser') }}" class="ltd-nav__item {{ Request::is('admin/users*', 'admin/add-user', 'admin/edit-user/*') ? 'is-active' : '' }}"><i class="fas fa-users"></i> Users</a></li>
         <li><a href="{{ route('admin.premium-payments.index') }}" class="ltd-nav__item {{ Request::is('admin/premium-payments*') ? 'is-active' : '' }}"><i class="fas fa-credit-card"></i> Premium Payments</a></li>
+        <li><a href="{{ route('admin.school-payments') }}" class="ltd-nav__item {{ Request::is('admin/school-payments*') ? 'is-active' : '' }}"><i class="fas fa-money-bill"></i> School Payments</a></li>
         <li><a href="{{ route('support.index') }}" class="ltd-nav__item {{ Request::is('admin/support*') ? 'is-active' : '' }}"><i class="fas fa-comments"></i> Support &amp; Feedback</a></li>
         <li class="ltd-nav__section">System</li>
         <li><a href="{{ route('bulkImport') }}" class="ltd-nav__item {{ Request::is('admin/bulk-import*') ? 'is-active' : '' }}"><i class="fas fa-file-import"></i> CSV / Excel Imports</a></li>

@@ -1,6 +1,6 @@
 @extends('admin.layout.master')
 
-@section('title', 'Edit Trafic-Signs')
+@section('title', 'Edit Traffic Signs')
 
 @section('page-script')
     <style type='text/css'>

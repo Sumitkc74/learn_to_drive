@@ -13,9 +13,10 @@ class DrivingSchoolController extends Controller
 {
     public function index(Request $request)
     {
-        $data = $request->validate(['status' => ['nullable', Rule::in(['Pending', 'Approved', 'Suspended'])]]);
+        $data = $request->validate(['status' => ['nullable', Rule::in(['Pending', 'Approved', 'Suspended'])], 'search' => ['nullable', 'string', 'max:100']]);
         $schools = DrivingSchool::withCount('memberships')
             ->when($data['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+            ->when($data['search'] ?? null, fn ($q, $search) => $q->where(fn ($b) => $b->where('name', 'like', '%'.$search.'%')->orWhere('address', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%')->orWhere('phone', 'like', '%'.$search.'%')))
             ->latest('id')->paginate(20)->withQueryString();
 
         return view('admin.schools.index', compact('schools'));
@@ -50,7 +51,7 @@ class DrivingSchoolController extends Controller
 
     public function edit(DrivingSchool $school)
     {
-        $school->load(['memberships' => fn ($q) => $q->where('role', 'Owner')->with('user:id,name,email')]);
+        $school->load(['memberships' => fn ($q) => $q->where('role', 'Owner')->with('user:id,name,email'), 'ratesDeclinedBy:id,name']);
         return view('admin.schools.edit', compact('school'));
     }
 
@@ -102,6 +103,11 @@ class DrivingSchoolController extends Controller
             $school->update([
                 'proposed_commission_percent' => $data['commission_percent'] ?? null,
                 'proposed_enrollment_fee_paisa' => $data['enrollment_fee_paisa'] ?? null,
+                // A fresh proposal starts clean: any earlier decline is
+                // resolved by the renegotiation, not left hanging.
+                'rates_declined_at' => null,
+                'rates_declined_reason' => null,
+                'rates_declined_by' => null,
             ]);
             $this->audit($request, $school, 'school.rates-proposed', $before, $school->only(['proposed_commission_percent', 'proposed_enrollment_fee_paisa']));
             // The school must accept before anything changes; tell its

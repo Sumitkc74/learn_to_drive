@@ -84,6 +84,30 @@ class SchoolCommissionTest extends TestCase {
         $this->assertSame(22500,$new->commission_paisa);
         $this->assertSame(127500,$new->school_payout_paisa);
     }
+    public function test_rate_decline_records_reason_and_admin_can_follow_up():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        $admin=User::factory()->create(['is_active'=>true,'role'=>'Admin']);
+        $school->update(['commission_percent'=>10]);
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>15])->assertRedirect();
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/rate-decline',['reason'=>'Too high for our margins'])->assertOk();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>null,'commission_percent'=>10,'rates_declined_reason'=>'Too high for our margins','rates_declined_by'=>$owner->id]);
+        $this->assertNotNull($school->fresh()->rates_declined_at);
+        $this->assertDatabaseHas('audit_logs',['event'=>'school.rates-declined','subject_id'=>$school->id,'actor_id'=>$owner->id]);
+        $this->actingAs($admin)->get(route('admin.schools.edit',$school->id))->assertOk()->assertSee('Last decline')->assertSee('Too high for our margins')->assertSee($owner->name);
+        // Renegotiate: a fresh proposal clears the stored decline.
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>12])->assertRedirect();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>12,'rates_declined_at'=>null,'rates_declined_reason'=>null,'rates_declined_by'=>null]);
+    }
+    public function test_rate_decline_without_reason_and_student_forbidden():void {
+        [$school,$owner,$teacher,$student]=$this->school();
+        $admin=User::factory()->create(['is_active'=>true,'role'=>'Admin']);
+        $this->actingAs($admin)->post(route('admin.schools.propose-rates',$school->id),['commission_percent'=>20])->assertRedirect();
+        $this->actingAs($student)->postJson('/api/school-centre/'.$school->id.'/rate-decline')->assertForbidden();
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/rate-decline',['reason'=>str_repeat('x',501)])->assertUnprocessable();
+        $this->actingAs($owner)->postJson('/api/school-centre/'.$school->id.'/rate-decline')->assertOk();
+        $this->assertDatabaseHas('driving_schools',['id'=>$school->id,'proposed_commission_percent'=>null,'rates_declined_reason'=>null,'rates_declined_by'=>$owner->id]);
+        $this->assertNotNull($school->fresh()->rates_declined_at);
+    }
     public function test_join_approve_uses_school_agreed_enrollment_fee():void {
         config(['schools.enrollment_fee_paisa'=>10000]);
         [$school,$owner,$teacher,$student]=$this->school();

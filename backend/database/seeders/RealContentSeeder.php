@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\TrafficSign;
 use App\Models\Tutorial;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Real, production-safe learning content for the Nepal driving licence
@@ -29,6 +30,14 @@ use Illuminate\Database\Seeder;
  * 5 = traffic-sign library records) or new rows will never seed.
  * A deleted row is likewise not restored until the version is bumped.
  *
+ * Media repair is NOT version-gated: seeded sign diagrams live on the
+ * local disk, which Render's free tier wipes on every restart/redeploy,
+ * so repairSeededMedia() runs on every boot and re-attaches any seeded
+ * diagram whose file is gone. It only touches files for rows that still
+ * exist — a deleted row is never restored — and it never duplicates a
+ * media record: a stale record (file missing from disk) is deleted
+ * before the file is re-attached from the repo.
+ *
  * Deliberately omitted: specific licence fees, written-exam pass marks
  * and question counts, and fine amounts. Published guides disagree on
  * those figures and they change by province and year, so the
@@ -44,6 +53,10 @@ class RealContentSeeder extends Seeder
 
     public function run(): void
     {
+        // Runs on every boot, even when the version below is current:
+        // see the class docblock.
+        $this->repairSeededMedia();
+
         if (AppSetting::read('real_content_version') === (string) self::VERSION) {
             return;
         }
@@ -157,6 +170,55 @@ class RealContentSeeder extends Seeder
         }
 
         AppSetting::updateOrCreate(['key' => 'real_content_version'], ['value' => (string) self::VERSION]);
+    }
+
+    /**
+     * Re-attach seeded sign diagrams whose files are gone from disk.
+     * Runs on every boot (see run()): Render's free tier wipes the local
+     * disk on restart/redeploy, which orphans the media records. Only
+     * rows that still exist are repaired; a deleted row is never
+     * restored, and a record whose file is still present is left alone.
+     */
+    private function repairSeededMedia(): void
+    {
+        foreach (array_merge($this->signQuestions(), $this->nepaliSignQuestions()) as [$question, $options, $correct, $category, $difficulty, $explanation, $svg]) {
+            $model = Question::where('question', $question)->first();
+            if ($model) {
+                $this->repairMedia($model, 'question-images', database_path('seeders/data/traffic-signs/'.$svg));
+            }
+        }
+        foreach ($this->trafficSigns() as [$name, $nepaliName, $description, $svg]) {
+            $sign = TrafficSign::where('name', $name)->first();
+            if ($sign) {
+                $this->repairMedia($sign, 'default', database_path('seeders/data/traffic-signs/'.$svg));
+            }
+        }
+    }
+
+    private function repairMedia($model, string $collection, ?string $path): void
+    {
+        if (!$path || !is_file($path)) {
+            return;
+        }
+        $live = false;
+        foreach ($model->getMedia($collection) as $media) {
+            try {
+                $exists = Storage::disk($media->disk)->exists($media->getPathRelativeToRoot());
+            } catch (\Throwable) {
+                // Storage unavailable: leave records alone rather than
+                // deleting media that may still be there.
+                return;
+            }
+            if ($exists) {
+                $live = true;
+            } else {
+                $media->delete();
+            }
+        }
+        if (!$live) {
+            $model->unsetRelation('media');
+            $model->addMedia($path)->preservingOriginal()->toMediaCollection($collection);
+        }
     }
 
     /** @return array<int, array{string, array<int, string>, string, string, string, string}> */

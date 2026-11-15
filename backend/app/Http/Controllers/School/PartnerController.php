@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Models\{DrivingSchool,SchoolMembership,User,DrivingLesson};
+use App\Models\{AuditLog, DrivingSchool, SchoolMembership, User, DrivingLesson};
 use App\Services\SchoolNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,7 +129,16 @@ class PartnerController extends Controller
                         $schoolModel->update($updates+['proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
                         break;
                     }
-                    $schoolModel->update(['proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null]);
+                    // Declining leaves the agreed rates untouched, but the
+                    // platform needs to know it happened: record who declined,
+                    // when, and why, so the admin can follow up.
+                    $d=$r->validate(['reason'=>['nullable','string','max:500']]);
+                    $before=$schoolModel->only(['proposed_commission_percent','proposed_enrollment_fee_paisa']);
+                    $schoolModel->update(['proposed_commission_percent'=>null,'proposed_enrollment_fee_paisa'=>null,
+                        'rates_declined_at'=>now(),'rates_declined_reason'=>$d['reason']??null,'rates_declined_by'=>$r->user()->id]);
+                    AuditLog::create(['actor_id'=>$r->user()->id,'event'=>'school.rates-declined',
+                        'subject_type'=>DrivingSchool::class,'subject_id'=>$school,'subject_label'=>$schoolModel->name,
+                        'old_values'=>$before,'new_values'=>['declined_reason'=>$d['reason']??null]]);
                     break;
                 case 'join-approve':
                 case 'join-decline':

@@ -5,6 +5,7 @@
 <p><a href="{{ route('admin.school-payments') }}">{{ __('School payments and refunds') }}</a></p>
 <section class="ltd-panel mb-3">
     <form method="get" class="d-flex gap-2 align-items-end">
+        <label>{{ __('Search') }}<input type="search" name="search" value="{{ request('search') }}" maxlength="100" class="form-control" placeholder="{{ __('Name, address, email or phone') }}"></label>
         <label>{{ __('Status') }}<select name="status" class="form-control"><option value="">{{ __('All') }}</option>@foreach(['Pending','Approved','Suspended'] as $status)<option @selected(request('status') === $status)>{{ $status }}</option>@endforeach</select></label>
         <button class="btn btn-primary">{{ __('Filter') }}</button>
     </form>
