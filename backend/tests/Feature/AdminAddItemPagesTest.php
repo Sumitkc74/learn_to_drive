@@ -34,7 +34,7 @@ class AdminAddItemPagesTest extends TestCase
         }
     }
 
-    public function test_tutorial_rejects_an_invalid_video_url_and_missing_thumbnail(): void
+    public function test_tutorial_rejects_an_invalid_video_url_but_not_a_missing_thumbnail(): void
     {
         $admin = User::factory()->create(['role' => 'Admin']);
 
@@ -46,7 +46,8 @@ class AdminAddItemPagesTest extends TestCase
                 'videoLink' => 'not-a-url',
             ])
             ->assertRedirect(route('addTutorial'))
-            ->assertSessionHasErrors(['videoLink', 'image']);
+            ->assertSessionHasErrors(['videoLink'])
+            ->assertSessionDoesntHaveErrors(['image']);
     }
 
     public function test_user_creation_rejects_an_unknown_role_and_unconfirmed_password(): void

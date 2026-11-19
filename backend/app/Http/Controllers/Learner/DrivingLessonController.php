@@ -26,7 +26,7 @@ class DrivingLessonController extends Controller
             ->when($data['date'] ?? null, function ($q, $date) {
                 $start = \Carbon\Carbon::parse($date, 'Asia/Kathmandu')->startOfDay()->utc();
                 $q->where('starts_at', '>=', $start)->where('starts_at', '<', $start->copy()->addDay());
-            })->with(['vehicle.school', 'vehicle.instructor'])->orderBy('starts_at')->paginate(12)->withQueryString();
+            })->with(['vehicle.school.media', 'vehicle.instructor'])->orderBy('starts_at')->paginate(12)->withQueryString();
         $waiting=$request->user()?\Illuminate\Support\Facades\DB::table('lesson_waitlist')->where('user_id',$request->user()->id)->whereIn('driving_lesson_id',$lessons->pluck('id'))->pluck('status','driving_lesson_id'):collect();
         return view('learner.lessons.index', compact('lessons', 'school','waiting'));
     }
@@ -35,7 +35,7 @@ class DrivingLessonController extends Controller
     {
         $bookings = LessonBooking::where('learner_id', $request->user()->id)
             ->withExists(['lesson as provider_available' => fn ($q) => $q->availableProvider()])
-            ->with(['lesson.vehicle.school', 'lesson.vehicle.instructor', 'payment'])->latest('id')->paginate(15);
+            ->with(['lesson.vehicle.school.media', 'lesson.vehicle.instructor', 'payment'])->latest('id')->paginate(15);
         return view('learner.lessons.bookings', compact('bookings'));
     }
 

@@ -65,6 +65,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/schools/{school}/edit', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'edit'])->whereNumber('school')->name('admin.schools.edit');
     Route::patch('/admin/schools/{school}', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'update'])->whereNumber('school')->name('admin.schools.update');
     Route::post('/admin/schools/{school}/propose-rates', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'proposeRates'])->whereNumber('school')->middleware('throttle:10,1')->name('admin.schools.propose-rates');
+    Route::get('/admin/schools/{school}/delete', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'confirmDelete'])->whereNumber('school')->name('admin.schools.confirm-delete');
     Route::delete('/admin/schools/{school}', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'destroy'])->whereNumber('school')->middleware('throttle:10,1')->name('admin.schools.destroy');
     Route::get('/admin/media-library', [\App\Http\Controllers\Admin\MediaLibraryController::class, 'index'])->name('mediaLibrary');
     Route::get('/admin/import-progress', [\App\Http\Controllers\Admin\ImportProgressController::class, 'index'])->name('importProgress');
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/storage-check', [\App\Http\Controllers\Admin\StorageCheckController::class, 'scan'])->middleware('throttle:3,1')->name('storageCheck.scan');
     Route::get('/admin/import-history', [\App\Http\Controllers\Admin\ImportHistoryController::class, 'index'])->name('importHistory');
     Route::post('/admin/content-screening/{kind}/{id}', [\App\Http\Controllers\Admin\ContentScreeningController::class, 'retry'])->whereNumber('id')->middleware('throttle:10,1')->name('contentScreening.retry');
+    Route::post('/admin/content-screening/retry-failed', [\App\Http\Controllers\Admin\ContentScreeningController::class, 'retryFailed'])->middleware('throttle:3,10')->name('contentScreening.retryFailed');
     Route::post('/admin/learning-content/upload-pdf', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'upload'])->middleware('throttle:5,10')->name('pdfTranslations.upload');
     Route::post('/admin/learning-content/{resource}/translate', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'start'])->whereNumber('resource')->middleware('throttle:3,10')->name('pdfTranslations.start');
     Route::get('/admin/pdf-translations/{translation}', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'show'])->name('pdfTranslations.show');

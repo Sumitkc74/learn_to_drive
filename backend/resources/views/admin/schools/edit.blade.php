@@ -58,8 +58,6 @@
 <section class="ltd-panel">
     <h2>{{ __('Delete school') }}</h2>
     <p>{{ __('Deleting a school is permanent. A school with members, vehicles, lessons, bookings, payments, join requests, courses or batches cannot be deleted.') }}</p>
-    <form method="post" action="{{ route('admin.schools.destroy', $school) }}">@csrf @method('DELETE')
-        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this school permanently? This cannot be undone.')"><i class="nav-icon fas fa-trash"></i> {{ __('Delete') }}</button>
-    </form>
+    <a class="btn btn-sm btn-danger" href="{{ route('admin.schools.confirm-delete', $school) }}"><i class="nav-icon fas fa-trash"></i> {{ __('Delete') }}</a>
 </section>
 @endsection

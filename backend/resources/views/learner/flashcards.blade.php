@@ -2,6 +2,7 @@
 @section('title',__('Traffic sign flashcards'))
 @section('content')
 <div class="page-heading"><a href="{{ route('learn.practice') }}">{{ __('← Practice') }}</a><p class="eyebrow">{{ __('LOOK · THINK · REVEAL') }}</p><h1>{{ __('Know the sign?') }}</h1><p class="lead">{{ __('Take a guess before revealing the answer. No timer, no pressure—just a new way to learn.') }}</p></div>
+@include('learner.sign-source')
 @forelse($signs as $sign)
 <article class="card flashcard">
     <span class="badge">{{ __('Card') }} {{ $signs->currentPage() }}</span>

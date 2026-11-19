@@ -1,0 +1,1 @@
+<p class="muted">{{ __('Learn to Drive is an independent study aid — not provided by the Government of Nepal or the Department of Transport Management. Practice questions are written for study and may not match the real exam questions.') }}</p>

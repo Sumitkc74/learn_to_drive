@@ -22,9 +22,13 @@ class AuthController extends \App\Http\Controllers\Controller {
     }
     public function register(Request $request){
         $data=$request->validate(['name'=>['required','string','max:100'],'email'=>['required','email','max:255','unique:users,email'],
-            'phoneNumber'=>['required','digits:10'],'password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)]]);
+            'phoneNumber'=>['required','digits:10'],'password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)],'terms'=>['accepted']]);
         $user=\App\Models\User::create(['name'=>$data['name'],'email'=>$data['email'],'phoneNumber'=>$data['phoneNumber'],'password'=>Hash::make($data['password']),'role'=>'User','profileImage'=>'dist/img/avatar.png','is_active'=>true]);
-        Auth::login($user);$request->session()->regenerate();return redirect()->route('learn.account')->with('success',__('Your account is ready. Start with a short practice session.'));
+        Auth::login($user);$request->session()->regenerate();
+        // A `premium` flag (e.g. from the Premium page) offers Premium once
+        // on the home page instead of sending the new user back to Premium.
+        if($request->boolean('premium')) return redirect()->route('learn.home')->with('premium_offer',true)->with('success',__('Your account is ready. You can now upgrade to Premium.'));
+        return redirect()->route('learn.account')->with('success',__('Your account is ready. Start with a short practice session.'));
     }
     public function logout(Request $request){Auth::logout();$request->session()->invalidate();$request->session()->regenerateToken();return redirect()->route('learn.home');}
 }

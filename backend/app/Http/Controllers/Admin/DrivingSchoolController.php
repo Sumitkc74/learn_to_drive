@@ -136,6 +136,15 @@ class DrivingSchoolController extends Controller
         return back()->with('success', __('Rates proposed. The school must accept them before they apply.'));
     }
 
+    // Two-step delete confirmation: a plain page, no JavaScript. The
+    // native confirm() it replaces could not be answered by an automated
+    // browser (auto-dismiss cancels the delete), so the delete form now
+    // lives here and the edit page links here instead.
+    public function confirmDelete(DrivingSchool $school)
+    {
+        return view('admin.schools.delete', compact('school'));
+    }
+
     public function destroy(Request $request, DrivingSchool $school)
     {
         // Check and delete under one lock: several related tables cascade

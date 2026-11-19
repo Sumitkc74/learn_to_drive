@@ -49,7 +49,8 @@ class GoogleLoginController extends \App\Http\Controllers\Controller {
     public function finish(Request $request) {
         abort_if((bool)$request->user(),409);
         $google=$request->session()->get('google_signup');abort_unless($google && $google['expires']>=time(),419);
-        $data=$request->validate(['name'=>'required|string|max:100','phoneNumber'=>'required|digits:10','password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)]]);
+        $data=$request->validate(['name'=>'required|string|max:100','phoneNumber'=>'required|digits:10','password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)],'terms'=>['accepted']]);
+        unset($data['terms']);
         if(User::where('email',$google['email'])->orWhere('google_id',$google['id'])->exists())return redirect()->route('learn.login')->with('error',__('This account already exists. Sign in to continue.'));
         $user=new User($data+['email'=>$google['email'],'role'=>'User','is_active'=>true,'profileImage'=>'dist/img/avatar.png']);
         $user->password=Hash::make($data['password']);$user->forceFill(['google_id'=>$google['id'],'email_verified_at'=>now()])->save();

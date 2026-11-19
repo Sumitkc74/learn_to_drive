@@ -1,0 +1,1 @@
+<p class="muted">{{ __('Sign diagrams:') }} <a href="https://commons.wikimedia.org/wiki/Category:Diagrams_of_road_signs_of_Nepal" target="_blank" rel="noopener">{{ __('Wikimedia Commons') }}</a> {{ __('(Nepal road sign SVGs, public domain), based on the Department of Roads Traffic Signs Manual.') }}</p>

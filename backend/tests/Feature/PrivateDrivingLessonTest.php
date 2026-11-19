@@ -2,7 +2,9 @@
 namespace Tests\Feature;
 
 use App\Models\{DrivingLesson, DrivingSchool, LessonBooking, LessonVehicle, SchoolMembership, User};
+use App\Support\SchoolMedia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class PrivateDrivingLessonTest extends TestCase
@@ -21,11 +23,14 @@ class PrivateDrivingLessonTest extends TestCase
         return [$teacher, $school, $car, $slot];
     }
 
-    public function test_public_search_hides_private_data_and_unapproved_or_removed_instructors(): void
+    public function test_public_search_shows_car_registration_but_hides_private_email_and_unapproved_or_removed_instructors(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();
+        // The lesson card is a bookable offer: the car's registration is
+        // shown so the learner knows which car they are booking. The
+        // instructor's email stays private.
         $this->get(route('learn.lessons'))->assertOk()->assertSee('Training car')->assertSee('1,500')
-            ->assertDontSee($car->registration)->assertDontSee($teacher->email);
+            ->assertSee($car->registration)->assertDontSee($teacher->email);
         $this->get(route('learn.lessons', ['transmission' => 'Automatic']))->assertOk()->assertDontSee('Training car');
         $school->update(['status' => 'Suspended']);
         $this->get(route('learn.lessons'))->assertOk()->assertDontSee('Training car');
@@ -101,6 +106,17 @@ class PrivateDrivingLessonTest extends TestCase
         $this->actingAs($teacher)->post(route('learn.instructor.vehicles'), $payload)->assertSessionHasNoErrors();
         $this->assertDatabaseHas('lesson_vehicles', ['registration' => 'NEW123', 'instructor_id' => $teacher->id]);
         $this->post(route('learn.instructor.vehicles'), $payload)->assertSessionHasErrors('registration');
+    }
+
+    public function test_lesson_card_shows_school_logo_and_car_registration(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        $school->addMedia(UploadedFile::fake()->image('logo.png'))->toMediaCollection(SchoolMedia::LOGO_COLLECTION);
+        $this->get(route('learn.lessons'))->assertOk()->assertSee('logo.png')->assertSee($car->registration);
+        // Without a logo the card falls back to the school's initial.
+        [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
+        $otherSchool->update(['name' => 'Zebra Academy']);
+        $this->get(route('learn.lessons'))->assertOk()->assertSee('school-logo-fallback-small', false);
     }
 
     public function test_school_card_links_to_only_that_schools_available_lessons(): void

@@ -72,6 +72,9 @@
   "Skip to content": "मुख्य सामग्रीमा जानुहोस्",
   "Main navigation": "मुख्य नेभिगेसन",
   "Learn to Drive": "Learn to Drive",
+  "Learn to Drive is an independent study aid — not provided by the Government of Nepal or the Department of Transport Management. Practice questions are written for study and may not match the real exam questions.": "Learn to Drive एउटा स्वतन्त्र अध्ययन सामग्री हो — यो नेपाल सरकार वा यातायात व्यवस्था विभागद्वारा प्रदान गरिएको होइन। अभ्यास प्रश्नहरू अध्ययनका लागि लेखिएका हुन् र वास्तविक परीक्षाका प्रश्नहरूसँग मिल्नु पर्दैन।",
+  "Learn to Drive is an independent study aid. It is not provided by the Government of Nepal or the Department of Transport Management. Practice questions are written for study and may not be the same as the real exam questions. Check official notices for current exam requirements.": "Learn to Drive एउटा स्वतन्त्र अध्ययन सामग्री हो। यो नेपाल सरकार वा यातायात व्यवस्था विभागद्वारा प्रदान गरिएको होइन। अभ्यास प्रश्नहरू अध्ययनका लागि लेखिएका हुन् र वास्तविक परीक्षाका प्रश्नहरूसँग ठ्याक्कै मिल्नु पर्दैन। परीक्षाका अद्यावधिक आवश्यकताका लागि आधिकारिक सूचना हेर्नुहोस्।",
+  "Source: :name": "स्रोत: :name",
   "NEPAL": "नेपाल",
   "Home": "गृहपृष्ठ",
   "My learning": "मेरो सिकाइ",
@@ -952,5 +955,8 @@
   "Paid live invoices (NPR)": "वास्तविक भुक्तानी भएका बिलहरू (रु.)",
   "Paid test invoices (NPR)": "परीक्षण भुक्तानी भएका बिलहरू (रु.)",
   "Refund requests": "भुक्तानी फिर्ताका अनुरोधहरू",
-  "Export CSV": "CSV निर्यात गर्नुहोस्"
+  "Export CSV": "CSV निर्यात गर्नुहोस्",
+  "Sign diagrams:": "सङ्केतका चित्रहरू:",
+  "(Nepal road sign SVGs, public domain), based on the Department of Roads Traffic Signs Manual.": "(नेपालका सडक सङ्केतका SVG हरू, सार्वजनिक डोमेन), सडक विभागको Traffic Signs Manual मा आधारित।",
+  "Practice questions are written for this app from publicly available driving guides and the exam syllabus topics — they are not the official question bank.": "अभ्यास प्रश्नहरू सार्वजनिक रूपमा उपलब्ध ड्राइभिङ गाइडहरू र परीक्षा पाठ्यक्रमका विषयहरूबाट यस एपका लागि लेखिएका हुन् — यी आधिकारिक प्रश्न बैंक होइनन्।"
 }

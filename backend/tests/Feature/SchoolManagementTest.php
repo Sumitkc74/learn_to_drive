@@ -59,6 +59,52 @@ class SchoolManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['event' => 'school.deleted', 'subject_id' => $school->id]);
     }
 
+    public function test_admin_confirm_delete_page_shows_school_and_delete_form(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'Empty Academy', 'status' => 'Pending']);
+        $this->actingAs($admin)->get(route('admin.schools.confirm-delete', $school))
+            ->assertOk()
+            ->assertSee('Empty Academy')
+            ->assertSee('Delete this school permanently')
+            ->assertSee(route('admin.schools.destroy', $school), false);
+    }
+
+    public function test_non_admin_cannot_open_confirm_delete_page(): void
+    {
+        [$owner, $school] = $this->staff('Owner');
+        $this->actingAs($owner)->get(route('admin.schools.confirm-delete', $school))->assertForbidden();
+    }
+
+    public function test_admin_deletes_empty_school_from_confirm_page(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'Empty Academy', 'status' => 'Pending']);
+        $this->actingAs($admin)->from(route('admin.schools.confirm-delete', $school))
+            ->delete(route('admin.schools.destroy', $school))
+            ->assertRedirect(route('admin.schools.index'))
+            ->assertSessionHas('success');
+        $this->assertDatabaseMissing('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'school.deleted', 'subject_id' => $school->id]);
+    }
+
+    public function test_admin_refusal_from_confirm_page_shows_error_on_confirm_page(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [, $school] = $this->staff('Student');
+        $this->actingAs($admin)->from(route('admin.schools.confirm-delete', $school))
+            ->delete(route('admin.schools.destroy', $school))
+            ->assertRedirect(route('admin.schools.confirm-delete', $school))
+            ->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+        // The refusal flash must actually render on the confirmation page
+        // the admin is sent back to, not just sit in the session.
+        $this->actingAs($admin)->followingRedirects()->from(route('admin.schools.confirm-delete', $school))
+            ->delete(route('admin.schools.destroy', $school))
+            ->assertOk()
+            ->assertSee('still has members');
+    }
+
     public function test_admin_cannot_delete_school_with_members(): void
     {
         $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);

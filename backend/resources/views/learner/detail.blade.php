@@ -7,6 +7,7 @@
 <form class="bookmark-action" method="post" action="{{ $bookmark?route('learn.saved.destroy',$bookmark):route('learn.saved.store',[$type,$item->id]) }}">@csrf @if($bookmark) @method('DELETE') @endif<button class="button secondary">{{ __($bookmark?'Remove from saved':'Save resource') }}</button></form>
 @else<p><a href="{{ route('learn.login') }}">{{ __('Sign in to save resources') }}</a></p>@endauth
 <article class="card detail">
+@if($type==='tutorial' && ($thumb=$item->thumbnailUrl()))<img class="content-image" src="{{ $thumb }}" alt="{{ \App\Support\LearnerContent::text($item,$field) }}">@endif
 @if(in_array($type,['traffic-sign','vision-test'])) @if($media=$item->getFirstMedia())<img class="content-image" src="{{ $media->getUrl() }}" alt="{{ $type==='vision-test'?__('Vision practice plate'):\App\Support\LearnerContent::text($item,$field) }}">@else<p class="empty">{{ __('This image is currently unavailable.') }}</p>@endif @endif
 @if(app()->getLocale()==='en' && $type==='traffic-sign' && $item->nepaliSignName)<h2 lang="ne">{{ $item->nepaliSignName }}</h2>@endif
 @if($type==='vision-test')<details><summary>{{ __('Reveal the number') }}</summary><p class="answer-number">{{ $item->testNumber }}</p></details><p class="muted">{{ __('This is a learning exercise, not a medical assessment.') }}</p>@endif
@@ -15,5 +16,6 @@
 @if(app()->getLocale()==='en' && $type==='notice' && $item->nepaliDescription)<div class="prose" lang="ne">{{ $item->nepaliDescription }}</div>@endif
 @php($external=$type==='tutorial'?$item->videoLink:($type==='notice'?$item->link:null))
 @if($external && in_array(strtolower(parse_url($external,PHP_URL_SCHEME) ?? ''),['https','http']))<a class="button" href="{{ $external }}" target="_blank" rel="noopener noreferrer">{{ $type==='tutorial'?__('Watch tutorial'):__('Open notice source') }} ↗</a>@endif
-</article><p><a href="{{ route('learn.report',[$type,$item->id]) }}">{{ __('Report a problem with this resource') }}</a></p>
+@if($type==='notice' && $item->source_name)<p class="muted">{{ __('Source: :name', ['name' => $item->source_name]) }}</p>@endif
+</article>@if(in_array($type,['traffic-sign','question-bank','exam-information','tutorial']))@include('learner.disclaimer')@endif @if($type==='traffic-sign')@include('learner.sign-source')@endif @if($type==='question-bank')@include('learner.question-source')@endif<p><a href="{{ route('learn.report',[$type,$item->id]) }}">{{ __('Report a problem with this resource') }}</a></p>
 @endsection

@@ -39,14 +39,17 @@ class TutorialController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
             'videoLink' => ['required', 'url:http,https', 'max:2048'],
-            'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
         ]);
 
-        $image = $sanitized['image'];
+        $image = $sanitized['image'] ?? null;
         unset($sanitized['image']);
 
         $tutorial = Tutorial::create($sanitized);
-        $tutorial->addMedia($image)->toMediaCollection();
+
+        if ($image) {
+            $tutorial->addMedia($image)->toMediaCollection();
+        }
 
         return redirect()->to('/admin/tutorials')->with('success','Tutorial Added Successfully');
     }

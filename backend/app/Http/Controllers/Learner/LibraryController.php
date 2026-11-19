@@ -12,7 +12,7 @@ class LibraryController extends \App\Http\Controllers\Controller {
         'notice'=>[Notice::class,'Notices','title','Keep up with current updates and announcements.'],
     ];
     public function home(){
-        if(auth()->check())return redirect()->route('learn.account');
+        if(auth()->check() && !session()->has('premium_offer'))return redirect()->route('learn.account');
         $counts=['questions'=>Question::where('status','Published')->count(),'signs'=>TrafficSign::count(),'banks'=>ExamPaper::count()];
         return view('learner.home',compact('counts'));
     }

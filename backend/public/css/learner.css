@@ -146,3 +146,11 @@ html[data-theme=dark] .art-note{background:#20262e;color:#ffde17;border-color:#4
    trims that excess at the viewport edge without creating a scroll
    container, so sticky elements elsewhere on the site keep working. */
 html,body{overflow-x:clip}
+
+/* Small school logo on lesson cards (see learner.lessons.details). */
+.school-logo-small{max-width:96px;max-height:72px;object-fit:contain;display:block;margin-bottom:12px}
+.school-logo-fallback-small{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:#ffde17;font-size:22px;font-weight:800;margin-bottom:12px}
+
+/* Terms agreement checkbox on the register form (see learner.auth-form). */
+.terms-agree{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}
+.terms-agree input{width:auto;margin-top:4px;flex-shrink:0}

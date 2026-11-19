@@ -27,7 +27,7 @@ class BookingToolsController extends Controller {
             ->where('id','!=',$booking->driving_lesson_id)->where('price_npr',$booking->lesson->price_npr)
             ->whereHas('vehicle',fn($q)=>$q->where('driving_school_id',$booking->lesson->vehicle->driving_school_id))
             ->whereDoesntHave('bookings',fn($q)=>$q->where('status','Booked'))
-            ->with('vehicle.school','vehicle.instructor')->orderBy('starts_at')->paginate(12);
+            ->with('vehicle.school.media','vehicle.instructor')->orderBy('starts_at')->paginate(12);
         return view('learner.lessons.reschedule',compact('booking','lessons'));
     }
     public function reschedule(Request $r,int $booking){

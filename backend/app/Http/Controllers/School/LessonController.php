@@ -22,7 +22,7 @@ class LessonController extends Controller
         abort_if($schools->isEmpty(), 403);
         $vehicles = LessonVehicle::where('instructor_id', $request->user()->id)->whereIn('driving_school_id', $schools->pluck('driving_school_id'))->with('school')->get();
         $lessons = DrivingLesson::whereHas('vehicle', fn ($q) => $q->where('instructor_id', $request->user()->id))
-            ->with(['vehicle.school', 'vehicle.instructor', 'bookings' => fn ($q) => $q->where('status', 'Booked')->with('learner:id,name,email')])
+            ->with(['vehicle.school.media', 'vehicle.instructor', 'bookings' => fn ($q) => $q->where('status', 'Booked')->with('learner:id,name,email')])
             ->orderByDesc('starts_at')->paginate(20);
         return view('school.lessons', compact('schools', 'vehicles', 'lessons'));
     }
