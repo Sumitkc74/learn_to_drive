@@ -70,7 +70,11 @@ RUN cp .env.example .env
 # compiled-view path with realpath(), which returns false for a missing
 # directory — and Blade then throws "Please provide a valid cache path"
 # on every page render. Create the directories explicitly.
-RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs
+# storage/app/* is gitignored too: without the app/private subdirectories
+# the first root-run seeder creates them root-owned and www-data can no
+# longer write inside them (see entrypoint.sh). Create them here as well;
+# the chown below makes them www-data-owned.
+RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs storage/app/public storage/app/private/media storage/app/private/learning-content storage/app/private/backups
 
 RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader \
     && chown -R www-data:www-data storage bootstrap/cache \

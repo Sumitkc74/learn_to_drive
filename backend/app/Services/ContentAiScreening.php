@@ -12,7 +12,11 @@ class ContentAiScreening {
         abort_unless(in_array($record->ai_status,['Ready','Flagged']) && hash_equals((string)$record->ai_hash,$this->fingerprint($record)),409,'Complete AI screening for the current source before human approval.');
     }
     public function screen($record): void {
-        $record->forceFill(['ai_status'=>'Running','ai_report'=>null,'ai_activity_at'=>now()])->save();
+        // The Running marker is bookkeeping, not an admin-visible change:
+        // save it quietly so the audit observer writes one entry for the
+        // screening outcome below, instead of two entries (Running, then
+        // the outcome) listing the same ai_status/ai_report/ai_activity_at.
+        $record->forceFill(['ai_status'=>'Running','ai_report'=>null,'ai_activity_at'=>now()])->saveQuietly();
         try {
             $key = config('pdf-translation.gemini_key');
             $model = config('pdf-translation.gemini_model');

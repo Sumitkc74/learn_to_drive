@@ -13,6 +13,6 @@
         ['fa-calendar-check', $operations['lesson_bookings'], 'Lesson bookings'],
         ['fa-money-bill', $operations['school_payments'], 'School lesson payments'],
     ] as [$icon, $value, $label])
-    <div class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}"></i></div><div><div class="ltd-stat-card__value">{{ $value }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></div>
+    <div class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}"></i></div><div><div class="ltd-stat-card__value">{{ $value ?? '—' }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></div>
     @endforeach
 </div>

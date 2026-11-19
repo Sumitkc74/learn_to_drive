@@ -8,7 +8,9 @@ class StorageCheckController extends \App\Http\Controllers\Controller {
     }
     public function scan(\App\Services\MediaStorageAudit $audit) {
         $report=$audit->scan();
-        file_put_contents(storage_path('app/private/storage-check.json'),json_encode($report,JSON_PRETTY_PRINT));
+        $path=storage_path('app/private/storage-check.json');
+        if(!is_dir(dirname($path))) mkdir(dirname($path),0700,true);
+        file_put_contents($path,json_encode($report,JSON_PRETTY_PRINT));
         return redirect()->route('storageCheck')->with('success','Storage checked. No files were changed or deleted.');
     }
 }

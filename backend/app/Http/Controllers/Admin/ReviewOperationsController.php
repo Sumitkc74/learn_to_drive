@@ -8,7 +8,8 @@ class ReviewOperationsController extends \App\Http\Controllers\Controller {
         $type=$request->query('type','learning'); abort_unless(isset(self::TYPES[$type]),404);
         $class=self::TYPES[$type]; $items=$class::where('status',$type==='notices'?'Published':'Pending')->orderBy('id')->paginate(25)->withQueryString();
         $admins=\App\Models\User::where('role','Admin')->get(['id','name']);
-        return view('admin.workflow.review',compact('type','items','admins'));
+        $screeningCounts=$type==='government' ? \App\Models\GovernmentNoticeImport::screeningCounts('Pending') : null;
+        return view('admin.workflow.review',compact('type','items','admins','screeningCounts'));
     }
     public function update(Request $request) {
         $data=$request->validate(['type'=>['required','in:learning,notices,government'],'ids'=>['required','array','min:1','max:25'],'ids.*'=>['integer','distinct'],

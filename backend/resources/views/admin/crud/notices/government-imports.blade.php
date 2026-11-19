@@ -3,6 +3,7 @@
 @section('content')
 <div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Official Sources</span><h1>Government Notices</h1></div><a href="{{ route('allNotice') }}" class="btn btn-outline-secondary">Back to Notices</a></div>
 <div class="ltd-panel mb-4"><div class="d-flex justify-content-between align-items-center flex-wrap"><div><h3 class="ltd-panel__title mb-1">Nepal Department of Transport Management</h3><p class="text-muted mb-0">Checks one official public page. New links always require review and enter Notices as drafts.</p></div><form method="POST" action="{{ route('governmentNotices.fetch') }}">@csrf<button class="btn btn-primary" type="submit"><i class="fas fa-sync-alt mr-2"></i>Check Official Website</button></form></div></div>
+@include('admin.crud.notices.screening-counts')
 <div class="ltd-panel">
     @include('admin.crud.partials.table-controls', ['items' => $imports, 'sortOptions' => ['fetched_at' => 'Date fetched', 'title' => 'Title', 'status' => 'Review status', 'reviewed_at' => 'Review date', 'id' => 'ID'], 'filters' => ['status' => ['label' => 'Review status', 'options' => ['Pending' => 'Pending', 'Approved' => 'Approved', 'Rejected' => 'Rejected']]]])
     @if($imports->isEmpty())<div class="text-center py-5"><i class="fas fa-landmark fa-3x text-muted mb-3"></i><h4>No imported suggestions</h4><p class="text-muted mb-0">Check the official website to retrieve relevant driving-license links.</p></div>@else

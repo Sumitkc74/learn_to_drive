@@ -12,7 +12,16 @@ cd /var/www/html
 # Belt and braces for the Dockerfile mkdir: the compiled-view path is
 # resolved with realpath() when config is cached below, so these
 # directories must exist before config:cache runs.
-mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs
+# storage/app/* is gitignored, so the image has none of it — and the
+# seeders below run as root. If root is the first to create
+# storage/app/private (via the media repair or storage:link), that
+# directory ends up root-owned and www-data can no longer create
+# subdirectories inside it, which broke PDF extraction writes
+# ("Unable to create a directory at .../storage/app/private/
+# learning-content"), backup creation, and the storage check. Create
+# every directory the app writes to here, before the chown below, so
+# they are www-data-owned from the start.
+mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs storage/app/public storage/app/private/media storage/app/private/learning-content storage/app/private/backups
 # Apache serves requests as www-data, but the artisan commands below run as
 # root. If root creates anything under storage first (it does not today, but
 # a future command might), www-data can no longer write beside it — and the

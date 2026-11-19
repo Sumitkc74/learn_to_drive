@@ -15,6 +15,26 @@ class GovernmentNoticeImport extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    /**
+     * AI screening counts over one set of records, so the Government
+     * Notices page and the Review Operations government tab can never
+     * disagree: both render the counts this method returns for the set
+     * they list. Pass 'Pending' for the review queue, null for all rows.
+     */
+    public static function screeningCounts(?string $status = null): array
+    {
+        $query = static::query();
+        if ($status !== null) $query->where('status', $status);
+        $failed = (clone $query)->where('ai_status', 'Failed')->count();
+        $flagged = (clone $query)->where('ai_status', 'Flagged')->count();
+        $ready = (clone $query)->where('ai_status', 'Ready')->count();
+        $deferred = (clone $query)->where('ai_status', 'Deferred')->count();
+        $inProgress = (clone $query)->whereIn('ai_status', ['Queued', 'Running'])->count();
+        $total = $query->count();
+
+        return ['failed' => $failed, 'flagged' => $flagged, 'ready' => $ready, 'deferred' => $deferred, 'in_progress' => $inProgress, 'not_screened' => $total - $failed - $flagged - $ready - $deferred - $inProgress, 'total' => $total];
+    }
+
     public function notice()
     {
         return $this->hasOne(Notice::class, 'government_notice_import_id');

@@ -24,14 +24,18 @@ class LearningContentDownload
         }
         $pdf = $resource->kind === 'question-bank-document';
         $limit = ($pdf ? AppSetting::documentLimitKb() : AppSetting::imageLimitKb()) * 1024;
-        $response = $custom ? app(PublicWebsiteRequest::class)->get($resource->asset_url) : Http::connectTimeout(10)->timeout(25)
-            ->withHeaders(['User-Agent' => 'LearnToDrive-ContentReview/1.0'])
-            ->withOptions(['allow_redirects' => false, 'stream' => true, 'verify' => config('official-content.ca_bundle') ?: true])->get($resource->asset_url);
+        $response = $custom ? app(PublicWebsiteRequest::class)->get($resource->asset_url) : app(RedirectFollowingRequest::class)->get(
+            $resource->asset_url,
+            fn ($url) => $this->allowedRedirect($url, $source),
+            fn ($url) => Http::connectTimeout(10)->timeout(25)
+                ->withHeaders(['User-Agent' => 'LearnToDrive-ContentReview/1.0'])
+                ->withOptions(['allow_redirects' => false, 'stream' => true, 'verify' => config('official-content.ca_bundle') ?: true])->get($url)
+        );
         $stream = $response->toPsrResponse()->getBody();
         $contents = '';
         try {
             if (! $response->successful()) {
-                throw new RuntimeException('The official file could not be retrieved; redirects are not followed.');
+                throw new RuntimeException('The official file could not be retrieved (HTTP '.$response->status().').');
             }
             if ((int) $response->header('Content-Length') > $limit) {
                 throw new RuntimeException('The official file exceeds the saved upload size limit.');
@@ -63,5 +67,17 @@ class LearningContentDownload
         Storage::disk('learning-content')->put($path, $contents);
 
         return ['file_path' => $path, 'mime_type' => $mime, 'file_size' => strlen($contents), 'file_hash' => hash('sha256', $contents), 'downloaded_at' => now()];
+    }
+
+    /** Same host/port/scheme checks as the initial allowlist validation, applied to every redirect hop. */
+    private function allowedRedirect(string $url, ?array $source): bool
+    {
+        if (! $source) return false;
+        $parts = parse_url($url);
+
+        return is_array($parts) && ($parts['scheme'] ?? '') === 'https'
+            && in_array(strtolower($parts['host'] ?? ''), $source['hosts'], true)
+            && ! isset($parts['user']) && ! isset($parts['pass'])
+            && (! isset($parts['port']) || $parts['port'] === 443);
     }
 }

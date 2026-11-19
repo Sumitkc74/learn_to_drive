@@ -13,6 +13,14 @@ class DrivingSchoolController extends Controller
 {
     public function index(Request $request)
     {
+        $status = $request->query('status');
+        if (is_string($status)) {
+            // The status filter is case-insensitive (?status=approved):
+            // normalize to the stored case before validating, so a
+            // lowercase value filters instead of erroring with
+            // "The selected status is invalid."
+            $request->merge(['status' => ucfirst(strtolower($status))]);
+        }
         $data = $request->validate(['status' => ['nullable', Rule::in(['Pending', 'Approved', 'Suspended'])], 'search' => ['nullable', 'string', 'max:100']]);
         $schools = DrivingSchool::withCount('memberships')
             ->when($data['status'] ?? null, fn ($q, $status) => $q->where('status', $status))

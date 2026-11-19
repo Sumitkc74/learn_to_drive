@@ -18,11 +18,15 @@ class OfficialContentPreview
         if (! $this->allowed($source['url'], $source['hosts'])) {
             throw new RuntimeException('Source must use HTTPS on an approved host.');
         }
-        $response = Http::connectTimeout(10)->timeout(25)
-            ->withHeaders(['User-Agent' => 'LearnToDrive-ContentPreview/1.0', 'Accept' => 'text/html'])
-            ->withOptions(['allow_redirects' => false, 'stream' => true, 'verify' => config('official-content.ca_bundle') ?: true])->get($source['url']);
+        $response = app(RedirectFollowingRequest::class)->get(
+            $source['url'],
+            fn ($url) => $this->allowed($url, $source['hosts']),
+            fn ($url) => Http::connectTimeout(10)->timeout(25)
+                ->withHeaders(['User-Agent' => 'LearnToDrive-ContentPreview/1.0', 'Accept' => 'text/html'])
+                ->withOptions(['allow_redirects' => false, 'stream' => true, 'verify' => config('official-content.ca_bundle') ?: true])->get($url)
+        );
         if (! $response->successful()) {
-            throw new RuntimeException('Source returned HTTP '.$response->status().'; redirects are not followed.');
+            throw new RuntimeException('Source returned HTTP '.$response->status().'.');
         }
         if (! str_contains(strtolower($response->header('Content-Type')), 'text/html')) {
             throw new RuntimeException('Expected an HTML source page.');

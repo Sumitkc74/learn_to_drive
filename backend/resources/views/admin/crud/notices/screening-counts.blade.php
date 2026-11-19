@@ -1,0 +1,1 @@
+<p class="text-muted mb-3">AI screening: {{ $screeningCounts['failed'] }} Failed · {{ $screeningCounts['flagged'] }} Flagged · {{ $screeningCounts['ready'] }} Ready · {{ $screeningCounts['deferred'] }} Deferred · {{ $screeningCounts['in_progress'] }} in progress · {{ $screeningCounts['not_screened'] }} not screened ({{ $screeningCounts['total'] }} total)</p>

@@ -25,7 +25,7 @@
             </div>
 
             <div class="form-group row">
-                <label for="description" class="col-sm-2 col-form-label">Descriptioin :</label>
+                <label for="description" class="col-sm-2 col-form-label">Description :</label>
                 <div class="col-sm-10">
                     <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter tutorial description">
                         {{ $tutorial->description }}

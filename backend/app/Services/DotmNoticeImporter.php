@@ -28,18 +28,22 @@ class DotmNoticeImporter
             throw new RuntimeException('The configured DoTM source is not on the official allowlist.');
         }
 
-        $response = Http::withOptions([
-            'allow_redirects' => false, 'stream' => true,
-            'verify' => config('official-content.ca_bundle') ?: true,
-        ])->timeout(20)->retry(2, 1000)->withHeaders([
-            'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (one-page public notice check)',
-            'Accept' => 'text/html,application/xhtml+xml',
-        ])->get($sourceUrl)->throw();
+        $response = app(RedirectFollowingRequest::class)->get(
+            $sourceUrl,
+            fn ($url) => $this->allowedRedirect($url),
+            fn ($url) => Http::withOptions([
+                'allow_redirects' => false, 'stream' => true,
+                'verify' => config('official-content.ca_bundle') ?: true,
+            ])->timeout(20)->retry(2, 1000)->withHeaders([
+                'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (one-page public notice check)',
+                'Accept' => 'text/html,application/xhtml+xml',
+            ])->get($url)
+        )->throw();
 
         $stream=$response->toPsrResponse()->getBody();
         $html='';
         try {
-            if(!$response->successful())throw new RuntimeException('Official source redirects are not followed.');
+            if(!$response->successful())throw new RuntimeException('Official source returned HTTP '.$response->status().' without a usable redirect.');
             while(!$stream->eof()){
                 $html.=$stream->read(65536);
                 if(strlen($html)>2*1024*1024)throw new RuntimeException('Official source exceeds the 2 MB limit.');
@@ -56,6 +60,17 @@ class DotmNoticeImporter
         }
 
         return ['found' => count($links), 'created' => $created, 'duplicates' => count($links) - $created];
+    }
+
+    /** Same host/scheme/port checks as the initial source validation, applied to every redirect hop. */
+    private function allowedRedirect(string $url): bool
+    {
+        $parts = parse_url($url);
+
+        return is_array($parts) && ($parts['scheme'] ?? '') === 'https'
+            && in_array(strtolower((string) ($parts['host'] ?? '')), self::ALLOWED_HOSTS, true)
+            && ! isset($parts['user']) && ! isset($parts['pass'])
+            && (! isset($parts['port']) || $parts['port'] === 443);
     }
 
     public function extractLinks(string $html, string $baseUrl): array
