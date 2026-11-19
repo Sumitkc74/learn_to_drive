@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\{DrivingSchool, SchoolMembership, User};
+use App\Models\{DrivingLesson, DrivingSchool, LessonBooking, LessonVehicle, SchoolJoinRequest, SchoolLessonPayment, SchoolMembership, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class SchoolManagementTest extends TestCase
@@ -44,6 +46,77 @@ class SchoolManagementTest extends TestCase
         $this->actingAs($owner)->get(route('admin.schools.index'))->assertForbidden();
         $this->post(route('admin.schools.store'), ['name' => 'Unapproved'])->assertForbidden();
         $this->patch(route('admin.schools.update', $school), ['name' => 'Changed', 'status' => 'Approved'])->assertForbidden();
+    }
+
+    public function test_admin_can_delete_empty_school(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'Empty Academy', 'status' => 'Pending']);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))
+            ->assertRedirect(route('admin.schools.index'))
+            ->assertSessionHas('success');
+        $this->assertDatabaseMissing('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'school.deleted', 'subject_id' => $school->id]);
+    }
+
+    public function test_admin_cannot_delete_school_with_members(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [, $school] = $this->staff('Student');
+        $this->actingAs($admin)->from(route('admin.schools.edit', $school))
+            ->delete(route('admin.schools.destroy', $school))
+            ->assertRedirect(route('admin.schools.edit', $school))
+            ->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+    }
+
+    public function test_admin_cannot_delete_school_with_lesson_booking_and_payment(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $instructor = User::factory()->create(['is_active' => true]);
+        $learner = User::factory()->create(['is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'Busy Academy', 'status' => 'Approved']);
+        $vehicle = LessonVehicle::create(['driving_school_id' => $school->id, 'instructor_id' => $instructor->id,
+            'name' => 'Training sedan', 'registration' => 'BA 1 KHA 1234', 'transmission' => 'Manual']);
+        $lesson = DrivingLesson::create(['lesson_vehicle_id' => $vehicle->id, 'starts_at' => now()->addDay(),
+            'ends_at' => now()->addDay()->addHour(), 'price_npr' => 1500, 'meeting_point' => 'School gate']);
+        $booking = LessonBooking::create(['driving_lesson_id' => $lesson->id, 'learner_id' => $learner->id, 'status' => 'Booked']);
+        // id is guarded from mass assignment, so set it directly like
+        // the gateway does when it creates a payment record.
+        $payment = new SchoolLessonPayment(['lesson_booking_id' => $booking->id,
+            'amount_paisa' => 150000, 'gateway' => 'khalti', 'live' => false, 'status' => 'Paid']);
+        $payment->id = (string) Str::uuid();
+        $payment->save();
+        $this->actingAs($admin)->from(route('admin.schools.edit', $school))
+            ->delete(route('admin.schools.destroy', $school))
+            ->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseHas('lesson_bookings', ['id' => $booking->id]);
+        $this->assertDatabaseHas('school_lesson_payments', ['lesson_booking_id' => $booking->id]);
+    }
+
+    public function test_admin_cannot_delete_school_with_join_request_or_course(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        $applicant = User::factory()->create(['is_active' => true]);
+        $school = DrivingSchool::create(['name' => 'Requested Academy', 'status' => 'Approved']);
+        SchoolJoinRequest::create(['driving_school_id' => $school->id, 'user_id' => $applicant->id, 'status' => 'Pending']);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+
+        // A course alone (no join request) also blocks deletion.
+        $courseSchool = DrivingSchool::create(['name' => 'Course Academy', 'status' => 'Approved']);
+        DB::table('school_courses')->insert(['driving_school_id' => $courseSchool->id, 'title' => 'Beginner car course',
+            'description' => 'Classroom + practice.', 'archived' => false, 'created_at' => now(), 'updated_at' => now()]);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $courseSchool))->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $courseSchool->id]);
+    }
+
+    public function test_non_admin_cannot_delete_school(): void
+    {
+        [$owner, $school] = $this->staff('Owner');
+        $this->actingAs($owner)->delete(route('admin.schools.destroy', $school))->assertForbidden();
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
     }
 
     public function test_admin_email_cannot_be_owner_and_invalid_creation_is_atomic(): void

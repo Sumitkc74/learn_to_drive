@@ -15,3 +15,13 @@
     @endforeach
     <p>{{ __('Approved school names, addresses, phone numbers and map locations are public. Owner and member details remain private.') }}</p>
 </fieldset>
+<fieldset class="mb-3">
+    <legend>{{ __('School logo and photos') }}</legend>
+    <p>{{ __('The logo and gallery show on the public school listing once the school is approved. Images: JPEG, PNG or WebP, up to :imageLimit MB each. Videos: MP4 or WebM, up to :videoLimit MB each. At most :max gallery items per school.', ['imageLimit' => (int) (\App\Models\AppSetting::imageLimitKb() / 1024), 'videoLimit' => (int) (\App\Models\AppSetting::videoLimitKb() / 1024), 'max' => \App\Support\SchoolMedia::GALLERY_MAX_ITEMS]) }}</p>
+    <label for="school-logo" class="form-label">{{ __('Logo (optional)') }}</label>
+    <input id="school-logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="form-control mb-3">
+    <label for="school-gallery-images" class="form-label">{{ __('Gallery photos (optional)') }}</label>
+    <input id="school-gallery-images" type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple class="form-control mb-3">
+    <label for="school-gallery-videos" class="form-label">{{ __('Gallery videos (optional)') }}</label>
+    <input id="school-gallery-videos" type="file" name="gallery_videos[]" accept="video/mp4,video/webm" multiple class="form-control mb-3">
+</fieldset>

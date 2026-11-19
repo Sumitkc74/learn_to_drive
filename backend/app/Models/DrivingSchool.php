@@ -4,10 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class DrivingSchool extends Model
+class DrivingSchool extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
+
+    // Logo and gallery live on the public disk: both render for signed-out
+    // learners on the Find Schools listing. The logo is a single file; the
+    // gallery holds up to SchoolMedia::GALLERY_MAX_ITEMS images/videos.
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(\App\Support\SchoolMedia::LOGO_COLLECTION)->singleFile()->useDisk('public');
+        $this->addMediaCollection(\App\Support\SchoolMedia::GALLERY_COLLECTION)->useDisk('public');
+    }
+
+    public function logoUrl(): ?string
+    {
+        return $this->getFirstMediaUrl(\App\Support\SchoolMedia::LOGO_COLLECTION) ?: null;
+    }
 
     protected $fillable = ['name', 'address', 'phone', 'email', 'status', 'latitude', 'longitude',
         'commission_percent', 'enrollment_fee_paisa', 'proposed_commission_percent', 'proposed_enrollment_fee_paisa',

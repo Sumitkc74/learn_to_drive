@@ -22,3 +22,9 @@
     }, 3000); // the duration is set to 3 seconds (3000 milliseconds)
 </script>
 @endif
+
+@if ($message = Session::get('error'))
+<div class="alert alert-danger alert-block" role="alert" id="admin-error-alert">
+    <strong>{{ $message }}</strong>
+</div>
+@endif

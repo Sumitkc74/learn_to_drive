@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\AppSetting;
-use App\Models\DrivingSchool;
 use App\Models\ExamInformation;
 use App\Models\Question;
 use App\Models\TrafficSign;
@@ -26,7 +25,9 @@ use Illuminate\Support\Facades\Storage;
  * returns early when the stored real_content_version matches VERSION,
  * so boots skip it entirely. BUMP VERSION whenever the seeded content
  * below changes (1 = original 44 EN questions, tutorials, exam info;
- * 2 = Nepali translations; 3 = traffic signs; 4 = 4 schools as Pending;
+ * 2 = Nepali translations; 3 = traffic signs; 4 = 4 schools as Pending
+ * (removed Nov 18, 2026: real schools must register and be approved by
+ * an admin, never be seeded as partners);
  * 5 = traffic-sign library records) or new rows will never seed.
  * A deleted row is likewise not restored until the version is bumped.
  *
@@ -137,22 +138,6 @@ class RealContentSeeder extends Seeder
             if ($sign->getMedia()->isEmpty() && is_file($path)) {
                 $sign->addMedia($path)->preservingOriginal()->toMediaCollection();
             }
-        }
-
-        // Real driving schools, verified on Google Maps (all open, none
-        // closed) and seeded Pending so they go through the system's own
-        // flow: an admin reviews and approves each one in /admin/schools
-        // before it appears on Find Schools. Names, addresses, phones and
-        // coordinates are the Maps listings; no invented details.
-        // firstOrCreate on the name keeps this idempotent.
-        foreach ($this->schools() as [$name, $address, $phone, $latitude, $longitude]) {
-            DrivingSchool::firstOrCreate(['name' => $name], [
-                'address' => $address,
-                'phone' => $phone,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
-                'status' => 'Pending',
-            ]);
         }
 
         foreach ($this->tutorials() as [$title, $description]) {
@@ -654,16 +639,6 @@ class RealContentSeeder extends Seeder
                 'The blue P sign marks a place where parking is allowed.', 'Nepal_road_sign_C3.svg'],
             ['Filling station', 'पेट्रोल पम्प',
                 'This information sign tells you a filling station is nearby.', 'Nepal_road_sign_C5.svg'],
-        ];
-    }
-
-    private function schools(): array
-    {
-        return [
-            ['Nepal Driving Center', 'Chabahil, Kathmandu', '+97714586995', 27.72114779, 85.34210356],
-            ['Bagmati Driving Center', 'Dyabu Marg, Kathmandu', '+97714022567', 27.721515, 85.312555],
-            ['New Oxford Motor Driving Training Center', 'Ring Rd, Kathmandu', '+9779849511751', 27.72423142, 85.29857852],
-            ['Shree Suman Motor Driving School', 'Balaju Chakrapath, Kathmandu', '+9779851183032', 27.72231223, 85.29978054],
         ];
     }
 

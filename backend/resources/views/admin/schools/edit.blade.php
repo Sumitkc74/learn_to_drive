@@ -6,8 +6,26 @@
     <p>School ID: {{ $school->id }}</p>
     <p>{{ __('Suspending a school immediately blocks its staff dashboard without deleting learner accounts.') }}</p>
     @foreach($school->memberships as $membership)<p>{{ __('Owner') }}: {{ $membership->user->name }} ({{ $membership->user->email }})</p>@endforeach
-    <form method="post" action="{{ route('admin.schools.update', $school) }}">@csrf @method('PATCH')
+    <form method="post" action="{{ route('admin.schools.update', $school) }}" enctype="multipart/form-data">@csrf @method('PATCH')
         @include('admin.schools.fields')
+        @if($school->logoUrl())
+            <p>{{ __('Current logo') }}</p>
+            <p><img src="{{ $school->logoUrl() }}" alt="{{ $school->name }} logo" width="160"></p>
+            <label class="form-label"><input type="checkbox" name="remove_logo" value="1"> {{ __('Remove logo') }}</label>
+        @endif
+        @if($school->getMedia(\App\Support\SchoolMedia::GALLERY_COLLECTION)->isNotEmpty())
+            <p>{{ __('Current gallery — tick to remove') }}</p>
+            @foreach($school->getMedia(\App\Support\SchoolMedia::GALLERY_COLLECTION) as $media)
+                <p>
+                    @if(\App\Support\SchoolMedia::isVideo($media))
+                        <video src="{{ $media->getUrl() }}" controls preload="none" width="160"></video>
+                    @else
+                        <img src="{{ $media->getUrl() }}" alt="" width="160">
+                    @endif
+                    <label class="form-label"><input type="checkbox" name="remove_gallery[]" value="{{ $media->id }}"> {{ __('Remove') }}</label>
+                </p>
+            @endforeach
+        @endif
         <label for="school-status" class="form-label">{{ __('Status') }}</label>
         <select id="school-status" name="status" class="form-control mb-3">@foreach(['Pending','Approved','Suspended'] as $status)<option value="{{ $status }}" @selected(old('status', $school->status) === $status)>{{ __($status) }}</option>@endforeach</select>
         @if($school->memberships->isEmpty())
@@ -35,6 +53,13 @@
         <input id="propose-fee" type="number" name="enrollment_fee_paisa" value="{{ old('enrollment_fee_paisa') }}" class="form-control mb-3" min="0">
         <p>{{ __('Leave a field blank to leave that rate out of the proposal. The school must accept the proposal before it applies to future lessons and enrolments.') }}</p>
         <button class="btn btn-primary">{{ __('Propose rates') }}</button>
+    </form>
+</section>
+<section class="ltd-panel">
+    <h2>{{ __('Delete school') }}</h2>
+    <p>{{ __('Deleting a school is permanent. A school with members, vehicles, lessons, bookings, payments, join requests, courses or batches cannot be deleted.') }}</p>
+    <form method="post" action="{{ route('admin.schools.destroy', $school) }}">@csrf @method('DELETE')
+        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this school permanently? This cannot be undone.')"><i class="nav-icon fas fa-trash"></i> {{ __('Delete') }}</button>
     </form>
 </section>
 @endsection

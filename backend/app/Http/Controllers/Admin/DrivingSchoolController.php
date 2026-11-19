@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{AuditLog, DrivingSchool, SchoolMembership, User};
+use App\Models\{AuditLog, DrivingLesson, DrivingSchool, LessonBooking, LessonVehicle, SchoolJoinRequest, SchoolLessonPayment, SchoolMembership, User};
+use App\Support\SchoolMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -32,7 +33,7 @@ class DrivingSchoolController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules() + ['owner_email' => ['nullable', 'email', 'max:255']]);
+        $data = $request->validate($this->rules() + ['owner_email' => ['nullable', 'email', 'max:255'], 'logo' => SchoolMedia::logoRules()] + SchoolMedia::galleryRules());
         $school = DB::transaction(function () use ($data, $request) {
             // The owner is optional: an admin-curated listing (e.g. a real
             // school found on Google Maps) starts Pending with no owner, and
@@ -50,6 +51,8 @@ class DrivingSchoolController extends Controller
             if ($owner) {
                 SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
             }
+            SchoolMedia::attachLogo($school, $request->file('logo'));
+            SchoolMedia::attachGallery($school, $request->file('gallery_images', []), $request->file('gallery_videos', []));
             $this->audit($request, $school, 'school.created', [], ['status' => 'Pending', 'owner_id' => $owner?->id]);
             return $school;
         });
@@ -59,13 +62,13 @@ class DrivingSchoolController extends Controller
 
     public function edit(DrivingSchool $school)
     {
-        $school->load(['memberships' => fn ($q) => $q->where('role', 'Owner')->with('user:id,name,email'), 'ratesDeclinedBy:id,name']);
+        $school->load(['memberships' => fn ($q) => $q->where('role', 'Owner')->with('user:id,name,email'), 'ratesDeclinedBy:id,name', 'media']);
         return view('admin.schools.edit', compact('school'));
     }
 
     public function update(Request $request, DrivingSchool $school)
     {
-        $data = $request->validate($this->rules() + ['status' => ['required', Rule::in(['Pending', 'Approved', 'Suspended'])], 'owner_email' => ['nullable', 'email', 'max:255']]);
+        $data = $request->validate($this->rules() + ['status' => ['required', Rule::in(['Pending', 'Approved', 'Suspended'])], 'owner_email' => ['nullable', 'email', 'max:255'], 'logo' => SchoolMedia::logoRules(), 'remove_logo' => ['nullable', 'boolean'], 'remove_gallery' => ['nullable', 'array'], 'remove_gallery.*' => ['integer']] + SchoolMedia::galleryRules());
         DB::transaction(function () use ($request, $school, $data) {
             $school = DrivingSchool::whereKey($school->id)->lockForUpdate()->firstOrFail();
             // An owner can be attached later to an ownerless school. A school
@@ -84,13 +87,18 @@ class DrivingSchoolController extends Controller
                 }
             }
             $after = $data;
-            unset($after['owner_email']);
+            unset($after['owner_email'], $after['logo'], $after['remove_logo'], $after['remove_gallery'], $after['gallery_images'], $after['gallery_videos']);
             $before = $school->only(array_keys($after));
             $school->update($after);
             if ($owner && !$school->memberships()->where('role', 'Owner')->where('user_id', $owner->id)->exists()) {
                 SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
                 $after['owner_id'] = $owner->id;
             }
+            // Removals run before additions so the gallery cap counts the
+            // items being kept, not the ones being replaced.
+            SchoolMedia::removeGalleryItems($school, $data['remove_gallery'] ?? []);
+            SchoolMedia::attachLogo($school, $request->file('logo'), (bool) ($data['remove_logo'] ?? false));
+            SchoolMedia::attachGallery($school, $request->file('gallery_images', []), $request->file('gallery_videos', []));
             $this->audit($request, $school, 'school.updated', $before, $after);
         });
 
@@ -126,6 +134,62 @@ class DrivingSchoolController extends Controller
         });
 
         return back()->with('success', __('Rates proposed. The school must accept them before they apply.'));
+    }
+
+    public function destroy(Request $request, DrivingSchool $school)
+    {
+        // Check and delete under one lock: several related tables cascade
+        // on school delete, so a school with any related rows must be
+        // refused before anything is removed.
+        $blocking = DB::transaction(function () use ($request, $school) {
+            $school = DrivingSchool::whereKey($school->id)->lockForUpdate()->firstOrFail();
+            if ($label = $this->blockingRelation($school)) {
+                return $label;
+            }
+            $before = $school->only(['name', 'status', 'address']);
+            $school->delete();
+            $this->audit($request, $school, 'school.deleted', $before, []);
+            return null;
+        });
+        if ($blocking !== null) {
+            return back()->with('error', __('This school cannot be deleted because it still has :relation.', ['relation' => $blocking]));
+        }
+
+        return redirect()->route('admin.schools.index')->with('success', __('School deleted.'));
+    }
+
+    // First related record type that blocks deletion, or null when the
+    // school is empty. Courses are checked before batches: a batch always
+    // belongs to a course, so a school with batches is caught by the
+    // courses check first and the batches check is belt-and-braces.
+    private function blockingRelation(DrivingSchool $school): ?string
+    {
+        if ($school->memberships()->exists()) {
+            return __('members');
+        }
+        if (LessonVehicle::where('driving_school_id', $school->id)->exists()) {
+            return __('vehicles');
+        }
+        if (DrivingLesson::whereHas('vehicle', fn ($q) => $q->where('driving_school_id', $school->id))->exists()) {
+            return __('lessons');
+        }
+        if (LessonBooking::whereHas('lesson.vehicle', fn ($q) => $q->where('driving_school_id', $school->id))->exists()) {
+            return __('lesson bookings');
+        }
+        if (SchoolLessonPayment::whereHas('booking.lesson.vehicle', fn ($q) => $q->where('driving_school_id', $school->id))->exists()) {
+            return __('lesson payments');
+        }
+        if (SchoolJoinRequest::where('driving_school_id', $school->id)->exists()) {
+            return __('join requests');
+        }
+        if (DB::table('school_courses')->where('driving_school_id', $school->id)->exists()) {
+            return __('courses');
+        }
+        if (DB::table('school_batches')->join('school_courses', 'school_batches.school_course_id', '=', 'school_courses.id')->where('school_courses.driving_school_id', $school->id)->exists()) {
+            return __('batches');
+        }
+
+        return null;
     }
 
     private function rules(): array

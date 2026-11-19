@@ -65,6 +65,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/schools/{school}/edit', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'edit'])->whereNumber('school')->name('admin.schools.edit');
     Route::patch('/admin/schools/{school}', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'update'])->whereNumber('school')->name('admin.schools.update');
     Route::post('/admin/schools/{school}/propose-rates', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'proposeRates'])->whereNumber('school')->middleware('throttle:10,1')->name('admin.schools.propose-rates');
+    Route::delete('/admin/schools/{school}', [\App\Http\Controllers\Admin\DrivingSchoolController::class, 'destroy'])->whereNumber('school')->middleware('throttle:10,1')->name('admin.schools.destroy');
     Route::get('/admin/media-library', [\App\Http\Controllers\Admin\MediaLibraryController::class, 'index'])->name('mediaLibrary');
     Route::get('/admin/import-progress', [\App\Http\Controllers\Admin\ImportProgressController::class, 'index'])->name('importProgress');
     Route::get('/admin/website-import', [\App\Http\Controllers\Admin\WebsiteImportController::class, 'index'])->name('websiteImport');

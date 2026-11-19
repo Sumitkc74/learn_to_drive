@@ -3,6 +3,7 @@ namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
 use App\Models\{AuditLog, DrivingSchool, SchoolMembership, User, DrivingLesson};
+use App\Support\SchoolMedia;
 use App\Services\SchoolNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,15 @@ class PartnerController extends Controller
     }
     public function apply(Request $r) {
         abort_if($r->user()->role === 'Admin',403);
-        $data=$r->validate(['name'=>'required|string|max:160','address'=>'required|string|max:255','phone'=>'required|string|max:30','email'=>'required|email|max:255']);
+        $data=$r->validate(['name'=>'required|string|max:160','address'=>'required|string|max:255','phone'=>'required|string|max:30','email'=>'required|email|max:255','logo'=>SchoolMedia::logoRules()]+SchoolMedia::galleryRules());
         DB::transaction(function()use($r,$data){
             User::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
             if($r->user()->schoolMemberships()->where('role','Owner')->whereHas('school',fn($q)=>$q->where('status','Pending'))->exists())
                 throw ValidationException::withMessages(['name'=>__('You already have a pending school application.')]);
             $school=DrivingSchool::create($data+['status'=>'Pending']);
             $school->memberships()->create(['user_id'=>$r->user()->id,'role'=>'Owner']);
+            SchoolMedia::attachLogo($school,$r->file('logo'));
+            SchoolMedia::attachGallery($school,$r->file('gallery_images',[]),$r->file('gallery_videos',[]));
         });
         return $this->respond($r,'School application submitted for administrator review.');
     }
@@ -80,7 +83,7 @@ class PartnerController extends Controller
         $data['session_pages']=['current_page'=>$sessionPages->currentPage(),'last_page'=>$sessionPages->lastPage()];
         $members=$member->role==='Owner'?DrivingSchool::findOrFail($school)->memberships()->where('role','!=','Owner')->with('user:id,name')->get():collect();
         $joinRequests=in_array($member->role,['Owner','Manager'],true)?DB::table('school_join_requests as j')->join('users as u','u.id','=','j.user_id')->where('j.driving_school_id',$school)->where('j.status','Pending')->select('j.id','j.user_id','u.name','j.created_at')->orderBy('j.id')->get():collect();
-        $schoolModel=DrivingSchool::findOrFail($school);
+        $schoolModel=DrivingSchool::with('media')->findOrFail($school);
         $rateProposal=in_array($member->role,['Owner','Manager'],true) && ($schoolModel->proposed_commission_percent!==null || $schoolModel->proposed_enrollment_fee_paisa!==null) ? $schoolModel : null;
         if(!$r->expectsJson()) $data+=compact('sessionPages','members');
         $data+=compact('joinRequests','rateProposal');
@@ -114,8 +117,20 @@ class PartnerController extends Controller
                 DB::table('school_batch_members')->insert(['school_batch_id'=>$batch->id,'user_id'=>$r->user()->id,'created_at'=>now(),'updated_at'=>now()]); return;
             }
             abort_unless(in_array($member->role,['Owner','Manager','Instructor']),403);
-            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer','join-approve','join-decline','rate-accept','rate-decline'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
+            if(in_array($action,['invite','create-student','course','batch','close-batch','role','transfer','join-approve','join-decline','rate-accept','rate-decline','logo','gallery','gallery-remove'])) abort_unless(in_array($member->role,['Owner','Manager']),403);
             switch($action) {
+                case 'logo':
+                    $d=$r->validate(['logo'=>SchoolMedia::logoRules(),'remove_logo'=>['nullable','boolean']]);
+                    SchoolMedia::attachLogo($schoolModel,$r->file('logo'),(bool)($d['remove_logo']??false));
+                    break;
+                case 'gallery':
+                    $d=$r->validate(SchoolMedia::galleryRules());
+                    SchoolMedia::attachGallery($schoolModel,$r->file('gallery_images',[]),$r->file('gallery_videos',[]));
+                    break;
+                case 'gallery-remove':
+                    $d=$r->validate(['media_id'=>['required','integer']]);
+                    SchoolMedia::removeGalleryItems($schoolModel,[$d['media_id']]);
+                    break;
                 case 'rate-accept':
                 case 'rate-decline':
                     // A proposed rate only applies once the school accepts

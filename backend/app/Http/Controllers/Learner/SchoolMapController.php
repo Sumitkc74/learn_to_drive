@@ -16,6 +16,7 @@ class SchoolMapController extends Controller
         $schools = DrivingSchool::where('status', 'Approved')
             ->when($search !== '', fn ($query) => $query->where(fn ($q) => $q
                 ->where('name', 'like', '%'.$search.'%')->orWhere('address', 'like', '%'.$search.'%')))
+            ->with('media')
             ->orderBy('name')->orderBy('id')->paginate(24, ['id', 'name', 'address', 'phone', 'latitude', 'longitude'])
             ->withQueryString();
         $memberSchoolIds = $request->user()?->schoolMemberships()->pluck('driving_school_id')->all() ?? [];

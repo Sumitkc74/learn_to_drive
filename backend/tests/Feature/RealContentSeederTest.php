@@ -57,19 +57,17 @@ class RealContentSeederTest extends TestCase
         }
     }
 
-    public function test_seeder_adds_pending_driving_schools_idempotently(): void
+    public function test_seeder_does_not_seed_driving_schools(): void
     {
         $this->seed(RealContentSeeder::class);
         $this->seed(RealContentSeeder::class);
 
-        $this->assertSame(4, DrivingSchool::where('status', 'Pending')->count());
-        $this->assertSame(0, DrivingSchool::where('status', '!=', 'Pending')->count());
+        // Real schools must register and be approved by an admin, never
+        // be seeded as partners — the 4 Kathmandu schools were removed
+        // from the seeder Nov 18, 2026.
+        $this->assertSame(0, DrivingSchool::count());
         foreach (['Nepal Driving Center', 'Bagmati Driving Center', 'New Oxford Motor Driving Training Center', 'Shree Suman Motor Driving School'] as $name) {
-            $school = DrivingSchool::where('name', $name)->firstOrFail();
-            $this->assertNotNull($school->address);
-            $this->assertNotNull($school->phone);
-            $this->assertNotNull($school->latitude);
-            $this->assertNotNull($school->longitude);
+            $this->assertDatabaseMissing('driving_schools', ['name' => $name]);
         }
     }
 

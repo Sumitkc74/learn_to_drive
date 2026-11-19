@@ -17,6 +17,7 @@ class AppSetting extends Model
         'access_token_expiry_days' => 90,
         'image_upload_limit_mb' => 2,
         'document_upload_limit_mb' => 10,
+        'video_upload_limit_mb' => 20,
         'maintenance_notice' => '',
     ];
 
@@ -45,5 +46,12 @@ class AppSetting extends Model
     public static function documentLimitKb(): int
     {
         return self::read('document_upload_limit_mb') * 1024;
+    }
+
+    // No video upload existed before school galleries; 20 MB covers short
+    // phone clips of a school while keeping free-tier storage bounded.
+    public static function videoLimitKb(): int
+    {
+        return self::read('video_upload_limit_mb') * 1024;
     }
 }
