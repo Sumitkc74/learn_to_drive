@@ -3,6 +3,36 @@
 Learn to Drive is a driving-test preparation platform with a Laravel backend,
 administration interface, learner web experience, and Flutter mobile client.
 
+Live demo: https://learn-to-drive.onrender.com/
+
+## Screenshots
+
+Captured from the live demo.
+
+**Homepage**
+
+![Homepage](docs/screenshots/home.jpg)
+
+**Find schools**
+
+![Driving schools on the map](docs/screenshots/schools.jpg)
+
+**Learning library**
+
+![Learning library](docs/screenshots/library.jpg)
+
+**Practice**
+
+![Practice session setup and flashcards](docs/screenshots/practice.jpg)
+
+**Traffic sign flashcards**
+
+![Traffic sign flashcard](docs/screenshots/flashcards.jpg)
+
+**Tutorials**
+
+![Tutorials](docs/screenshots/tutorials.jpg)
+
 ## Repository layout
 
 ```text
