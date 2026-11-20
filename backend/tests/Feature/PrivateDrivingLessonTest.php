@@ -68,6 +68,22 @@ class PrivateDrivingLessonTest extends TestCase
         $this->post(route('learn.lessons.book', $second))->assertNotFound();
     }
 
+    public function test_instructor_can_publish_lesson_with_string_form_values(): void
+    {
+        // A real browser submits every form value as a string. Carbon 3
+        // rejects a string duration in addMinutes(), so publishing a lesson
+        // 500'd live even though the integer-valued tests passed.
+        [$teacher, $school, $car] = $this->offering();
+        $start = now()->addDays(3)->setTime(9, 0)->format('Y-m-d\TH:i');
+        $payload = ['lesson_vehicle_id' => (string) $car->id, 'starts_at' => $start,
+            'duration' => '60', 'price_npr' => '1200', 'meeting_point' => 'Main gate'];
+        $this->actingAs($teacher)->post(route('learn.instructor.lessons.store'), $payload)
+            ->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('driving_lessons', 2);
+        $this->actingAs($teacher)->get(route('learn.instructor.lessons'))->assertOk()
+            ->assertSee('Training car')->assertSee('1,200');
+    }
+
     public function test_instructor_scheduling_checks_vehicle_ownership_overlaps_and_timezone(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();

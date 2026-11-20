@@ -50,7 +50,9 @@ class LessonController extends Controller
             $vehicle = LessonVehicle::where('instructor_id', $request->user()->id)
                 ->whereIn('driving_school_id', $this->schools($request)->pluck('driving_school_id'))->findOrFail($data['lesson_vehicle_id']);
             $start = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $data['starts_at'], 'Asia/Kathmandu')->second(0)->utc();
-            $end = $start->copy()->addMinutes($data['duration']);
+            // Validated form values arrive as strings from a real browser;
+            // Carbon 3 rejects a string here, so cast before adding.
+            $end = $start->copy()->addMinutes((int) $data['duration']);
             if (!$start->isFuture() || $start->greaterThan(now()->addYear())) {
                 throw ValidationException::withMessages(['starts_at' => __('Choose a future time within the next year.')]);
             }

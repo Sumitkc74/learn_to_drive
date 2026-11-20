@@ -60,7 +60,7 @@ class SchoolPartnerTest extends TestCase {
         $this->action($student,$school,'join',['batch_id'=>$batch])->assertOk();
         $second=User::factory()->create(['is_active'=>true]);$school->memberships()->create(['user_id'=>$second->id,'role'=>'Student']);
         $this->action($second,$school,'join',['batch_id'=>$batch])->assertUnprocessable();
-        $payload=['batch_id'=>$batch,'starts_at'=>now('Asia/Kathmandu')->addDay()->format('Y-m-d\TH:i'),'duration'=>60,'location'=>'School'];
+        $payload=['batch_id'=>$batch,'starts_at'=>now('Asia/Kathmandu')->addDay()->format('Y-m-d\TH:i'),'duration'=>'60','location'=>'School'];
         $this->action($teacher,$school,'session',$payload)->assertOk();
         $this->action($teacher,$school,'session',$payload)->assertUnprocessable();
         $session=DB::table('school_class_sessions')->value('id');
@@ -120,7 +120,7 @@ class SchoolPartnerTest extends TestCase {
         $course=DB::table('school_courses')->insertGetId(['driving_school_id'=>$school->id,'title'=>'Course','description'=>'Basics']);
         $batch=DB::table('school_batches')->insertGetId(['school_course_id'=>$course,'instructor_id'=>$teacher->id,'name'=>'Weekly',
             'starts_on'=>now()->toDateString(),'ends_on'=>now()->addDays(10)->toDateString(),'capacity'=>10]);
-        $payload=['batch_id'=>$batch,'starts_at'=>now('Asia/Kathmandu')->addDay()->format('Y-m-d\TH:i'),'duration'=>60,'location'=>'School','weeks'=>3];
+        $payload=['batch_id'=>$batch,'starts_at'=>now('Asia/Kathmandu')->addDay()->format('Y-m-d\TH:i'),'duration'=>'60','location'=>'School','weeks'=>3];
         $this->action($teacher,$school,'session',$payload)->assertUnprocessable();
         $this->assertDatabaseCount('school_class_sessions',0);
         $payload['weeks']=2;$this->action($teacher,$school,'session',$payload)->assertOk();

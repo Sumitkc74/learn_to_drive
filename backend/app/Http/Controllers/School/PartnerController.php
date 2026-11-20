@@ -223,7 +223,7 @@ class PartnerController extends Controller
                     for($week=0;$week<($d['weeks']??1);$week++){
                     $start=$first->copy()->addWeeks($week);
                     abort_unless($start->isFuture() && $start->toDateString()>=$batch->starts_on && $start->toDateString()<=$batch->ends_on,422);
-                    $start->utc(); $end=$start->copy()->addMinutes($d['duration']);
+                    $start->utc(); $end=$start->copy()->addMinutes((int) $d['duration']); // validated form values arrive as strings; Carbon 3 rejects a string here
                     abort_if($end->copy()->timezone('Asia/Kathmandu')->toDateString()>$batch->ends_on,422);
                     $learnerBusy=\App\Models\LessonBooking::whereIn('learner_id',$learners)->where('status','Booked')->whereHas('lesson',fn($q)=>$q->overlapping($start,$end))->exists()
                         || DB::table('school_class_sessions as s')->join('school_batch_members as m','m.school_batch_id','=','s.school_batch_id')->whereIn('m.user_id',$learners)->where('s.cancelled',false)->where('s.starts_at','<',$end)->where('s.ends_at','>',$start)->exists();
