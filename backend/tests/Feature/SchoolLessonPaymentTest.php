@@ -61,4 +61,22 @@ class SchoolLessonPaymentTest extends TestCase {
         $this->assertTrue(app(SchoolLessonGateway::class)->verify($p));
         $this->assertSame('Paid',$p->fresh()->status);
     }
+    public function test_pending_payment_gateway_can_switch_and_clears_stale_provider_state():void {
+        [$user,$booking,$p]=$this->booking();
+        $p->update(['provider_id'=>'pidx-old','checkout_url'=>'https://test-pay.khalti.com/checkout/old']);
+        $this->actingAs($user)->get(route('learn.lesson-payment.show',$p->id))->assertOk()->assertSee('Change payment method');
+        $this->actingAs($user)->post(route('learn.lesson-payment.checkout',$booking->id),['gateway'=>'esewa'])->assertRedirect();
+        $p=$p->fresh();
+        $this->assertSame('esewa',$p->gateway);$this->assertSame('EPAYTEST',$p->merchant);
+        $this->assertNull($p->provider_id);$this->assertNull($p->checkout_url);$this->assertSame('Pending',$p->status);
+        $this->actingAs($user)->post(route('learn.lesson-payment.checkout',$booking->id),['gateway'=>'khalti'])->assertRedirect();
+        $p=$p->fresh();
+        $this->assertSame('khalti',$p->gateway);$this->assertNull($p->merchant);$this->assertNull($p->provider_id);$this->assertNull($p->checkout_url);
+    }
+    public function test_gateway_switch_then_start_uses_new_gateway():void {
+        [$user,$booking,$p]=$this->booking();
+        $p->update(['provider_id'=>'pidx-old','checkout_url'=>'https://test-pay.khalti.com/checkout/old']);
+        $this->actingAs($user)->post(route('learn.lesson-payment.checkout',$booking->id),['gateway'=>'esewa'])->assertRedirect();
+        $this->actingAs($user)->post(route('learn.lesson-payment.start',$p->id))->assertOk()->assertSee('https://rc-epay.esewa.com.np/api/epay/main/v2/form');
+    }
 }

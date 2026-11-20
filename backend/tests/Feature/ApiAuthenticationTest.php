@@ -99,7 +99,7 @@ class ApiAuthenticationTest extends TestCase
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
 
-        $this->withToken($token)->postJson('/api/payment')->assertStatus(503);
+        $this->withToken($token)->postJson('/api/payment', ['gateway' => 'khalti'])->assertStatus(503);
         $this->assertSame('User', $user->fresh()->role);
     }
 }

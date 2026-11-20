@@ -5,7 +5,8 @@
 @unless($payment->live)<p>{{ __('Test payment — no live settlement.') }}</p>@endunless
 <p>{{ __('Cancellation before the lesson starts requests a full refund of a verified online payment. Refunds are processed through the merchant and are not instant.') }}</p>
 @if($payment->status==='Pending')
-@if($payment->booking->status==='Booked' && $payment->booking->lesson->starts_at->isFuture())<form method="post" action="{{ route('learn.lesson-payment.start',$payment->id) }}">@csrf<button class="button">{{ __('Continue to payment provider') }}</button></form>@endif
+@if($payment->booking->status==='Booked' && $payment->booking->lesson->starts_at->isFuture())<form method="post" action="{{ route('learn.lesson-payment.start',$payment->id) }}">@csrf<button class="button">{{ __('Continue to payment provider') }}</button></form>
+<form method="post" action="{{ route('learn.lesson-payment.checkout',$payment->booking->id) }}">@csrf<select name="gateway">@foreach(['khalti'=>'Khalti','esewa'=>'eSewa'] as $value=>$label)@if(app(\App\Services\SchoolLessonGateway::class)->ready($value))<option value="{{ $value }}" @selected($payment->gateway===$value)>{{ $label }}</option>@endif @endforeach</select><button>{{ __('Change payment method') }}</button></form>@endif
 <form method="post" action="{{ route('learn.lesson-payment.verify',$payment->id) }}">@csrf<button>{{ __('Verify payment') }}</button></form>
 @endif
 @if($payment->refund_reference)<p>{{ __('Refund reference') }}: {{ $payment->refund_reference }}</p>@endif

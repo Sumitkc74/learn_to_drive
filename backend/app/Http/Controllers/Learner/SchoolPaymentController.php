@@ -16,6 +16,12 @@ class SchoolPaymentController extends Controller {
             abort_if($b->lesson->price_npr<10,422);
             $p=SchoolLessonPayment::where('lesson_booking_id',$b->id)->first();
             if(!$p){ $p=new SchoolLessonPayment; $p->forceFill(['id'=>(string)Str::uuid(),'lesson_booking_id'=>$b->id,'amount_paisa'=>$b->lesson->price_npr*100,'gateway'=>$data['gateway'],'live'=>(bool)config('schools.payments_live'),'merchant'=>$data['gateway']==='esewa'?config('payments.esewa_code'):null])->save(); }
+            elseif($p->status==='Pending' && $p->gateway!==$data['gateway']){
+                // Switching gateway on a pending payment: drop the previous
+                // gateway's checkout state so a stale pidx or checkout URL
+                // can never be reused, and record the new merchant.
+                $p->update(['gateway'=>$data['gateway'],'merchant'=>$data['gateway']==='esewa'?config('payments.esewa_code'):null,'provider_id'=>null,'checkout_url'=>null]);
+            }
             return $p;
         });
         return redirect()->route('learn.lesson-payment.show',$p->id);

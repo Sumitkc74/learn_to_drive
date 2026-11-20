@@ -66,7 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/userHistory', [UserHistoryController::class, 'recordHistory']);
     Route::get('/userHistory', [UserHistoryController::class, 'displayHistory']);
-    Route::post('/payment', [PaymentController::class, 'payment']);
+    Route::post('/payment', [PaymentController::class, 'payment'])->middleware('throttle:3,1');
 });
 
 
