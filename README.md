@@ -33,6 +33,10 @@ Captured from the live demo.
 
 ![Tutorials](docs/screenshots/tutorials.jpg)
 
+**Question banks**
+
+![Question banks](docs/screenshots/question-banks.jpg)
+
 ## Repository layout
 
 ```text
