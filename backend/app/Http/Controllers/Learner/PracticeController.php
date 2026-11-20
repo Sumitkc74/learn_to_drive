@@ -7,7 +7,10 @@ class PracticeController extends \App\Http\Controllers\Controller {
     private const FIELDS=['question','option1','option2','option3','option4','correctOption','explanation'];
     public function index(){
         $categories=Question::where('status','Published')->select('category')->distinct()->orderBy('category')->pluck('category');
-        $count=Question::where('status','Published')->count();return view('learner.practice-start',compact('categories','count'));
+        $count=Question::where('status','Published')->count();
+        $samples=Question::where('status','Published')->whereIn('correctOption',['A','B','C','D'])->where('language',app()->getLocale())->orderBy('id')->limit(5)->get();
+        if($samples->isEmpty())$samples=Question::where('status','Published')->whereIn('correctOption',['A','B','C','D'])->orderBy('id')->limit(5)->get();
+        return view('learner.practice-start',compact('categories','count','samples'));
     }
     public function start(Request $request){
         $data=$request->validate(['category'=>['nullable','string','max:100'],'count'=>['required','in:5,10,20,25'],'mode'=>['nullable','in:revision,personalized,mock'],'language'=>['nullable','in:en,ne']]);

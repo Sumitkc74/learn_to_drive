@@ -17,7 +17,7 @@ class LibraryController extends \App\Http\Controllers\Controller {
         return view('learner.home',compact('counts'));
     }
     public function flashcards(){
-        $signs=TrafficSign::with('media')->whereHas('media')->orderBy('id')->simplePaginate(1);
+        $signs=TrafficSign::with('media')->whereHas('media')->orderBy('id')->simplePaginate(1)->withPath(route('learn.flashcards',[],false));
         return view('learner.flashcards',compact('signs'));
     }
     public function index(Request $request,string $type){
