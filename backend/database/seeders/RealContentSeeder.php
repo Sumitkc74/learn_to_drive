@@ -37,14 +37,15 @@ use Illuminate\Support\Facades\Storage;
  * local disk, which Render's free tier wipes on every restart/redeploy,
  * so repairSeededMedia() runs on every boot and re-attaches any seeded
  * diagram whose file is gone. The same wipe orphans the admin-added
- * question-bank PDFs and vision-test plates, whose files are committed
- * under database/seeders/data/ for the same reason, so the repair also
- * covers those two (matched by exact bank name and by test number).
- * It only touches files for rows that still exist — a deleted row is
- * never restored — and it never duplicates a media record: a stale
- * record (file missing from disk) is deleted before the file is
- * re-attached from the repo. ExamPaper media keep their language
- * custom property, matching replacePdf().
+ * question-bank PDFs and vision-test plates, and the exam-information
+ * PDFs, whose files are committed under database/seeders/data/ for the
+ * same reason, so the repair also covers those three (matched by exact
+ * bank name, by test number, and by exact entry name). It only touches
+ * files for rows that still exist — a deleted row is never restored —
+ * and it never duplicates a media record: a stale record (file missing
+ * from disk) is deleted before the file is re-attached from the repo.
+ * ExamPaper and ExamInformation media keep their language custom
+ * property, matching replacePdf().
  *
  * Deliberately omitted: specific licence fees, written-exam pass marks
  * and question counts, and fine amounts. Published guides disagree on
@@ -155,21 +156,30 @@ class RealContentSeeder extends Seeder
         }
 
         foreach ($this->examInformation() as [$name, $description]) {
-            ExamInformation::firstOrCreate(['name' => $name], [
+            $info = ExamInformation::firstOrCreate(['name' => $name], [
                 'description' => $description,
                 'language' => 'English',
             ]);
+            // Attach the PDF on creation (same idempotent pattern as the
+            // sign diagrams above), so a fresh install is complete on the
+            // first boot; the every-boot repair below re-attaches it
+            // after a disk wipe.
+            $pdfs = array_column($this->examInformationPdfs(), 0, 1);
+            $path = isset($pdfs[$name]) ? database_path('seeders/data/exam-information/'.$pdfs[$name]) : null;
+            if ($info->getMedia()->isEmpty() && $path && is_file($path)) {
+                $info->addMedia($path)->preservingOriginal()->withCustomProperties(['language' => $info->language])->toMediaCollection();
+            }
         }
 
         AppSetting::updateOrCreate(['key' => 'real_content_version'], ['value' => (string) self::VERSION]);
     }
 
     /**
-     * Re-attach seeded sign diagrams whose files are gone from disk.
-     * Runs on every boot (see run()): Render's free tier wipes the local
-     * disk on restart/redeploy, which orphans the media records. Only
-     * rows that still exist are repaired; a deleted row is never
-     * restored, and a record whose file is still present is left alone.
+     * Re-attach seeded media whose files are gone from disk. Runs on
+     * every boot (see run()): Render's free tier wipes the local disk
+     * on restart/redeploy, which orphans the media records. Only rows
+     * that still exist are repaired; a deleted row is never restored,
+     * and a record whose file is still present is left alone.
      */
     private function repairSeededMedia(): void
     {
@@ -197,6 +207,30 @@ class RealContentSeeder extends Seeder
                 $this->repairMedia($paper, 'default', database_path('seeders/data/question-banks/'.$file), ['language' => $paper->language]);
             }
         }
+        foreach ($this->examInformationPdfs() as [$file, $name]) {
+            $info = ExamInformation::where('name', $name)->first();
+            if ($info) {
+                $this->repairMedia($info, 'default', database_path('seeders/data/exam-information/'.$file), ['language' => $info->language]);
+            }
+        }
+    }
+
+    /**
+     * Repo file => exact live ExamInformation name, from the public API
+     * (GET /api/examInformation, 2026-11-21). The 4 entries only: the
+     * live "Test Exam Info Admin" row is test data and is deliberately
+     * not repaired.
+     *
+     * @return array<int, array{string, string}>
+     */
+    private function examInformationPdfs(): array
+    {
+        return [
+            ['exam-info-licence-categories-a-and-b.pdf', 'Licence categories A and B'],
+            ['exam-info-written-exam-likhit.pdf', 'The written exam (Likhit)'],
+            ['exam-info-trial-practical-test.pdf', 'The trial (practical) test'],
+            ['exam-info-documents-and-steps-to-apply.pdf', 'Documents and steps to apply'],
+        ];
     }
 
     /**
