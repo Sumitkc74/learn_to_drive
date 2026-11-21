@@ -154,3 +154,14 @@ html,body{overflow-x:clip}
 /* Terms agreement checkbox on the register form (see learner.auth-form). */
 .terms-agree{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}
 .terms-agree input{width:auto;margin-top:4px;flex-shrink:0}
+
+/* Upcoming-class cards: the lesson time leads the card, and the car,
+   instructor and school read as labeled rows (see
+   learner.lessons.details). Theme variables keep it working in dark mode. */
+.lesson-time{display:grid;gap:2px;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.lesson-time strong{font-size:22px;letter-spacing:-.4px}
+.lesson-time span{font-size:13px;color:var(--muted)}
+.lesson-details{display:grid;gap:10px;margin:0 0 20px}
+.lesson-details>div{display:flex;justify-content:space-between;gap:12px}
+.lesson-details dt{color:var(--muted);font-size:14px;font-weight:600}
+.lesson-details dd{margin:0;text-align:right;font-weight:600}

@@ -1,7 +1,7 @@
 @extends('learner.layout')
 @section('title', __('Find driving schools'))
 @section('content')
-<p><a class="button" href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a></p>
+<p class="actions"><a class="button" href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a> <a class="button secondary" href="{{ route('learn.lessons') }}">{{ __('Upcoming classes') }}</a></p>
 <div class="page-heading"><p class="eyebrow">Learn to Drive</p><h1>{{ __('Find driving schools') }}</h1><p class="lead">{{ __('Explore approved driving schools by name or area.') }}</p></div>
 <form method="get" class="card stack">
     <label for="school-search">{{ __('School name or area') }}</label>

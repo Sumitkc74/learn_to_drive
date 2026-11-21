@@ -149,4 +149,27 @@ class PrivateDrivingLessonTest extends TestCase
         $school->update(['status' => 'Suspended']);
         $this->get(route('learn.lessons', ['school' => $school->id]))->assertNotFound();
     }
+
+    public function test_find_schools_page_has_a_distinct_upcoming_classes_button(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        $this->get(route('learn.schools'))->assertOk()
+            ->assertSee('Book a private driving lesson')
+            ->assertSee('<a class="button secondary" href="'.route('learn.lessons').'">Upcoming classes</a>', false);
+    }
+
+    public function test_upcoming_classes_page_shows_time_car_and_instructor_on_each_card(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        $date = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('d M Y');
+        $time = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('H:i');
+        $this->get(route('learn.lessons'))->assertOk()
+            ->assertSee('Upcoming classes')
+            ->assertSee($date)
+            ->assertSee($time)
+            ->assertSee('Training car')
+            ->assertSee($teacher->name)
+            ->assertSee($car->registration)
+            ->assertSee('Nepal time');
+    }
 }

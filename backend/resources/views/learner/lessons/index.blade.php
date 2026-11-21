@@ -1,7 +1,7 @@
 @extends('learner.layout')
-@section('title', __('Private driving lessons'))
+@section('title', __('Upcoming classes'))
 @section('content')
-<div class="page-heading"><h1>{{ __('Private driving lessons') }}</h1><p>{{ __('Book a car and instructor together for a private lesson. Choose an available time, review the price and confirm your booking.') }}</p></div>
+<div class="page-heading"><h1>{{ __('Upcoming classes') }}</h1><p>{{ __('Book a car and instructor together for a private lesson. Choose an available time, review the price and confirm your booking.') }}</p></div>
 <p>{{ __(config('schools.payments_enabled') ? 'Online payment is available from My driving bookings after confirming your lesson.' : 'Arrange payment directly with the school after booking.') }}</p>
 @if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View lessons from all schools') }}</a></p>@endif
 @auth<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endauth
