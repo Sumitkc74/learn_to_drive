@@ -11,13 +11,16 @@ class DrivingSchool extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
-    // Logo and gallery live on the public disk: both render for signed-out
-    // learners on the Find Schools listing. The logo is a single file; the
-    // gallery holds up to SchoolMedia::GALLERY_MAX_ITEMS images/videos.
+    // Logo and gallery follow the configured media disk (R2 in production,
+    // via MEDIA_DISK): both render for signed-out learners on the Find
+    // Schools listing through the disk's public URL. They must NOT pin the
+    // local 'public' disk — Render's free disk is wiped on every deploy.
+    // The logo is a single file; the gallery holds up to
+    // SchoolMedia::GALLERY_MAX_ITEMS images/videos.
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(\App\Support\SchoolMedia::LOGO_COLLECTION)->singleFile()->useDisk('public');
-        $this->addMediaCollection(\App\Support\SchoolMedia::GALLERY_COLLECTION)->useDisk('public');
+        $this->addMediaCollection(\App\Support\SchoolMedia::LOGO_COLLECTION)->singleFile();
+        $this->addMediaCollection(\App\Support\SchoolMedia::GALLERY_COLLECTION);
     }
 
     public function logoUrl(): ?string

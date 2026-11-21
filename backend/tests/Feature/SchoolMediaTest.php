@@ -6,6 +6,7 @@ use App\Models\{AppSetting, DrivingSchool, SchoolMembership, User};
 use App\Support\SchoolMedia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SchoolMediaTest extends TestCase
@@ -207,5 +208,22 @@ class SchoolMediaTest extends TestCase
         $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))->assertSessionHas('success');
         $this->assertDatabaseMissing('driving_schools', ['id' => $school->id]);
         $this->assertDatabaseMissing('media', ['model_type' => DrivingSchool::class, 'model_id' => $school->id]);
+    }
+
+    public function test_school_media_follows_configured_media_disk(): void
+    {
+        // Regression: the logo/gallery collections used to pin useDisk('public'),
+        // so uploads landed on Render's ephemeral disk and vanished on deploy
+        // even after MEDIA_DISK was switched to R2. They must follow the
+        // configured media disk instead.
+        Storage::fake('s3');
+        config(['media-library.disk_name' => 's3']);
+
+        $school = DrivingSchool::create(['name' => 'Disk Academy', 'status' => 'Approved']);
+        $school->addMedia($this->logo())->toMediaCollection(SchoolMedia::LOGO_COLLECTION);
+        $school->addMedia($this->photo())->toMediaCollection(SchoolMedia::GALLERY_COLLECTION);
+
+        $this->assertSame('s3', $school->getFirstMedia(SchoolMedia::LOGO_COLLECTION)->disk);
+        $this->assertSame('s3', $school->getFirstMedia(SchoolMedia::GALLERY_COLLECTION)->disk);
     }
 }
