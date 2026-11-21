@@ -4,9 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\AppSetting;
 use App\Models\ExamInformation;
+use App\Models\ExamPaper;
 use App\Models\Question;
 use App\Models\TrafficSign;
 use App\Models\Tutorial;
+use App\Models\VisionTest;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,10 +36,15 @@ use Illuminate\Support\Facades\Storage;
  * Media repair is NOT version-gated: seeded sign diagrams live on the
  * local disk, which Render's free tier wipes on every restart/redeploy,
  * so repairSeededMedia() runs on every boot and re-attaches any seeded
- * diagram whose file is gone. It only touches files for rows that still
- * exist — a deleted row is never restored — and it never duplicates a
- * media record: a stale record (file missing from disk) is deleted
- * before the file is re-attached from the repo.
+ * diagram whose file is gone. The same wipe orphans the admin-added
+ * question-bank PDFs and vision-test plates, whose files are committed
+ * under database/seeders/data/ for the same reason, so the repair also
+ * covers those two (matched by exact bank name and by test number).
+ * It only touches files for rows that still exist — a deleted row is
+ * never restored — and it never duplicates a media record: a stale
+ * record (file missing from disk) is deleted before the file is
+ * re-attached from the repo. ExamPaper media keep their language
+ * custom property, matching replacePdf().
  *
  * Deliberately omitted: specific licence fees, written-exam pass marks
  * and question counts, and fine amounts. Published guides disagree on
@@ -178,9 +185,47 @@ class RealContentSeeder extends Seeder
                 $this->repairMedia($sign, 'default', database_path('seeders/data/traffic-signs/'.$svg));
             }
         }
+        foreach ([6, 8, 12, 29, 42, 74] as $testNumber) {
+            $test = VisionTest::where('testNumber', $testNumber)->first();
+            if ($test) {
+                $this->repairMedia($test, 'default', database_path('seeders/data/vision-plates/vision-plate-'.$testNumber.'.png'));
+            }
+        }
+        foreach ($this->questionBanks() as [$file, $name]) {
+            $paper = ExamPaper::where('name', $name)->first();
+            if ($paper) {
+                $this->repairMedia($paper, 'default', database_path('seeders/data/question-banks/'.$file), ['language' => $paper->language]);
+            }
+        }
     }
 
-    private function repairMedia($model, string $collection, ?string $path): void
+    /**
+     * Repo file => exact live ExamPaper name, from the public API
+     * (GET /api/examPaper, 2026-11-20). The 12 banks only: the live
+     * "Test Question Bank Admin" row is test data and is deliberately
+     * not repaired.
+     *
+     * @return array<int, array{string, string}>
+     */
+    private function questionBanks(): array
+    {
+        return [
+            ['question-bank-english.pdf', 'Nepal Driving Licence Exam — Question Bank (English)'],
+            ['question-bank-nepali.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — प्रश्न बैंक (नेपाली)'],
+            ['question-bank-english-general.pdf', 'Nepal Driving Licence Exam — General Questions (English)'],
+            ['question-bank-english-road-signs.pdf', 'Nepal Driving Licence Exam — Road Signs Questions (English)'],
+            ['question-bank-english-traffic-rules.pdf', 'Nepal Driving Licence Exam — Traffic Rules Questions (English)'],
+            ['question-bank-english-road-safety.pdf', 'Nepal Driving Licence Exam — Road Safety Questions (English)'],
+            ['question-bank-english-vehicle-knowledge.pdf', 'Nepal Driving Licence Exam — Vehicle Knowledge Questions (English)'],
+            ['question-bank-nepali-general.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — सामान्य प्रश्नहरू (नेपाली)'],
+            ['question-bank-nepali-road-signs.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — सडक चिन्ह प्रश्नहरू (नेपाली)'],
+            ['question-bank-nepali-traffic-rules.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — ट्राफिक नियम प्रश्नहरू (नेपाली)'],
+            ['question-bank-nepali-road-safety.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — सडक सुरक्षा प्रश्नहरू (नेपाली)'],
+            ['question-bank-nepali-vehicle-knowledge.pdf', 'नेपाल सवारी चालक अनुमतिपत्र परीक्षा — सवारी ज्ञान प्रश्नहरू (नेपाली)'],
+        ];
+    }
+
+    private function repairMedia($model, string $collection, ?string $path, array $customProperties = []): void
     {
         if (!$path || !is_file($path)) {
             return;
@@ -202,7 +247,11 @@ class RealContentSeeder extends Seeder
         }
         if (!$live) {
             $model->unsetRelation('media');
-            $model->addMedia($path)->preservingOriginal()->toMediaCollection($collection);
+            $fileAdder = $model->addMedia($path)->preservingOriginal();
+            if ($customProperties !== []) {
+                $fileAdder->withCustomProperties($customProperties);
+            }
+            $fileAdder->toMediaCollection($collection);
         }
     }
 
