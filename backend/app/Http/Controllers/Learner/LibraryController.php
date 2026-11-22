@@ -26,6 +26,15 @@ class LibraryController extends \App\Http\Controllers\Controller {
         $query=$class::query();if($type==='notice') $query->visibleToLearners();else $query->with('media');
         if(!empty($data['q'])) $query->where($field,'like','%'.$data['q'].'%');
         if(in_array($type,['question-bank','exam-information']) && !empty($data['language'])) $query->where('language',$data['language']);
+        if($type==='question-bank'){
+            // Full collections first, then the topic splits, newest first
+            // within each group. The full collections are the ones whose
+            // attached PDF is question-bank-english.pdf or
+            // question-bank-nepali.pdf, so admin-added banks land in the
+            // splits group instead of needing a hardcoded id.
+            $table=(new $class)->getTable();
+            $query->orderByRaw("(SELECT CASE WHEN file_name IN ('question-bank-english.pdf','question-bank-nepali.pdf') THEN 0 ELSE 1 END FROM media WHERE media.model_type = ? AND media.model_id = {$table}.id ORDER BY media.id LIMIT 1)",[(new $class)->getMorphClass()]);
+        }
         $items=$query->latest('id')->paginate(12)->withQueryString();
         return view('learner.library',compact('type','title','field','intro','items'));
     }

@@ -34,7 +34,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
-        \Illuminate\Support\Facades\URL::forceScheme(parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https');
+        // Render terminates TLS in front of the app, and the APP_URL value
+        // in the Render dashboard can drift back to http (live pagination
+        // links were emitted as http:// despite render.yaml saying
+        // https). Production is always served over https, so force that
+        // scheme here instead of trusting APP_URL's scheme; other
+        // environments keep the scheme from APP_URL.
+        \Illuminate\Support\Facades\URL::forceScheme(app()->environment('production') ? 'https' : (parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https'));
         Queue::looping(function (Looping $event) {
             if ($event->connectionName === 'pdf-extraction') {
                 app(AdminSystemHealth::class)->heartbeat();

@@ -4,7 +4,7 @@
 @php($premium=auth()->check() && auth()->user()->hasPremium())
 @guest
 @include('learner.tier-comparison')
-<p class="muted"><a href="{{ route('learn.register', ['premium' => 1]) }}">{{ __('Create an account') }}</a> {{ __('to upgrade to Premium.') }}</p>
+@if(config('payments.enabled'))<p class="muted"><a href="{{ route('learn.register', ['premium' => 1]) }}">{{ __('Create an account') }}</a> {{ __('to upgrade to Premium.') }}</p>@endif
 @else
 <div class="page-heading"><p class="eyebrow">{{ __('LEARN FROM EVERY MISTAKE') }}</p><h1>{{ __('A little extra support.') }}<br>{{ __('A clearer way forward.') }}</h1><p class="lead">{{ __('Premium brings your difficult topics together and gives you a study assistant to help explain them.') }}</p></div>
 @if($premium)<p class="badge">{{ __('Premium access active') }}</p>@endif
