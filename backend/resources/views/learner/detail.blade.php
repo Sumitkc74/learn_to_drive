@@ -17,5 +17,5 @@
 @php($external=$type==='tutorial'?$item->videoLink:($type==='notice'?$item->link:null))
 @if($external && in_array(strtolower(parse_url($external,PHP_URL_SCHEME) ?? ''),['https','http']))<a class="button" href="{{ $external }}" target="_blank" rel="noopener noreferrer">{{ $type==='tutorial'?__('Watch tutorial'):__('Open notice source') }} ↗</a>@endif
 @if($type==='notice' && $item->source_name)<p class="muted">{{ __('Source: :name', ['name' => $item->source_name]) }}</p>@endif
-</article>@if(in_array($type,['traffic-sign','question-bank','exam-information','tutorial']))@include('learner.disclaimer')@endif @if($type==='traffic-sign')@include('learner.sign-source')@endif @if($type==='question-bank')@include('learner.question-source')@endif<p><a href="{{ route('learn.report',[$type,$item->id]) }}">{{ __('Report a problem with this resource') }}</a></p>
+</article>@if($type==='traffic-sign')@include('learner.sign-source')@endif @if($type==='question-bank')@include('learner.question-source')@endif<p><a href="{{ route('learn.report',[$type,$item->id]) }}">{{ __('Report a problem with this resource') }}</a></p>
 @endsection

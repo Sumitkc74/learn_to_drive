@@ -1,7 +1,7 @@
 @extends('learner.layout')
 @section('title',__($title))
 @section('content')
-<div class="page-heading">@if($type!=='notice')<a href="{{ route('learn.library.home') }}">{{ __('← Learning library') }}</a>@endif<p class="eyebrow">{{ __('THE LEARNING LIBRARY') }}</p><h1>{{ __($title) }}</h1><p class="lead">{{ __($intro) }}</p></div>@include('learner.disclaimer')@if($type==='traffic-sign')@include('learner.sign-source')@endif @if($type==='question-bank')@include('learner.question-source')@endif
+<div class="page-heading">@if($type!=='notice')<a href="{{ route('learn.library.home') }}">{{ __('← Learning library') }}</a>@endif<p class="eyebrow">{{ __('THE LEARNING LIBRARY') }}</p><h1>{{ __($title) }}</h1><p class="lead">{{ __($intro) }}</p></div>@if($type==='traffic-sign')@include('learner.sign-source')@endif @if($type==='question-bank')@include('learner.question-source')@endif
 
 
 <form class="filters" method="get"><label>{{ __('Search') }}<input name="q" value="{{ request('q') }}" maxlength="100" placeholder="{{ __('Search resources') }}"></label>@if(in_array($type,['question-bank','exam-information']))<label>{{ __('Content language') }}<select name="language"><option value="">{{ __('All languages') }}</option>@foreach(['English','Nepali'] as $language)<option value="{{ $language }}" @selected(request('language')===$language)>{{ __($language) }}</option>@endforeach</select></label>@endif<button class="button">{{ __('Search') }}</button><a href="{{ route('learn.library',$type) }}">{{ __('Clear') }}</a></form>

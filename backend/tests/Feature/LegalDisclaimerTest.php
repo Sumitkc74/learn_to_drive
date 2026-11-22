@@ -11,13 +11,13 @@ class LegalDisclaimerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHORT = 'Practice questions are written for study and may not match the real exam questions.';
+    private const FOOTER_LINE = 'Check official notices for current exam requirements.';
     private const FOOTER = 'It is not provided by the Government of Nepal or the Department of Transport Management.';
 
     public function test_disclaimer_on_home_page_and_footer(): void
     {
         $this->get('/')->assertOk()
-            ->assertSee(self::SHORT)
+            ->assertSee(self::FOOTER_LINE)
             ->assertSee(self::FOOTER);
     }
 
@@ -45,27 +45,27 @@ class LegalDisclaimerTest extends TestCase
         $heroEnd = strpos($html, '</section>', $heroStart) + strlen('</section>');
         $heroHtml = substr($html, $heroStart, $heroEnd - $heroStart);
         $this->assertStringContainsString('class="road-art"', $heroHtml);
-        $this->assertStringNotContainsString(self::SHORT, $heroHtml, 'Disclaimer must not sit inside the hero grid.');
-        $this->assertStringContainsString(self::SHORT, substr($html, $heroEnd), 'Disclaimer must still render on the page, below the hero.');
+        $this->assertStringNotContainsString(self::FOOTER, $heroHtml, 'Disclaimer must not sit inside the hero grid.');
+        $this->assertStringContainsString(self::FOOTER_LINE, substr($html, $heroEnd), 'Disclaimer must still render on the page, below the hero.');
     }
 
     public function test_disclaimer_on_practice_start_page(): void
     {
-        $this->get('/learn/practice')->assertOk()->assertSee(self::SHORT);
+        $this->get('/learn/practice')->assertOk()->assertSee(self::FOOTER_LINE);
     }
 
     public function test_disclaimer_on_library_hub_and_lists(): void
     {
-        $this->get('/learn/library')->assertOk()->assertSee(self::SHORT);
-        $this->get('/learn/library/traffic-sign')->assertOk()->assertSee(self::SHORT);
-        $this->get('/learn/library/question-bank')->assertOk()->assertSee(self::SHORT);
+        $this->get('/learn/library')->assertOk()->assertSee(self::FOOTER_LINE);
+        $this->get('/learn/library/traffic-sign')->assertOk()->assertSee(self::FOOTER_LINE);
+        $this->get('/learn/library/question-bank')->assertOk()->assertSee(self::FOOTER_LINE);
     }
 
     public function test_disclaimer_on_traffic_sign_detail_page(): void
     {
         $sign = TrafficSign::create(['name' => 'Stop and give way', 'nepaliSignName' => 'रोक्नुहोस् र बाटो दिनुहोस्', 'description' => 'Come to a complete stop.', 'image' => 'stop.svg']);
 
-        $this->get('/learn/library/traffic-sign/'.$sign->id)->assertOk()->assertSee(self::SHORT);
+        $this->get('/learn/library/traffic-sign/'.$sign->id)->assertOk()->assertSee(self::FOOTER_LINE);
     }
 
     public function test_notice_detail_shows_source_attribution_and_official_link(): void
