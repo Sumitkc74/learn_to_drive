@@ -23,6 +23,23 @@
     <button class="button">{{ __('Publish lesson') }}</button>
 </form></section>
 @endif
+@if($requests->isNotEmpty())<h2>{{ __('Private lesson requests') }}</h2>
+@foreach($requests as $req)<article class="card">
+    <p><strong>{{ $req->learner->name }}</strong> · {{ $req->school->name }} · {{ $req->vehicle->name }} · {{ $req->vehicle->registration }}</p>
+    <p>{{ $req->starts_at->copy()->timezone('Asia/Kathmandu')->format('d M Y H:i') }} · {{ $req->duration_minutes }} {{ __('minutes') }} · {{ $req->meeting_point }}</p>
+    @if($req->note)<p>{{ $req->note }}</p>@endif
+    <p><strong>{{ __($req->status) }}</strong>@if($req->status === 'Declined' && $req->decline_reason) — {{ $req->decline_reason }}@endif</p>
+    @if($req->status === 'Pending')
+    <form method="post" action="{{ route('learn.instructor.private-lesson-requests.accept', $req->id) }}" class="stack">@csrf
+        <label>{{ __('Price (NPR)') }}<input name="price_npr" type="number" min="0" max="100000" required></label>
+        <button class="button">{{ __('Accept') }}</button>
+    </form>
+    <details><summary>{{ __('Decline') }}</summary><form method="post" action="{{ route('learn.instructor.private-lesson-requests.decline', $req->id) }}" class="stack">@csrf
+        <label>{{ __('Decline reason (optional)') }}<input name="decline_reason" maxlength="500"></label>
+        <button class="button">{{ __('Decline') }}</button>
+    </form></details>
+    @endif
+</article>@endforeach @endif
 <h2>{{ __('My lesson schedule') }}</h2>
 @forelse($lessons as $lesson)<article class="card">@include('learner.lessons.details')
     @if($lesson->cancelled)<p>{{ __('Cancelled') }}</p>

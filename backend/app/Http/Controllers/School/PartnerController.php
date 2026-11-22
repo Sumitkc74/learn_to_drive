@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Models\{AuditLog, DrivingSchool, SchoolMembership, User, DrivingLesson};
+use App\Models\{AuditLog, DrivingSchool, PrivateLessonRequest, SchoolMembership, User, DrivingLesson};
 use App\Support\SchoolMedia;
 use App\Services\SchoolNotifications;
 use Illuminate\Http\Request;
@@ -86,7 +86,10 @@ class PartnerController extends Controller
         $schoolModel=DrivingSchool::with('media')->findOrFail($school);
         $rateProposal=in_array($member->role,['Owner','Manager'],true) && ($schoolModel->proposed_commission_percent!==null || $schoolModel->proposed_enrollment_fee_paisa!==null) ? $schoolModel : null;
         if(!$r->expectsJson()) $data+=compact('sessionPages','members');
-        $data+=compact('joinRequests','rateProposal');
+        $privateLessonRequests = in_array($member->role, ['Owner', 'Manager'], true)
+            ? PrivateLessonRequest::where('driving_school_id', $school)->with(['learner:id,name', 'instructor:id,name', 'vehicle:id,name,registration'])->orderByDesc('id')->limit(20)->get()
+            : collect();
+        $data+=compact('joinRequests','rateProposal','privateLessonRequests');
         $data['school']=$schoolModel;
         return $r->expectsJson() ? response()->json(['data'=>$data]) : view('school.partner',$data);
     }

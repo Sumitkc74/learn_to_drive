@@ -50,10 +50,15 @@ Route::prefix('learn')->name('learn.')->group(function () {
         Route::get('driving-lessons/bookings', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'bookings'])->name('lessons.bookings');
         Route::post('driving-lessons/{lesson}/book', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'book'])->whereNumber('lesson')->middleware('throttle:10,1')->name('lessons.book');
         Route::delete('driving-lessons/bookings/{booking}', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'cancel'])->whereNumber('booking')->middleware('throttle:10,1')->name('lessons.cancel');
+        Route::get('private-lessons', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'index'])->name('private-lessons');
+        Route::post('private-lessons', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'store'])->middleware('throttle:10,1')->name('private-lessons.store');
+        Route::post('private-lessons/{privateRequest}/cancel', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'cancel'])->whereNumber('privateRequest')->middleware('throttle:10,1')->name('private-lessons.cancel');
         Route::get('instructor/lessons', [\App\Http\Controllers\School\LessonController::class, 'index'])->name('instructor.lessons');
         Route::post('instructor/vehicles', [\App\Http\Controllers\School\LessonController::class, 'vehicle'])->middleware('throttle:10,1')->name('instructor.vehicles');
         Route::post('instructor/lessons', [\App\Http\Controllers\School\LessonController::class, 'store'])->middleware('throttle:20,1')->name('instructor.lessons.store');
         Route::delete('instructor/lessons/{lesson}', [\App\Http\Controllers\School\LessonController::class, 'cancel'])->whereNumber('lesson')->middleware('throttle:10,1')->name('instructor.lessons.cancel');
+        Route::post('instructor/private-lesson-requests/{privateRequest}/accept', [\App\Http\Controllers\School\LessonController::class, 'acceptRequest'])->whereNumber('privateRequest')->middleware('throttle:10,1')->name('instructor.private-lesson-requests.accept');
+        Route::post('instructor/private-lesson-requests/{privateRequest}/decline', [\App\Http\Controllers\School\LessonController::class, 'declineRequest'])->whereNumber('privateRequest')->middleware('throttle:10,1')->name('instructor.private-lesson-requests.decline');
         Route::middleware(\App\Http\Middleware\RequireSchoolStaff::class)->group(function () {
             Route::get('school', [\App\Http\Controllers\School\DashboardController::class, 'index'])->name('school.dashboard');
             Route::post('school/enroll', [\App\Http\Controllers\School\DashboardController::class, 'enroll'])->middleware('throttle:20,1')->name('school.enroll');

@@ -1,7 +1,7 @@
 @extends('learner.layout')
 @section('title', __('My driving bookings'))
 @section('content')
-<div class="page-heading"><h1>{{ __('My driving bookings') }}</h1><a href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a></div>
+<div class="page-heading"><h1>{{ __('My driving bookings') }}</h1></div>
 <p>{{ __(config('schools.payments_enabled') ? 'Pay online using your booking receipt, or arrange payment with the school. Do not pay twice.' : 'Arrange payment directly with the school. Check this page for booking status before travelling.') }}</p>
 @forelse($bookings as $booking)
 <article class="card">@include('learner.lessons.details', ['lesson' => $booking->lesson])

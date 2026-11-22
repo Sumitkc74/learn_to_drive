@@ -1,7 +1,6 @@
 @extends('learner.layout')
 @section('title', __('Find driving schools'))
 @section('content')
-<p class="actions"><a class="button" href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a></p>
 <div class="page-heading"><p class="eyebrow">Learn to Drive</p><h1>{{ __('Find driving schools') }}</h1><p class="lead">{{ __('Explore approved driving schools by name or area.') }}</p></div>
 <form method="get" class="card stack">
     <label for="school-search">{{ __('School name or area') }}</label>
@@ -27,7 +26,6 @@
     <button type="button" class="dialog-close" data-school-close aria-label="{{ __('Close school details') }}">@include('learner.icon',['icon'=>'close'])</button>
     @if($school->logoUrl())<img class="school-logo" src="{{ $school->logoUrl() }}" alt="{{ $school->name }} logo" loading="lazy">@else<span class="school-logo-fallback" aria-hidden="true">{{ mb_strtoupper(mb_substr($school->name, 0, 1)) }}</span>@endif
     <h2 id="school-title-{{ $school->id }}">{{ $school->name }}</h2>
-    <p><a class="button" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Book a private driving lesson') }}</a></p>
     @auth @if(!in_array($school->id,$memberSchoolIds))<form method="post" action="{{ route('learn.schools.join-request',$school->id) }}">@csrf<button class="button small">{{ __('Request to join') }}</button></form>@endif @endauth
     @if($school->address)<p>{{ $school->address }}</p>@endif
     @if($school->phone)<p>{{ __('Phone') }}: {{ $school->phone }}</p>@endif
@@ -48,7 +46,7 @@
     </div>
     @endif
     <h3>{{ __('Upcoming lessons') }}</h3>
-    <p><a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
+    <p><a class="button" href="{{ route('learn.private-lessons', ['school' => $school->id]) }}">{{ __('Book a private driving lesson') }}</a> <a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
     @forelse($upcomingLessons[$school->id] ?? [] as $lesson)
     <section class="school-lesson">
         @include('learner.lessons.details', ['lesson' => $lesson, 'hideLogo' => true])

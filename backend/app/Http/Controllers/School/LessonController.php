@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
-use App\Models\{DrivingLesson, LessonVehicle, User};
+use App\Models\{DrivingLesson, LessonBooking, LessonVehicle, PrivateLessonRequest, User};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -24,7 +24,10 @@ class LessonController extends Controller
         $lessons = DrivingLesson::whereHas('vehicle', fn ($q) => $q->where('instructor_id', $request->user()->id))
             ->with(['vehicle.school.media', 'vehicle.instructor', 'bookings' => fn ($q) => $q->where('status', 'Booked')->with('learner:id,name,email')])
             ->orderByDesc('starts_at')->paginate(20);
-        return view('school.lessons', compact('schools', 'vehicles', 'lessons'));
+        $requests = PrivateLessonRequest::where('instructor_id', $request->user()->id)
+            ->with(['learner:id,name,email', 'school:id,name', 'vehicle'])
+            ->orderByRaw("CASE WHEN status = 'Pending' THEN 0 ELSE 1 END")->orderBy('starts_at')->take(20)->get();
+        return view('school.lessons', compact('schools', 'vehicles', 'lessons', 'requests'));
     }
 
     public function vehicle(Request $request)
@@ -65,6 +68,60 @@ class LessonController extends Controller
                 'price_npr' => $data['price_npr'], 'meeting_point' => $data['meeting_point']]);
         });
         return back()->with('success', __('Lesson time published.'));
+    }
+
+    private function pendingRequest(Request $request, int $privateRequest): PrivateLessonRequest
+    {
+        $record = PrivateLessonRequest::lockForUpdate()->findOrFail($privateRequest);
+        abort_unless($record->instructor_id === $request->user()->id, 403, __('Only the addressed instructor can respond to this request.'));
+        if ($record->status !== 'Pending') {
+            throw ValidationException::withMessages(['request' => __('This request is no longer pending.')]);
+        }
+        return $record;
+    }
+
+    public function acceptRequest(Request $request, int $privateRequest)
+    {
+        $data = $request->validate(['price_npr' => ['required', 'integer', 'min:0', 'max:100000']]);
+        DB::transaction(function () use ($request, $data, $privateRequest) {
+            $record = $this->pendingRequest($request, $privateRequest);
+            abort_unless($this->schools($request)->contains('driving_school_id', $record->driving_school_id), 403);
+            $start = $record->starts_at->copy()->utc();
+            // Validated form values arrive as strings from a real browser;
+            // Carbon 3 rejects a string here, so cast before adding.
+            $end = $start->copy()->addMinutes((int) $record->duration_minutes);
+            if (!$start->isFuture()) {
+                throw ValidationException::withMessages(['starts_at' => __('Choose a future time within the next year.')]);
+            }
+            if (DrivingLesson::where('cancelled', false)->whereHas('vehicle', fn ($q) => $q->where('instructor_id', $request->user()->id))
+                    ->overlapping($start, $end)->exists()) {
+                throw ValidationException::withMessages(['starts_at' => __('You already have a lesson at this time.')]);
+            }
+            if (LessonBooking::where('learner_id', $record->learner_id)->where('status', 'Booked')
+                    ->whereHas('lesson', fn ($q) => $q->overlapping($start, $end))->exists()
+                || DB::table('school_class_sessions as s')->join('school_batch_members as m', 'm.school_batch_id', '=', 's.school_batch_id')
+                    ->where('m.user_id', $record->learner_id)->where('s.cancelled', false)->where('s.starts_at', '<', $end)->where('s.ends_at', '>', $start)->exists()) {
+                throw ValidationException::withMessages(['starts_at' => __('The learner already has a booking at this time.')]);
+            }
+            $lesson = DrivingLesson::create(['lesson_vehicle_id' => $record->lesson_vehicle_id, 'starts_at' => $start, 'ends_at' => $end,
+                'price_npr' => (int) $data['price_npr'], 'meeting_point' => $record->meeting_point]);
+            LessonBooking::create(['driving_lesson_id' => $lesson->id, 'active_lesson_id' => $lesson->id, 'learner_id' => $record->learner_id]);
+            $record->update(['status' => 'Accepted', 'driving_lesson_id' => $lesson->id]);
+            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private lesson request was accepted. View My driving bookings.');
+            \App\Services\SchoolNotifications::send($record->instructor_id, 'You accepted a private lesson request.');
+        });
+        return back()->with('success', __('Private lesson request accepted.'));
+    }
+
+    public function declineRequest(Request $request, int $privateRequest)
+    {
+        $data = $request->validate(['decline_reason' => ['nullable', 'string', 'max:500']]);
+        DB::transaction(function () use ($request, $data, $privateRequest) {
+            $record = $this->pendingRequest($request, $privateRequest);
+            $record->update(['status' => 'Declined', 'decline_reason' => $data['decline_reason'] ?? null]);
+            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private lesson request was declined.');
+        });
+        return back()->with('success', __('Private lesson request declined.'));
     }
 
     public function cancel(Request $request, int $lesson)
