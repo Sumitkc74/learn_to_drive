@@ -21,6 +21,34 @@ class LegalDisclaimerTest extends TestCase
             ->assertSee(self::FOOTER);
     }
 
+    public function test_homepage_hero_keeps_road_art_beside_text_and_disclaimer_below(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($html);
+        libxml_clear_errors();
+        $hero = (new \DOMXPath($dom))->query('//section[contains(@class, "hero")]')->item(0);
+        $this->assertNotNull($hero, 'Homepage has no hero section.');
+
+        $children = [];
+        foreach ($hero->childNodes as $child) {
+            if ($child->nodeType === XML_ELEMENT_NODE) {
+                $children[] = $child;
+            }
+        }
+        $this->assertCount(2, $children, 'Hero must have exactly two direct children: text and road art.');
+        $this->assertSame('road-art', $children[1]->getAttribute('class'));
+
+        $heroStart = strpos($html, '<section class="hero">');
+        $heroEnd = strpos($html, '</section>', $heroStart) + strlen('</section>');
+        $heroHtml = substr($html, $heroStart, $heroEnd - $heroStart);
+        $this->assertStringContainsString('class="road-art"', $heroHtml);
+        $this->assertStringNotContainsString(self::SHORT, $heroHtml, 'Disclaimer must not sit inside the hero grid.');
+        $this->assertStringContainsString(self::SHORT, substr($html, $heroEnd), 'Disclaimer must still render on the page, below the hero.');
+    }
+
     public function test_disclaimer_on_practice_start_page(): void
     {
         $this->get('/learn/practice')->assertOk()->assertSee(self::SHORT);

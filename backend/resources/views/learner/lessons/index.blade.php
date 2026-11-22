@@ -5,17 +5,18 @@
 <p>{{ __(config('schools.payments_enabled') ? 'Online payment is available from My driving bookings after confirming your lesson.' : 'Arrange payment directly with the school after booking.') }}</p>
 @if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View lessons from all schools') }}</a></p>@endif
 @auth<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endauth
-<form method="get" class="card stack">
+<form method="get" class="filters">
     <label>{{ __('Institute') }}<select name="school"><option value="">{{ __('All institutes') }}</option>@foreach($schools as $s)<option value="{{ $s->id }}" @selected(request('school') == $s->id)>{{ $s->name }}</option>@endforeach</select></label>
     <label>{{ __('Date (Nepal time)') }}<input type="date" name="date" value="{{ request('date') }}"></label>
     <label>{{ __('Car') }}<input name="car" value="{{ request('car') }}" maxlength="100"></label>
     <label>{{ __('Instructor') }}<input name="instructor" value="{{ request('instructor') }}" maxlength="100"></label>
     <label>{{ __('Availability') }}<select name="availability"><option value="available">{{ __('Available') }}</option><option value="booked" @selected(request('availability')==='booked')>{{ __('Booked — join waitlist') }}</option></select></label>
     <label>{{ __('Transmission') }}<select name="transmission"><option value="">{{ __('All') }}</option>@foreach(['Manual','Automatic'] as $type)<option value="{{ $type }}" @selected(request('transmission') === $type)>{{ __($type) }}</option>@endforeach</select></label>
-    <div><button class="button">{{ __('Search') }}</button> <a href="{{ route('learn.lessons', $school ? ['school' => $school->id] : []) }}">{{ __('Clear') }}</a></div>
+    <button class="button">{{ __('Search') }}</button> <a href="{{ route('learn.lessons', $school ? ['school' => $school->id] : []) }}">{{ __('Clear') }}</a>
 </form>
-<div class="grid">@forelse($lessons as $lesson)
-<article class="card">@include('learner.lessons.details')
+<div class="lesson-list">@forelse($lessons as $lesson)
+<article class="card lesson-row">@include('learner.lessons.details')
+    <div class="lesson-action">
     @auth
     @if(request('availability')==='booked')
     <p>{{ __('Waitlist alerts do not reserve a slot. Confirm a booking when one becomes available.') }}</p>
@@ -25,6 +26,7 @@
     <form method="post" action="{{ route('learn.lessons.book', $lesson->id) }}">@csrf<button class="button">{{ __('Confirm booking') }}</button></form></details>
     @endif
     @else<a class="button" href="{{ route('learn.login') }}">{{ __('Sign in to book') }}</a>@endauth
+    </div>
 </article>
 @empty<section class="card"><p>{{ __('No lesson times are available. Try another date or transmission.') }}</p></section>@endforelse</div>
 {{ $lessons->links('pagination::simple-default') }}

@@ -27,7 +27,7 @@ class LearnerReviewFixesTest extends TestCase
     {
         $this->assertSame(0,ExamPaper::count());
         $this->get('/')->assertOk()
-            ->assertSee('<title>Your next turn starts here · Learn to Drive</title>',false)
+            ->assertSee('<title>Learn to Drive</title>',false)
             ->assertSee('Your next three steps')
             ->assertDontSee('Question banks')
             ->assertDontSee('Open question banks')

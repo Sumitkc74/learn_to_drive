@@ -150,12 +150,16 @@ class PrivateDrivingLessonTest extends TestCase
         $this->get(route('learn.lessons', ['school' => $school->id]))->assertNotFound();
     }
 
-    public function test_find_schools_page_has_a_distinct_upcoming_classes_button(): void
+    public function test_find_schools_page_has_no_top_level_upcoming_classes_button_but_dialog_links_to_filtered_classes(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();
         $this->get(route('learn.schools'))->assertOk()
             ->assertSee('Book a private driving lesson')
-            ->assertSee('<a class="button secondary" href="'.route('learn.lessons').'">Upcoming classes</a>', false);
+            // The redundant top-level button is gone: no unfiltered
+            // "Upcoming classes" link on the page.
+            ->assertDontSee('<a class="button secondary" href="'.route('learn.lessons').'">Upcoming classes</a>', false)
+            // Each school's dialog links to its own filtered classes.
+            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false);
     }
 
     public function test_upcoming_classes_page_shows_time_car_and_instructor_on_each_card(): void
@@ -170,7 +174,14 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee('Training car')
             ->assertSee($teacher->name)
             ->assertSee($car->registration)
-            ->assertSee('Nepal time');
+            ->assertSee('Nepal time')
+            // The card is one compact row: values only, no label tags.
+            ->assertSee('class="card lesson-row"', false)
+            ->assertSee('Rs 1,500')
+            ->assertSee('Lesson Academy')
+            ->assertSee('School reception')
+            ->assertDontSee('<dl')
+            ->assertDontSee('<dt>');
     }
 
     public function test_institute_dropdown_lists_approved_schools_and_filters_classes(): void
@@ -225,5 +236,21 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee('Day car')->assertDontSee('Other day car');
         $this->get(route('learn.lessons', ['date' => $otherDay]))->assertOk()
             ->assertSee('Other day car')->assertDontSee('Day car');
+    }
+
+    public function test_upcoming_classes_filter_form_is_a_compact_bar(): void
+    {
+        $this->offering();
+        $this->get(route('learn.lessons'))->assertOk()
+            ->assertSee('<form method="get" class="filters">', false)
+            ->assertSee('name="school"', false)
+            ->assertSee('name="date"', false)
+            ->assertSee('name="car"', false)
+            ->assertSee('name="instructor"', false)
+            ->assertSee('name="transmission"', false)
+            ->assertSee('name="availability"', false)
+            ->assertDontSee('class="card stack"')
+            // Other pages keep the " · Learn to Drive" tab suffix.
+            ->assertSee('<title>Upcoming classes · Learn to Drive</title>', false);
     }
 }

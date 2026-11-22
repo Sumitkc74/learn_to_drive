@@ -1,7 +1,7 @@
 @extends('learner.layout')
 @section('title', __('Find driving schools'))
 @section('content')
-<p class="actions"><a class="button" href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a> <a class="button secondary" href="{{ route('learn.lessons') }}">{{ __('Upcoming classes') }}</a></p>
+<p class="actions"><a class="button" href="{{ route('learn.lessons') }}">{{ __('Book a private driving lesson') }}</a></p>
 <div class="page-heading"><p class="eyebrow">Learn to Drive</p><h1>{{ __('Find driving schools') }}</h1><p class="lead">{{ __('Explore approved driving schools by name or area.') }}</p></div>
 <form method="get" class="card stack">
     <label for="school-search">{{ __('School name or area') }}</label>
@@ -48,6 +48,7 @@
     </div>
     @endif
     <h3>{{ __('Upcoming lessons') }}</h3>
+    <p><a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
     @forelse($upcomingLessons[$school->id] ?? [] as $lesson)
     <section class="school-lesson">
         @include('learner.lessons.details', ['lesson' => $lesson, 'hideLogo' => true])

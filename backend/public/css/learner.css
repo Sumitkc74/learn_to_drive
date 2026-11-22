@@ -155,13 +155,19 @@ html,body{overflow-x:clip}
 .terms-agree{display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5}
 .terms-agree input{width:auto;margin-top:4px;flex-shrink:0}
 
-/* Upcoming-class cards: the lesson time leads the card, and the car,
-   instructor and school read as labeled rows (see
-   learner.lessons.details). Theme variables keep it working in dark mode. */
-.lesson-time{display:grid;gap:2px;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:18px}
-.lesson-time strong{font-size:22px;letter-spacing:-.4px}
-.lesson-time span{font-size:13px;color:var(--muted)}
-.lesson-details{display:grid;gap:10px;margin:0 0 20px}
-.lesson-details>div{display:flex;justify-content:space-between;gap:12px}
-.lesson-details dt{color:var(--muted);font-size:14px;font-weight:600}
-.lesson-details dd{margin:0;text-align:right;font-weight:600}
+/* Upcoming-class cards: one compact horizontal row per lesson — time
+   first, then car, instructor, school and price, values only, no labels
+   (see learner.lessons.details). The row wraps on narrow screens with the
+   time keeping its own line. Theme variables keep it working in dark mode. */
+.lesson-list{display:grid;gap:12px}
+.lesson-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.lesson-values{display:flex;align-items:center;gap:24px;flex:1;flex-wrap:wrap;min-width:0}
+.lesson-when{display:flex;flex-direction:column;min-width:170px}
+.lesson-when strong{font-size:18px;letter-spacing:-.3px}
+.lesson-when span{font-size:13px;color:var(--muted)}
+.lesson-car{font-weight:700}
+.lesson-price{font-weight:800;white-space:nowrap}
+.lesson-action{margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.lesson-action p{margin:0}
+.lesson-action details{margin:0}
+@media(max-width:600px){.lesson-row{gap:14px}.lesson-values{gap:12px}.lesson-when{flex-basis:100%}.lesson-action{margin-left:0;width:100%;align-items:stretch}}
