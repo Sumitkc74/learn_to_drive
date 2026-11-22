@@ -111,6 +111,29 @@ class RealContentSeederTest extends TestCase
         $this->assertSame($before, Media::count(), 'A second run must not duplicate media records.');
     }
 
+    public function test_repair_moves_a_stale_protected_media_question_image_to_s3(): void
+    {
+        $this->seed(RealContentSeeder::class);
+        $question = Question::whereHas('media', fn ($q) => $q->where('collection_name', 'question-images'))->first();
+        $this->assertNotNull($question, 'A seeded sign question with an image is expected.');
+
+        // Live state before the move: the row sits on the protected-media
+        // disk and its file is gone (Render wiped the local disk).
+        $question->getMedia('question-images')->first()->forceFill(['disk' => 'protected-media'])->save();
+        Storage::fake('protected-media');
+        Storage::fake('s3');
+        config(['media-library.disk_name' => 's3']);
+
+        // The boot repair must delete the stale row and re-attach the SVG
+        // from the repo to the shared disk — exactly one row, on s3.
+        $this->seed(RealContentSeeder::class);
+        $this->assertSame(1, $question->fresh()->getMedia('question-images')->count());
+        $repaired = $question->fresh()->getMedia('question-images')->first();
+        $this->assertSame('s3', $repaired->disk);
+        $this->assertTrue(Storage::disk('s3')->exists($repaired->getPathRelativeToRoot()));
+        $this->assertSame(0, Media::where('model_type', $question->getMorphClass())->where('model_id', $question->id)->where('disk', 'protected-media')->count());
+    }
+
     public function test_seeder_skips_when_version_is_current(): void
     {
         $this->seed(RealContentSeeder::class);

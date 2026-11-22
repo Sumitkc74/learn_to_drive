@@ -7,7 +7,7 @@
 <article class="card flashcard">
     <span class="badge">{{ __('Card') }} {{ $signs->currentPage() }}</span>
     <img class="flashcard-image" src="{{ $sign->getFirstMedia()->getUrl() }}" alt="{{ __('Traffic sign to identify') }}">
-    <details class="flashcard-answer"><summary>{{ __('Reveal the answer') }}</summary><div><h2>{{ \App\Support\LearnerContent::text($sign,'name') }}</h2>@if(app()->getLocale()==='en' && $sign->nepaliSignName)<p lang="ne">{{ $sign->nepaliSignName }}</p>@endif<p class="prose">{{ $sign->description }}</p><a href="{{ route('learn.detail',['traffic-sign',$sign->id]) }}">{{ __('View sign details →') }}</a></div></details>
+    <details class="flashcard-answer"><summary>{{ __('Reveal the answer') }}</summary><div><h2>{{ \App\Support\LearnerContent::text($sign,'name') }}</h2><p class="prose">{{ $sign->description }}</p><a href="{{ route('learn.detail',['traffic-sign',$sign->id]) }}">{{ __('View sign details →') }}</a></div></details>
     <div class="flashcard-navigation">@if($signs->previousPageUrl())<a class="button secondary" href="{{ $signs->previousPageUrl() }}">{{ __('← Previous') }}</a>@endif @if($signs->nextPageUrl())<a class="button" href="{{ $signs->nextPageUrl() }}">{{ __('Next sign →') }}</a>@else<a class="button" href="{{ route('learn.flashcards') }}">{{ __('Start again ↻') }}</a>@endif</div>
     @unless($signs->hasMorePages())<p class="muted">{{ __('You’ve reached the last available card. Revisit any signs you want to remember.') }}</p>@endunless
 </article>

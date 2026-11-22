@@ -78,7 +78,7 @@ class AdminReviewFixesTest extends TestCase
             ->assertOk()
             ->assertSee('Declined rate proposals: 1')
             ->assertSee('Driving schools')
-            ->assertSee('School lesson payments')
+            ->assertSee('Premium users')
             ->assertSee('Failed AI checks: 1');
     }
 

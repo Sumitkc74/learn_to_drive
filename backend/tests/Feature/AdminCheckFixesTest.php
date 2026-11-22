@@ -107,7 +107,7 @@ class AdminCheckFixesTest extends TestCase
             ->assertSee('Driving schools')
             ->assertSee('Pending schools')
             ->assertSee('Lesson bookings')
-            ->assertSee('School lesson payments')
+            ->assertSee('Premium users')
             ->assertViewHas('operations', fn ($o) => $o['schools'] === 2 && $o['schools_pending'] === 1 && $o['lesson_bookings'] === 1 && $o['school_payments'] === 1 && $o['school_paid_paisa'] === 150000);
     }
 

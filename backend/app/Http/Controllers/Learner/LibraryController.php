@@ -32,7 +32,9 @@ class LibraryController extends \App\Http\Controllers\Controller {
     public function show(string $type,int $id){
         abort_unless(isset(self::TYPES[$type]),404);[$class,$title,$field,$intro]=self::TYPES[$type];
         $query=$class::query();if($type==='notice')$query->visibleToLearners();else $query->with('media');
-        $item=$query->findOrFail($id);return view('learner.detail',compact('type','title','field','item'));
+        $item=$query->findOrFail($id);
+        if($type==='notice' && auth()->check()) \App\Support\NoticeBell::markRead(auth()->id(), $item->id);
+        return view('learner.detail',compact('type','title','field','item'));
     }
     public function account(Request $request){
         $progress=app(\App\Services\LearnerProgress::class)->forUser($request->user()->id);

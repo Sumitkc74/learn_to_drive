@@ -126,7 +126,19 @@ class TutorialThumbnailTest extends TestCase
 
         $this->get(route('learn.detail', ['tutorial', $tutorial->id]))
             ->assertOk()
-            ->assertSee('https://img.youtube.com/vi/BKEkpBmZGiM/hqdefault.jpg', false)
+            ->assertSee('https://www.youtube-nocookie.com/embed/BKEkpBmZGiM', false)
+            ->assertSee('Watch tutorial')
+            ->assertDontSee('https://img.youtube.com/vi/BKEkpBmZGiM/hqdefault.jpg', false);
+    }
+
+    public function test_tutorial_detail_embeds_video_from_shorts_link(): void
+    {
+        $tutorial = $this->tutorial('https://www.youtube.com/shorts/ewnzE-WWGvo');
+
+        $this->get(route('learn.detail', ['tutorial', $tutorial->id]))
+            ->assertOk()
+            ->assertSee('<iframe', false)
+            ->assertSee('https://www.youtube-nocookie.com/embed/ewnzE-WWGvo', false)
             ->assertSee('Watch tutorial');
     }
 
@@ -165,6 +177,8 @@ class TutorialThumbnailTest extends TestCase
         $this->get(route('learn.detail', ['tutorial', $tutorial->id]))
             ->assertOk()
             ->assertDontSee('img.youtube.com')
+            ->assertDontSee('youtube-nocookie.com/embed', false)
+            ->assertDontSee('<iframe', false)
             ->assertDontSee('src=""', false);
     }
 }

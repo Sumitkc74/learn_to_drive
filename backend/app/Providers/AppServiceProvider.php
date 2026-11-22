@@ -52,5 +52,8 @@ class AppServiceProvider extends ServiceProvider
         LearningContentImport::observe(AdminAuditObserver::class);
         PdfQuestionImport::observe(AdminAuditObserver::class);
         PdfExtractionRun::observe(AdminAuditObserver::class);
+        \Illuminate\Support\Facades\View::composer('learner.layout', function ($view) {
+            $view->with('noticeBell', \App\Support\NoticeBell::data());
+        });
     }
 }

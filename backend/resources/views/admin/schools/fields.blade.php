@@ -1,27 +1,27 @@
+<section class="ltd-form-section"><h3 class="ltd-form-section__title">{{ __('School details') }}</h3>
+<div class="row">
 @foreach(['name' => 'School name', 'address' => 'Address', 'phone' => 'Phone', 'email' => 'School email'] as $field => $label)
-<div class="mb-3">
-    <label for="school-{{ $field }}" class="form-label">{{ __($label) }}</label>
-    <input id="school-{{ $field }}" class="form-control" name="{{ $field }}" type="{{ $field === 'email' ? 'email' : 'text' }}"
-        maxlength="{{ $field === 'name' ? 160 : ($field === 'phone' ? 30 : 255) }}"
-        value="{{ old($field, $school?->$field) }}" @required($field === 'name')>
-</div>
+    <div class="col-md-6 form-group">
+        <label for="school-{{ $field }}" class="ltd-field-label">{{ __($label) }} @if($field === 'name')<span class="ltd-required">*</span>@endif</label>
+        <input id="school-{{ $field }}" class="form-control" name="{{ $field }}" type="{{ $field === 'email' ? 'email' : 'text' }}"
+            maxlength="{{ $field === 'name' ? 160 : ($field === 'phone' ? 30 : 255) }}"
+            value="{{ old($field, $school?->$field) }}" @required($field === 'name')>
+    </div>
 @endforeach
-<fieldset class="mb-3">
-    <legend>{{ __('Map location') }}</legend>
-    <p>{{ __('Enter both coordinates to show an approved school on the public map. Leave both blank if its location is not confirmed.') }}</p>
+</div></section>
+<section class="ltd-form-section"><h3 class="ltd-form-section__title">{{ __('Map location') }}</h3>
+<span class="ltd-field-help">{{ __('Enter both coordinates to show an approved school on the public map. Leave both blank if its location is not confirmed.') }}</span>
+<div class="row">
     @foreach(['latitude' => 'Latitude', 'longitude' => 'Longitude'] as $field => $label)
-        <label for="school-{{ $field }}" class="form-label">{{ __($label) }}</label>
-        <input id="school-{{ $field }}" class="form-control mb-2" type="number" step="0.0000001" min="{{ $field === 'latitude' ? -90 : -180 }}" max="{{ $field === 'latitude' ? 90 : 180 }}" name="{{ $field }}" value="{{ old($field, $school?->$field) }}">
+        <div class="col-md-6 form-group">
+            <label for="school-{{ $field }}" class="ltd-field-label">{{ __($label) }}</label>
+            <input id="school-{{ $field }}" class="form-control" type="number" step="0.0000001" min="{{ $field === 'latitude' ? -90 : -180 }}" max="{{ $field === 'latitude' ? 90 : 180 }}" name="{{ $field }}" value="{{ old($field, $school?->$field) }}">
+        </div>
     @endforeach
-    <p>{{ __('Approved school names, addresses, phone numbers and map locations are public. Owner and member details remain private.') }}</p>
-</fieldset>
-<fieldset class="mb-3">
-    <legend>{{ __('School logo and photos') }}</legend>
-    <p>{{ __('The logo and gallery show on the public school listing once the school is approved. Images: JPEG, PNG or WebP, up to :imageLimit MB each. Videos: MP4 or WebM, up to :videoLimit MB each. At most :max gallery items per school.', ['imageLimit' => (int) (\App\Models\AppSetting::imageLimitKb() / 1024), 'videoLimit' => (int) (\App\Models\AppSetting::videoLimitKb() / 1024), 'max' => \App\Support\SchoolMedia::GALLERY_MAX_ITEMS]) }}</p>
-    <label for="school-logo" class="form-label">{{ __('Logo (optional)') }}</label>
-    <input id="school-logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="form-control mb-3">
-    <label for="school-gallery-images" class="form-label">{{ __('Gallery photos (optional)') }}</label>
-    <input id="school-gallery-images" type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple class="form-control mb-3">
-    <label for="school-gallery-videos" class="form-label">{{ __('Gallery videos (optional)') }}</label>
-    <input id="school-gallery-videos" type="file" name="gallery_videos[]" accept="video/mp4,video/webm" multiple class="form-control mb-3">
-</fieldset>
+</div>
+<span class="ltd-field-help">{{ __('Approved school names, addresses, phone numbers and map locations are public. Owner and member details remain private.') }}</span></section>
+<section class="ltd-form-section"><h3 class="ltd-form-section__title">{{ __('School logo and photos') }}</h3>
+<span class="ltd-field-help">{{ __('The logo and gallery show on the public school listing once the school is approved. Images: JPEG, PNG or WebP, up to :imageLimit MB each. Videos: MP4 or WebM, up to :videoLimit MB each. At most :max gallery items per school.', ['imageLimit' => (int) (\App\Models\AppSetting::imageLimitKb() / 1024), 'videoLimit' => (int) (\App\Models\AppSetting::videoLimitKb() / 1024), 'max' => \App\Support\SchoolMedia::GALLERY_MAX_ITEMS]) }}</span>
+<div class="form-group"><label for="school-logo" class="ltd-field-label">{{ __('Logo (optional)') }}</label><input id="school-logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="form-control"></div>
+<div class="form-group"><label for="school-gallery-images" class="ltd-field-label">{{ __('Gallery photos (optional)') }}</label><input id="school-gallery-images" type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple class="form-control"></div>
+<div class="form-group mb-0"><label for="school-gallery-videos" class="ltd-field-label">{{ __('Gallery videos (optional)') }}</label><input id="school-gallery-videos" type="file" name="gallery_videos[]" accept="video/mp4,video/webm" multiple class="form-control"></div></section>

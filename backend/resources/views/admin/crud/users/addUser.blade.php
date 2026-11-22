@@ -2,10 +2,7 @@
 @section('title', 'Add User')
 @section('content')
 <div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">User Management</span><h1>Add User</h1></div></div>
-<div class="ltd-form-shell">
-    <form class="ltd-form-card" action="{{ route('insertUser') }}" method="POST" enctype="multipart/form-data" data-add-form>
-        @csrf
-        <div class="ltd-form-card__intro"><i class="fas fa-user-plus"></i><div><h2>Create a user account</h2><p>Enter account details and assign only the access level this person needs.</p></div></div>
+<x-admin.form-card :action="route('insertUser')" intro-icon="fas fa-user-plus" intro-title="Create a user account" intro-text="Enter account details and assign only the access level this person needs." :cancel-url="route('allUser')" submit-label="Add User" submit-icon="fas fa-user-plus">
         <div class="ltd-form-card__body">
             <section class="ltd-form-section"><h3 class="ltd-form-section__title">Personal information</h3><div class="row">
                 <div class="col-md-6 form-group"><label class="ltd-field-label" for="name">Full name <span class="ltd-required">*</span></label><input id="name" name="name" value="{{ old('name') }}" maxlength="255" autocomplete="name" class="form-control @error('name') is-invalid @enderror" required>@error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
@@ -19,8 +16,6 @@
             </div></section>
             <section class="ltd-form-section"><h3 class="ltd-form-section__title">Profile photo <span class="text-muted">(optional)</span></h3><div class="ltd-file-field"><input type="file" name="profileImage" accept=".jpg,.jpeg,.png,.webp" data-image-input="#userImagePreview" class="form-control-file @error('profileImage') is-invalid @enderror">@error('profileImage')<div class="text-danger small mt-2">{{ $message }}</div>@enderror<span class="ltd-field-help">JPEG, PNG or WebP up to 2 MB. The default avatar is used when no photo is selected.</span><img id="userImagePreview" class="ltd-image-preview has-image" src="{{ asset('dist/img/avatar.png') }}" alt="Profile photo preview"></div></section>
         </div>
-        <div class="ltd-form-actions"><a href="{{ route('allUser') }}" class="btn btn-outline-secondary">Cancel</a><button class="btn btn-primary" type="submit" data-submit-button><i class="fas fa-user-plus mr-2"></i>Add User</button></div>
-    </form>
-</div>
+</x-admin.form-card>
 @endsection
 @section('page-script')@include('admin.crud.partials.add-form-script')@endsection

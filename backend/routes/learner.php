@@ -90,6 +90,7 @@ Route::prefix('learn')->name('learn.')->group(function () {
         Route::put('settings/password',[\App\Http\Controllers\Learner\SettingsController::class,'password'])->middleware('throttle:5,1')->name('settings.password');
         Route::get('account',[LibraryController::class,'account'])->name('account');
         Route::get('saved',[\App\Http\Controllers\Learner\BookmarkController::class,'index'])->name('saved');
+        Route::post('notices/read-all',[\App\Http\Controllers\Learner\NoticeBellController::class,'markAllRead'])->middleware('throttle:10,1')->name('notices.read-all');
         Route::post('saved/{type}/{id}',[\App\Http\Controllers\Learner\BookmarkController::class,'store'])->whereNumber('id')->middleware('throttle:30,1')->name('saved.store');
         Route::delete('saved/{id}',[\App\Http\Controllers\Learner\BookmarkController::class,'destroy'])->whereNumber('id')->name('saved.destroy');
         Route::patch('practice/{id}/draft',[PracticeController::class,'saveDraft'])->whereNumber('id')->middleware('throttle:60,1')->name('practice.draft');

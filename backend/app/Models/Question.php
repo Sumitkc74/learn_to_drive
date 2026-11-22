@@ -48,7 +48,7 @@ class Question extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('question-images')->useDisk('protected-media');
+        $this->addMediaCollection('question-images');
     }
 
     protected $appends = ['image_url'];

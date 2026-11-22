@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\TrafficSign;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class LearnerLanguageTest extends TestCase
@@ -48,6 +50,23 @@ class LearnerLanguageTest extends TestCase
         $this->actingAs(User::factory()->create(['is_active'=>true]));
         $this->get(route('learn.support'))->assertSee('value="Complaint"',false)->assertSee('गुनासो');
         $this->get(route('learn.settings'))->assertOk()->assertSee('खाता सेटिङहरू');
+    }
+
+    public function test_english_sign_pages_hide_nepali_name_and_nepali_pages_show_it(): void
+    {
+        Storage::fake('public');
+        $sign = TrafficSign::create(['name' => 'Petrol pump', 'nepaliSignName' => 'पेट्रोल पम्प', 'description' => 'This information sign tells you a filling station is nearby.', 'image' => '']);
+        $sign->addMedia(UploadedFile::fake()->image('sign.png'))->toMediaCollection('default', 'public');
+
+        $this->get(route('learn.detail', ['traffic-sign', $sign->id]))
+            ->assertOk()->assertSee('Petrol pump')->assertDontSee('पेट्रोल पम्प');
+        $this->get(route('learn.flashcards'))
+            ->assertOk()->assertSee('Petrol pump')->assertDontSee('पेट्रोल पम्प');
+
+        $this->withSession(['learner_locale' => 'ne'])->get(route('learn.detail', ['traffic-sign', $sign->id]))
+            ->assertOk()->assertSee('पेट्रोल पम्प');
+        $this->get(route('learn.flashcards'))
+            ->assertOk()->assertSee('पेट्रोल पम्प');
     }
 
     public function test_nepali_resource_title_uses_saved_translation(): void

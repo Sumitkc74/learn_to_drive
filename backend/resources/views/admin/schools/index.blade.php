@@ -19,9 +19,9 @@
     <p>{{ __('Schools start pending. You can assign an existing account as owner now, or leave it blank and add an owner later — then review and approve the school.') }}</p>
     <form method="post" action="{{ route('admin.schools.store') }}" enctype="multipart/form-data">@csrf
         @include('admin.schools.fields', ['school' => null])
-        <label for="owner-email" class="form-label">{{ __('Owner account email (optional)') }}</label>
+        <label for="owner-email" class="ltd-field-label">{{ __('Owner account email (optional)') }}</label>
         <input id="owner-email" type="email" name="owner_email" value="{{ old('owner_email') }}" class="form-control mb-3" maxlength="255">
-        <button class="btn btn-primary">{{ __('Create school') }}</button>
+        <div class="ltd-form-actions"><button class="btn btn-primary">{{ __('Create school') }}</button></div>
     </form>
 </details>
 @endsection

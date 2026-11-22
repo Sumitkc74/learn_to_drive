@@ -959,6 +959,9 @@ body.ltd-body {
 }
 
 .ltd-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -966,6 +969,23 @@ body.ltd-body {
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--border);
     background: var(--bg);
+}
+
+.ltd-current-image {
+    display: block;
+    max-width: 240px;
+    max-height: 160px;
+    margin-bottom: 0.75rem;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.ltd-translation-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
 }
 
 @media (max-width: 576px) {

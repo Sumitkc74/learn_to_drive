@@ -30,8 +30,43 @@ class AdminAddItemPagesTest extends TestCase
                 ->get(route($route))
                 ->assertOk()
                 ->assertSee('data-add-form', false)
-                ->assertSee('ltd-form-card', false);
+                ->assertSee('ltd-form-card', false)
+                ->assertSee('ltd-form-actions', false)
+                ->assertSee('ltd-form-section__title', false)
+                ->assertSee('data-submit-button', false);
         }
+    }
+
+    public function test_add_pages_use_titled_sections_and_a_consistent_submit_action(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin']);
+
+        $this->actingAs($admin)->get(route('addTutorial'))
+            ->assertOk()
+            ->assertSee('Tutorial details')
+            ->assertSee('Add Tutorial');
+
+        $this->actingAs($admin)->get(route('addVisionTest'))
+            ->assertOk()
+            ->assertSee('Test details')
+            ->assertSee('Add Vision Test');
+
+        $this->actingAs($admin)->get(route('addNotice'))
+            ->assertOk()
+            ->assertSee('Add Notice');
+    }
+
+    public function test_schools_index_create_form_uses_the_shared_section_layout(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin']);
+
+        $this->actingAs($admin)->get(route('admin.schools.index'))
+            ->assertOk()
+            ->assertSee('ltd-form-section__title', false)
+            ->assertSee('School details')
+            ->assertSee('Map location')
+            ->assertSee('School logo and photos')
+            ->assertSee('Create school');
     }
 
     public function test_tutorial_rejects_an_invalid_video_url_but_not_a_missing_thumbnail(): void

@@ -1006,5 +1006,8 @@
   "Only the addressed instructor can respond to this request.": "यो अनुरोधमा सम्बन्धित प्रशिक्षकले मात्र जवाफ दिन सक्नुहुन्छ।",
   "This request is no longer pending.": "यो अनुरोध अब विचाराधीन छैन।",
   "The learner already has a booking at this time.": "यो समयमा शिक्षार्थीको अर्को बुकिङ छ।",
-  "Choose an instructor and vehicle, then request a time. The instructor sets the price when they accept.": "प्रशिक्षक र सवारी साधन छान्नुहोस्, त्यसपछि समय अनुरोध गर्नुहोस्। स्वीकार गर्दा प्रशिक्षकले मूल्य तोक्नुहुन्छ।"
+  "Choose an instructor and vehicle, then request a time. The instructor sets the price when they accept.": "प्रशिक्षक र सवारी साधन छान्नुहोस्, त्यसपछि समय अनुरोध गर्नुहोस्। स्वीकार गर्दा प्रशिक्षकले मूल्य तोक्नुहुन्छ।",
+  "Notifications": "सूचनाहरू",
+  "View all notices": "सबै सूचनाहरू हेर्नुहोस्",
+  "No notices yet.": "अहिलेसम्म कुनै सूचना छैन।"
 }

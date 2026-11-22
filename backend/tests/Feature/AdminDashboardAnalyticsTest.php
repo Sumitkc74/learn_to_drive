@@ -21,7 +21,7 @@ class AdminDashboardAnalyticsTest extends TestCase
         $this->actingAs($admin)->get(route('adminDashboard'))
             ->assertOk()
             ->assertSee('Total users')
-            ->assertSee('Published questions')
+            ->assertSee('Premium users')
             ->assertSee('Start here')
             ->assertSee('Respond to users')
             ->assertDontSee('Quick Actions')

@@ -60,7 +60,7 @@ class LearnerStudyToolsTest extends TestCase
         $this->assertSame(1,LearnerBookmark::count());$bookmark=LearnerBookmark::firstOrFail();
         $this->get(route('learn.saved'))->assertSee('Public notice');
         $this->actingAs(User::factory()->create(['is_active'=>true]))->delete(route('learn.saved.destroy',$bookmark))->assertNotFound();
-        $this->get(route('learn.saved'))->assertDontSee('Public notice');
+        $this->get(route('learn.saved'))->assertSee('Open a resource and choose Save resource to keep it here.')->assertDontSee('Remove from saved');
         $notice->update(['status'=>'Archived']);$this->actingAs($user);
         $this->post($url)->assertNotFound();
         $this->get(route('learn.saved'))->assertDontSee('Public notice')->assertSee('This saved resource is no longer available.');
