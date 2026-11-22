@@ -13,22 +13,23 @@ class DrivingLessonController extends Controller
     public function index(Request $request)
     {
         $data = $request->validate(['transmission' => ['nullable', Rule::in(['Manual', 'Automatic'])],
-            'date' => ['nullable', 'date_format:Y-m-d'], 'q' => ['nullable', 'string', 'max:100'],
+            'date' => ['nullable', 'date_format:Y-m-d'], 'car' => ['nullable', 'string', 'max:100'],
+            'instructor' => ['nullable', 'string', 'max:100'],
             'school' => ['nullable', 'integer', 'min:1'], 'availability'=>['nullable','in:available,booked']]);
         $school = isset($data['school']) ? \App\Models\DrivingSchool::where('status', 'Approved')->findOrFail($data['school']) : null;
+        $schools = \App\Models\DrivingSchool::where('status', 'Approved')->orderBy('name')->get(['id', 'name']);
         $lessons = DrivingLesson::availableProvider()->where('cancelled', false)->where('starts_at', '>', now())
             ->when(($data['availability']??'available')==='booked',fn($q)=>$q->whereHas('bookings',fn($b)=>$b->where('status','Booked')),fn($q)=>$q->whereDoesntHave('bookings',fn($b)=>$b->where('status','Booked')))
             ->when($school, fn ($q) => $q->whereHas('vehicle', fn ($v) => $v->where('driving_school_id', $school->id)))
             ->when($data['transmission'] ?? null, fn ($q, $type) => $q->whereHas('vehicle', fn ($v) => $v->where('transmission', $type)))
-            ->when($data['q'] ?? null, fn ($q, $search) => $q->whereHas('vehicle', fn ($v) => $v
-                ->where('name', 'like', '%'.$search.'%')->orWhereHas('instructor', fn ($u) => $u->where('name', 'like', '%'.$search.'%'))
-                ->orWhereHas('school', fn ($s) => $s->where('name', 'like', '%'.$search.'%'))))
+            ->when($data['car'] ?? null, fn ($q, $car) => $q->whereHas('vehicle', fn ($v) => $v->where('name', 'like', '%'.$car.'%')))
+            ->when($data['instructor'] ?? null, fn ($q, $name) => $q->whereHas('vehicle', fn ($v) => $v->whereHas('instructor', fn ($u) => $u->where('name', 'like', '%'.$name.'%'))))
             ->when($data['date'] ?? null, function ($q, $date) {
                 $start = \Carbon\Carbon::parse($date, 'Asia/Kathmandu')->startOfDay()->utc();
                 $q->where('starts_at', '>=', $start)->where('starts_at', '<', $start->copy()->addDay());
             })->with(['vehicle.school.media', 'vehicle.instructor'])->orderBy('starts_at')->paginate(12)->withQueryString();
         $waiting=$request->user()?\Illuminate\Support\Facades\DB::table('lesson_waitlist')->where('user_id',$request->user()->id)->whereIn('driving_lesson_id',$lessons->pluck('id'))->pluck('status','driving_lesson_id'):collect();
-        return view('learner.lessons.index', compact('lessons', 'school','waiting'));
+        return view('learner.lessons.index', compact('lessons', 'school', 'schools', 'waiting'));
     }
 
     public function bookings(Request $request)

@@ -6,10 +6,11 @@
 @if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View lessons from all schools') }}</a></p>@endif
 @auth<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endauth
 <form method="get" class="card stack">
-    @if($school)<input type="hidden" name="school" value="{{ $school->id }}">@endif
-    <label>{{ __('Instructor, car or school') }}<input name="q" value="{{ request('q') }}" maxlength="100"></label>
-    <label>{{ __('Availability') }}<select name="availability"><option value="available">{{ __('Available') }}</option><option value="booked" @selected(request('availability')==='booked')>{{ __('Booked — join waitlist') }}</option></select></label>
+    <label>{{ __('Institute') }}<select name="school"><option value="">{{ __('All institutes') }}</option>@foreach($schools as $s)<option value="{{ $s->id }}" @selected(request('school') == $s->id)>{{ $s->name }}</option>@endforeach</select></label>
     <label>{{ __('Date (Nepal time)') }}<input type="date" name="date" value="{{ request('date') }}"></label>
+    <label>{{ __('Car') }}<input name="car" value="{{ request('car') }}" maxlength="100"></label>
+    <label>{{ __('Instructor') }}<input name="instructor" value="{{ request('instructor') }}" maxlength="100"></label>
+    <label>{{ __('Availability') }}<select name="availability"><option value="available">{{ __('Available') }}</option><option value="booked" @selected(request('availability')==='booked')>{{ __('Booked — join waitlist') }}</option></select></label>
     <label>{{ __('Transmission') }}<select name="transmission"><option value="">{{ __('All') }}</option>@foreach(['Manual','Automatic'] as $type)<option value="{{ $type }}" @selected(request('transmission') === $type)>{{ __($type) }}</option>@endforeach</select></label>
     <div><button class="button">{{ __('Search') }}</button> <a href="{{ route('learn.lessons', $school ? ['school' => $school->id] : []) }}">{{ __('Clear') }}</a></div>
 </form>

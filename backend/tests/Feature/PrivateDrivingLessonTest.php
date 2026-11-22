@@ -145,7 +145,7 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee(route('learn.lessons', ['school' => $school->id]), false);
         $this->get(route('learn.lessons', ['school' => $school->id]))->assertOk()
             ->assertSee('Selected school car')->assertDontSee('Other school car')
-            ->assertSee('name="school" value="'.$school->id.'"', false);
+            ->assertSee('<option value="'.$school->id.'" selected>', false);
         $school->update(['status' => 'Suspended']);
         $this->get(route('learn.lessons', ['school' => $school->id]))->assertNotFound();
     }
@@ -171,5 +171,59 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee($teacher->name)
             ->assertSee($car->registration)
             ->assertSee('Nepal time');
+    }
+
+    public function test_institute_dropdown_lists_approved_schools_and_filters_classes(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
+        $otherSchool->update(['name' => 'Zebra Academy']);
+        $car->update(['name' => 'Selected school car']);
+        $otherCar->update(['name' => 'Other school car']);
+        $this->get(route('learn.lessons'))->assertOk()
+            ->assertSee('<select name="school">', false)
+            ->assertSee('All institutes')
+            ->assertSee('Lesson Academy')
+            ->assertSee('Zebra Academy');
+        $this->get(route('learn.lessons', ['school' => $otherSchool->id]))->assertOk()
+            ->assertSee('Other school car')->assertDontSee('Selected school car')
+            ->assertSee('<option value="'.$otherSchool->id.'" selected>', false);
+    }
+
+    public function test_search_by_car_returns_only_matching_lessons(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
+        $car->update(['name' => 'Red Hatchback']);
+        $otherCar->update(['name' => 'Blue Sedan']);
+        $this->get(route('learn.lessons', ['car' => 'Hatchback']))->assertOk()
+            ->assertSee('Red Hatchback')->assertDontSee('Blue Sedan');
+    }
+
+    public function test_search_by_instructor_returns_only_matching_lessons(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
+        $teacher->update(['name' => 'Asha Sharma']);
+        $otherTeacher->update(['name' => 'Bikash Thapa']);
+        $this->get(route('learn.lessons', ['instructor' => 'Asha']))->assertOk()
+            ->assertSee('Asha Sharma')->assertDontSee('Bikash Thapa');
+    }
+
+    public function test_search_by_date_returns_only_that_days_lessons(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
+        $car->update(['name' => 'Day car']);
+        $otherCar->update(['name' => 'Other day car']);
+        // Move the other lesson to a different day so the date filter can tell them apart.
+        $otherLesson = DrivingLesson::where('lesson_vehicle_id', $otherCar->id)->firstOrFail();
+        $otherLesson->update(['starts_at' => now()->addDays(5), 'ends_at' => now()->addDays(5)->addHour()]);
+        $day = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('Y-m-d');
+        $otherDay = $otherLesson->starts_at->copy()->timezone('Asia/Kathmandu')->format('Y-m-d');
+        $this->get(route('learn.lessons', ['date' => $day]))->assertOk()
+            ->assertSee('Day car')->assertDontSee('Other day car');
+        $this->get(route('learn.lessons', ['date' => $otherDay]))->assertOk()
+            ->assertSee('Other day car')->assertDontSee('Day car');
     }
 }
