@@ -58,7 +58,12 @@
                             <label for="role" class="col-md-4 col-form-label text-md-end">{{ __('Role') }}</label>
 
                             <div class="col-md-6">
-                                <input id="role" type="text" class="form-control @error('role') is-invalid @enderror" name="role"  value="{{ old('role') }}" required>
+                                <select id="role" class="form-control @error('role') is-invalid @enderror" name="role" required>
+                                    <option value="" disabled {{ old('role') ? '' : 'selected' }}>{{ __('Choose a role') }}</option>
+                                    <option value="User" {{ old('role') === 'User' ? 'selected' : '' }}>{{ __('User') }}</option>
+                                    <option value="PremiumUser" {{ old('role') === 'PremiumUser' ? 'selected' : '' }}>{{ __('Premium User') }}</option>
+                                    <option value="Admin" {{ old('role') === 'Admin' ? 'selected' : '' }}>{{ __('Admin') }}</option>
+                                </select>
 
                                 @error('role')
                                     <span class="invalid-feedback" role="alert">

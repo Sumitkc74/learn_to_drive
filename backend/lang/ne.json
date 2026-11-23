@@ -1055,5 +1055,10 @@
   "This file is larger than :limit MB.": "यो फाइल :limit MB भन्दा ठूलो छ।",
   "Change profile photo": "प्रोफाइल फोटो परिवर्तन गर्नुहोस्",
   "Save photo": "फोटो सेभ गर्नुहोस्",
-  "Selected files": "छानिएका फाइलहरू"
+  "Selected files": "छानिएका फाइलहरू",
+  "Role": "भूमिका",
+  "Choose a role": "भूमिका छान्नुहोस्",
+  "User": "प्रयोगकर्ता",
+  "Premium User": "प्रिमियम प्रयोगकर्ता",
+  "Admin": "प्रशासक"
 }
