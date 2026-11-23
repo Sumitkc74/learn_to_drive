@@ -1,6 +1,6 @@
 <?php
 // School web and mobile workflows use the same controller and authorization rules.
-\Illuminate\Support\Facades\Route::prefix('school-centre')->middleware(['auth:sanctum', \App\Http\Middleware\MobileLearner::class, 'throttle:60,1'])->group(function () {
+\Illuminate\Support\Facades\Route::prefix('school-centre')->middleware([\App\Http\Middleware\ForceJsonResponse::class, 'auth:sanctum', \App\Http\Middleware\MobileLearner::class, 'throttle:60,1'])->group(function () {
     $progress=\App\Http\Controllers\School\ProgressController::class;
     \Illuminate\Support\Facades\Route::get('{school}/report',[$progress,'report'])->whereNumber('school');
     \Illuminate\Support\Facades\Route::get('{school}/students/{student}/readiness',[$progress,'readiness'])->whereNumber('school')->whereNumber('student');
@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-Route::prefix('learner')->middleware(\App\Http\Middleware\MobileLearner::class)->group(function () {
+Route::prefix('learner')->middleware([\App\Http\Middleware\ForceJsonResponse::class, \App\Http\Middleware\MobileLearner::class])->group(function () {
     $controller = \App\Http\Controllers\API\LearnerController::class;
     $practice = \App\Http\Controllers\Learner\PracticeController::class;
     Route::get('catalog', [$controller,'catalog']);
