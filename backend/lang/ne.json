@@ -1079,5 +1079,18 @@
   ":count tutorial deleted.|:count tutorials deleted.": ":count ट्युटोरियल मेटियो।|:count ट्युटोरियलहरू मेटिए।",
   ":count notice moved to Trash.|:count notices moved to Trash.": ":count सूचना Trash मा सारियो।|:count सूचनाहरू Trash मा सारिए।",
   ":count traffic sign deleted.|:count traffic signs deleted.": ":count ट्राफिक चिन्ह मेटियो।|:count ट्राफिक चिन्हहरू मेटिए।",
-  ":count vision test deleted.|:count vision tests deleted.": ":count दृष्टि परीक्षण मेटियो।|:count दृष्टि परीक्षणहरू मेटिए।"
+  ":count vision test deleted.|:count vision tests deleted.": ":count दृष्टि परीक्षण मेटियो।|:count दृष्टि परीक्षणहरू मेटिए।",
+  "Correct option": "सही विकल्प",
+  "No video": "भिडियो छैन",
+  "No thumbnail": "थम्बनेल छैन",
+  "No image": "तस्बिर छैन",
+  "Labels": "लेबलहरू",
+  "Dates": "मितिहरू",
+  "Published": "प्रकाशित",
+  "Expires": "समाप्त हुने",
+  "No expiration": "म्याद छैन",
+  "Immediately": "तुरुन्तै",
+  "Vision test": "दृष्टि परीक्षण",
+  "PDF unavailable": "PDF उपलब्ध छैन",
+  "Watch": "हेर्नुहोस्"
 }

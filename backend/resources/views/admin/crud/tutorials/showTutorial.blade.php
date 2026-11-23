@@ -34,15 +34,14 @@
         ])
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle ltd-list-table">
                 <thead>
                 <tr>
                     <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                     <th>ID</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Video Link</th>
-                    <th>Image</th>
+                    <th>Thumbnail</th>
+                    <th>Tutorial</th>
+                    <th>Video</th>
                     <th>Added by</th>
                     <th>Action</th>
                 </tr>
@@ -50,20 +49,24 @@
                 <tbody>
                     @foreach ($tutorials as $row)
                     <tr>
-                        <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
-                        <td>{{ $row->id }}</td>
-                        <td>{{ $row->title }}</td>
-                        <td>{{ $row->description }}</td>
-                        <td>{{ $row->videoLink }}</td>
-                        <td>@if($url=$row->thumbnailUrl())<img src="{{ $url }}" width="70" height="70" style="object-fit:cover;border-radius:8px" alt="">@else<span class="text-muted">No thumbnail</span>@endif</td>
+                        <td class="ltd-col-narrow"><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
+                        <td class="ltd-id">{{ $row->id }}</td>
+                        <td class="ltd-col-narrow">@if($url=$row->thumbnailUrl())<img src="{{ $url }}" class="ltd-thumb ltd-thumb--wide" alt="">@else<span class="text-muted small">{{ __('No thumbnail') }}</span>@endif</td>
+                        <td class="ltd-col-wide">
+                            <span class="ltd-lead ltd-clamp-2" title="{{ $row->title }}">{{ $row->title }}</span>
+                            @if($row->description)<span class="ltd-sub ltd-clamp-2" title="{{ $row->description }}">{{ $row->description }}</span>@endif
+                        </td>
+                        <td class="ltd-col-narrow">@if($row->videoLink)<a href="{{ $row->videoLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger" title="{{ $row->videoLink }}"><i class="fab fa-youtube"></i> {{ __('Watch') }}</a>@else<span class="text-muted small">{{ __('No video') }}</span>@endif</td>
                         <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
-                            <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <form action="{{ route('deleteTutorial', $row->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this tutorial?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
-                            </form>
+                            <div class="ltd-actions">
+                                <a href="{{ URL::to('/admin/edit-tutorial/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                <form action="{{ route('deleteTutorial', $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this tutorial?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

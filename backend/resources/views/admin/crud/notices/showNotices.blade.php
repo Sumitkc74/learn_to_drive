@@ -37,16 +37,14 @@
         ])
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle ltd-list-table">
                 <thead>
                 <tr>
                     <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                     <th>ID</th>
-                    <th>Title</th>
-                    <th>Nepali Title</th>
+                    <th>Notice</th>
                     <th>Status</th>
-                    <th>Publish date</th>
-                    <th>Expires</th>
+                    <th>{{ __('Dates') }}</th>
                     <th>Added by</th>
                     <th>Action</th>
                 </tr>
@@ -54,22 +52,28 @@
                 <tbody>
                     @foreach ($notices as $row)
                     <tr>
-                        <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
-                        <td>{{ $row->id }}</td>
-                        <td>{{ $row->title }}</td>
-                        <td>{{ $row->nepaliTitle }}</td>
+                        <td class="ltd-col-narrow"><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
+                        <td class="ltd-id">{{ $row->id }}</td>
+                        <td class="ltd-col-wide">
+                            <span class="ltd-lead ltd-clamp-2" title="{{ $row->title }}">{{ $row->title }}</span>
+                            @if($row->nepaliTitle)<span class="ltd-sub ltd-clamp-1" title="{{ $row->nepaliTitle }}">{{ $row->nepaliTitle }}</span>@endif
+                        </td>
                         <td><span class="badge badge-{{ $row->publication_state === 'Active' ? 'success' : ($row->publication_state === 'Scheduled' ? 'info' : ($row->publication_state === 'Draft' ? 'secondary' : 'dark')) }}">{{ $row->publication_state }}</span></td>
-                        <td>{{ $row->publish_at?->format('M j, Y g:i A') ?? 'Immediately' }}</td>
-                        <td>{{ $row->expires_at?->format('M j, Y g:i A') ?? 'No expiration' }}</td>
+                        <td class="ltd-col-narrow">
+                            <span class="d-block small">{{ __('Published') }}: {{ $row->publish_at?->format('M j, Y g:i A') ?? __('Immediately') }}</span>
+                            <span class="d-block small text-muted">{{ __('Expires') }}: {{ $row->expires_at?->format('M j, Y g:i A') ?? __('No expiration') }}</span>
+                        </td>
                         <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
-                            <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <form action="{{ route($row->status === 'Archived' ? 'noticeUnarchive' : 'noticeArchive', $row->id) }}" method="POST" class="d-inline">@csrf @method('PATCH')<button class="btn btn-sm btn-outline-secondary">{{ $row->status === 'Archived' ? 'Restore as draft' : 'Archive' }}</button></form>
-                            <form action="{{ route('deleteNotice' , $row->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Move this notice to Trash?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
-                            </form>
+                            <div class="ltd-actions">
+                                <a href="{{ URL::to('/admin/edit-notice/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                <form action="{{ route($row->status === 'Archived' ? 'noticeUnarchive' : 'noticeArchive', $row->id) }}" method="POST" class="d-inline">@csrf @method('PATCH')<button class="btn btn-sm btn-outline-secondary">{{ $row->status === 'Archived' ? 'Restore as draft' : 'Archive' }}</button></form>
+                                <form action="{{ route('deleteNotice' , $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Move this notice to Trash?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

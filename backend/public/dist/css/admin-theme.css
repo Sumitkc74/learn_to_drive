@@ -759,6 +759,71 @@ body.ltd-body {
     color: var(--text-muted) !important;
 }
 
+/* ---------- Redesigned admin list tables ----------
+   One shared base; each list picks its own column mix in its view, so a
+   text-heavy list (questions) reads differently from an image-led one
+   (traffic signs, vision tests) or a document list (banks, exam info). */
+.ltd-list-table tbody td {
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+}
+.ltd-list-table thead th {
+    white-space: nowrap;
+}
+.ltd-list-table .ltd-id {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    white-space: nowrap;
+}
+.ltd-list-table .ltd-lead {
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.ltd-list-table .ltd-sub {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+.ltd-list-table .ltd-clamp-1,
+.ltd-list-table .ltd-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.ltd-list-table .ltd-clamp-1 { -webkit-line-clamp: 1; }
+.ltd-list-table .ltd-clamp-2 { -webkit-line-clamp: 2; }
+.ltd-list-table .ltd-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+.ltd-list-table .ltd-thumb {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface-secondary);
+}
+.ltd-list-table .ltd-thumb--wide {
+    width: 96px;
+    height: 54px;
+}
+.ltd-list-table .ltd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.ltd-list-table .ltd-actions .btn { white-space: nowrap; }
+.ltd-list-table .ltd-col-narrow { white-space: nowrap; }
+.ltd-list-table .ltd-col-wide { min-width: 320px; }
+.ltd-list-table .ltd-cell-text { min-width: 0; }
+
 .ltd-creator {
     display: flex;
     align-items: center;

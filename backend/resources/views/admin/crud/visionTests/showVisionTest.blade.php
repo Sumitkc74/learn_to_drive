@@ -33,13 +33,13 @@
         ])
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle ltd-list-table">
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                         <th>ID</th>
-                        <th>Test Number</th>
-                        <th>Image</th>
+                        <th>Plate</th>
+                        <th>Test</th>
                         <th>Added by</th>
                         <th>Action</th>
                     </tr>
@@ -47,18 +47,23 @@
                 <tbody>
                     @foreach ($visionTests as $row)
                         <tr>
-                            <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
-                            <td>{{ $row->id }}</td>
-                            <td>{{ $row->testNumber }}</td>
-                            <td><img src="{{ $row->getFirstMediaUrl() }}" alt="Vision test {{ $row->testNumber }}" width="100"></td>
+                            <td class="ltd-col-narrow"><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
+                            <td class="ltd-id">{{ $row->id }}</td>
+                            <td class="ltd-col-narrow">@if($row->getFirstMediaUrl())<img src="{{ $row->getFirstMediaUrl() }}" alt="Vision test {{ $row->testNumber }}" class="ltd-thumb">@else<span class="text-muted small">{{ __('No image') }}</span>@endif</td>
+                            <td>
+                                <span class="ltd-lead d-block" style="font-size:1.15rem">{{ $row->testNumber }}</span>
+                                <span class="ltd-sub">{{ __('Vision test') }}</span>
+                            </td>
                             <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                             <td>
-                                <a href="{{ route('editVisionTest', $row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                                <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this vision test?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
-                                </form>
+                                <div class="ltd-actions">
+                                    <a href="{{ route('editVisionTest', $row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                    <form action="{{ route('deleteVisionTest', $row->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this vision test?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

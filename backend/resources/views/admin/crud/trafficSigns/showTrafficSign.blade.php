@@ -39,15 +39,14 @@
         ])
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle ltd-list-table">
                 <thead>
                 <tr>
                     <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                     <th>ID</th>
+                    <th>Sign</th>
                     <th>Traffic Sign</th>
-                    <th>Nepali Sign Name</th>
                     <th>Description</th>
-                    <th>Image</th>
                     <th>Added by</th>
                     <th>Action</th>
                 </tr>
@@ -55,20 +54,24 @@
                 <tbody>
                     @foreach ($trafficSigns as $row)
                     <tr>
-                        <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
-                        <td>{{ $row->id }}</td>
-                        <td>{{ $row->name }}</td>
-                        <td>{{ $row->nepaliSignName }}</td>
-                        <td>{{ $row->description }}</td>
-                        <td><img src="{{ $row->getFirstMediaUrl() }}" width="70" height="70" style="object-fit:cover;border-radius:8px"></td>
+                        <td class="ltd-col-narrow"><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
+                        <td class="ltd-id">{{ $row->id }}</td>
+                        <td class="ltd-col-narrow">@if($row->getFirstMediaUrl())<img src="{{ $row->getFirstMediaUrl() }}" class="ltd-thumb" alt="{{ $row->name }}">@else<span class="text-muted small">{{ __('No image') }}</span>@endif</td>
+                        <td class="ltd-col-wide">
+                            <span class="ltd-lead d-block">{{ $row->name }}</span>
+                            @if($row->nepaliSignName)<span class="ltd-sub">{{ $row->nepaliSignName }}</span>@endif
+                        </td>
+                        <td class="ltd-col-wide"><span class="ltd-clamp-2" title="{{ $row->description }}">{{ $row->description }}</span></td>
                         <td>@include('admin.crud.partials.creator', ['record' => $row])</td>
                         <td>
-                            <a href="{{ URL::to('/admin/edit-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
-                            <form action="{{ route('deleteTrafficSign', $row->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this traffic sign?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
-                            </form>
+                            <div class="ltd-actions">
+                                <a href="{{ URL::to('/admin/edit-traffic-sign/'.$row->id) }}" class="btn btn-sm btn-info"><i class="nav-icon fas fa-edit"></i> Edit</a>
+                                <form action="{{ route('deleteTrafficSign', $row->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this traffic sign?')"><i class="nav-icon fas fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
