@@ -217,13 +217,7 @@
                 method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
-                <button id="avatarButton" class="ltd-avatar-button" type="button" aria-label="Change profile photo">
-                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }} profile photo">
-                    <span class="ltd-avatar-button__edit"><i class="fas fa-camera" aria-hidden="true"></i></span>
-                </button>
-                <input id="profileImage" class="d-none" type="file" name="profileImage"
-                    accept=".jpg,.jpeg,.png,.webp">
-                <p class="ltd-avatar-help">Select the avatar to change your photo</p>
+                <x-upload-field variant="avatar" name="profileImage" id="profileImage" accept=".jpg,.jpeg,.png,.webp" :current="$user->avatar_url" :current-alt="$user->name . ' profile photo'" hint="Select the avatar to change your photo" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('profileImage')" autosubmit />
                 @error('profileImage')<p class="text-danger small text-center mb-0">{{ $message }}</p>@enderror
             </form>
 
@@ -311,16 +305,6 @@
 
 @section('page-script')
     <script>
-        document.getElementById('avatarButton')?.addEventListener('click', function () {
-            document.getElementById('profileImage')?.click();
-        });
-
-        document.getElementById('profileImage')?.addEventListener('change', function () {
-            if (this.files.length > 0) {
-                document.getElementById('avatarForm')?.submit();
-            }
-        });
-
         @if($errors->has('name'))
             $('#nameModal').modal('show');
         @elseif($errors->has('email'))

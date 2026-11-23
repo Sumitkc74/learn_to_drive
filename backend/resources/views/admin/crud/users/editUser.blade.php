@@ -75,9 +75,11 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="profileImage" class="col-sm-2 col-form-label">Input Profile Image :</label>
-                    <img src="{{ $edit->avatar_url }}" alt="{{ $edit->name }} profile photo" height="200" width="200">
                     <div class="col-sm-10">
-                        <input type="file" name="profileImage">
+                        <x-upload-field name="profileImage" id="profileImage" :current="$edit->avatar_url" current-alt="{{ $edit->name }} profile photo" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('profileImage')" />
+                        @if($errors->has('profileImage'))
+                            <p class="text-danger">{{ $errors->first('profileImage') }}</p>
+                        @endif
                     </div>
                 </div>
             </div>

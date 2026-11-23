@@ -8,7 +8,7 @@
     <details class="mb-3"><summary>Upload one PDF for translation</summary>
         <form method="POST" action="{{ route('pdfTranslations.upload') }}" enctype="multipart/form-data" class="mt-3">@csrf
             <div class="form-group"><label for="upload-pdf-title">Title</label><input id="upload-pdf-title" name="title" maxlength="255" class="form-control" required></div>
-            <div class="form-group"><label for="upload-pdf-file">English or Nepali PDF</label><input id="upload-pdf-file" name="pdf" type="file" accept="application/pdf" class="form-control" required></div>
+            <div class="form-group"><label for="upload-pdf-file">English or Nepali PDF</label><x-upload-field name="pdf" id="upload-pdf-file" accept="application/pdf" :required="true" :max-size-kb="\App\Models\AppSetting::documentLimitKb()" :invalid="$errors->has('pdf')" />@error('pdf')<div class="text-danger">{{ $message }}</div>@enderror</div>
             <button class="btn btn-outline-primary">Save PDF for Review</button>
         </form>
     </details>

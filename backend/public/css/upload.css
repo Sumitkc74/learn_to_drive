@@ -1,0 +1,167 @@
+/* Shared upload dropzone (admin + learner layouts).
+   Colours resolve against each layout's own variables, with light fallbacks. */
+
+.ltd-upload {
+    margin-bottom: 0.5rem;
+}
+
+.ltd-upload__dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1.75rem 1rem;
+    border: 2px dashed var(--border, var(--line, #cbd5e1));
+    border-radius: 12px;
+    background: var(--surface-secondary, #f8fafc);
+    color: var(--text, var(--ink, #2a2a2a));
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.ltd-upload__dropzone:hover,
+.ltd-upload__dropzone:focus-visible {
+    border-color: var(--yellow-dark, #a38b00);
+    outline: none;
+}
+
+.ltd-upload__dropzone.is-dragover {
+    border-color: var(--yellow-dark, #a38b00);
+    border-style: solid;
+    background: rgba(255, 222, 23, 0.12);
+}
+
+.ltd-upload__icon {
+    width: 40px;
+    height: 40px;
+    color: var(--text-muted, var(--muted, #6b7280));
+}
+
+.ltd-upload__text {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.ltd-upload__hint {
+    font-size: 0.82rem;
+    color: var(--text-muted, var(--muted, #6b7280));
+}
+
+/* The real input is only hidden once JavaScript has enhanced the field.
+   Without JavaScript it stays a normal visible file input. */
+.ltd-upload--enhanced .ltd-upload__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.ltd-upload--enhanced .ltd-upload__save {
+    display: none;
+}
+
+.ltd-upload__current {
+    display: block;
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+}
+
+.ltd-upload__files {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.ltd-upload__file {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border, var(--line, #e5e7eb));
+    border-radius: 8px;
+    background: var(--surface, #fff);
+}
+
+.ltd-upload__thumb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.ltd-upload__file-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    color: var(--text-muted, var(--muted, #6b7280));
+    background: var(--surface-secondary, #f8fafc);
+    border-radius: 6px;
+}
+
+.ltd-upload__file-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.ltd-upload__file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.ltd-upload__file-size {
+    font-size: 0.8rem;
+    color: var(--text-muted, var(--muted, #6b7280));
+}
+
+.ltd-upload__remove {
+    flex-shrink: 0;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border, var(--line, #e5e7eb));
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text, var(--ink, #2a2a2a));
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ltd-upload__remove:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+.ltd-upload__error {
+    margin: 0.5rem 0 0;
+    color: #dc2626;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.ltd-upload__save {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border, var(--line, #e5e7eb));
+    border-radius: 8px;
+    background: var(--yellow, var(--accent, #ffde17));
+    color: var(--text, var(--ink, #2a2a2a));
+    font-weight: 700;
+    cursor: pointer;
+}

@@ -8,6 +8,7 @@
         @include('admin.layout.css')
         <!-- Custom theme (built from scratch) -->
         <link rel="stylesheet" href="{{ asset('dist/css/admin-theme.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/upload.css') }}">
         <link rel="stylesheet" href="{{ asset('css/admin-chat.css') }}">
         @yield('page-style')
     </head>
@@ -33,6 +34,7 @@
         @include('admin.layout.script')
         @include('admin.layout.ai-chat')
         <script src="{{ asset('js/admin-chat.js') }}" defer></script>
+        <script src="{{ asset('js/upload-dropzone.js') }}" defer></script>
 
         <script>
             (function () {

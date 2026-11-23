@@ -16,10 +16,12 @@
     @if($type === 'schools')<p>owner_email must belong to an existing active non-admin account. Schools start Pending and need admin approval. Latitude and longitude are optional but must be provided together.</p>@endif
     @if($type === 'school-memberships')<p>Use an approved school's numeric ID and an existing active non-admin account email. Roles: Student, Instructor or Manager. Existing memberships keep their current roles.</p>@endif
     <form method="post" action="{{ route('bulkImport.store', $type) }}" enctype="multipart/form-data">@csrf
-        <label for="import-file">Spreadsheet</label><input id="import-file" type="file" name="file" accept=".csv,.xlsx" class="form-control mb-3" required>
+        <x-upload-field name="file" id="import-file" accept=".csv,.xlsx" :required="true" label="Spreadsheet" :max-size-kb="\App\Models\AppSetting::documentLimitKb()" :invalid="$errors->has('file')" class="mb-3" />
+        @error('file')<div class="text-danger">{{ $message }}</div>@enderror
         @if(in_array('attachment', $definition[2], true))
         <p>Put the exact filename in each attachment cell, then upload those files below. No URLs or server paths. Reusing an attachment across rows is supported. Keep batches within your server's upload limits.</p>
-        <label for="import-attachments">Images or PDFs</label><input id="import-attachments" type="file" name="attachments[]" multiple accept="{{ in_array($type, ['question-banks','exam-information']) ? '.pdf' : '.jpg,.jpeg,.png,.webp' }}" class="form-control mb-3">
+        <x-upload-field name="attachments[]" id="import-attachments" accept="{{ in_array($type, ['question-banks','exam-information']) ? '.pdf' : '.jpg,.jpeg,.png,.webp' }}" multiple label="Images or PDFs" :max-size-kb="max(\App\Models\AppSetting::documentLimitKb(), \App\Models\AppSetting::imageLimitKb())" :invalid="$errors->has('attachments')" class="mb-3" />
+        @error('attachments')<div class="text-danger">{{ $message }}</div>@enderror
         @endif
         <button class="btn btn-primary">Validate and import</button>
     </form>

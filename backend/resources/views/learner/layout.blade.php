@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">@php($pageTitle = trim($__env->yieldContent('title', 'Learn to Drive')))
-<title>{{ $pageTitle === 'Learn to Drive' ? 'Learn to Drive' : $pageTitle.' · Learn to Drive' }}</title><link rel="stylesheet" href="{{ asset('css/learner.css').'?v='.filemtime(public_path('css/learner.css')) }}"><script src="{{ asset('js/learner-theme.js') }}"></script></head>
+<title>{{ $pageTitle === 'Learn to Drive' ? 'Learn to Drive' : $pageTitle.' · Learn to Drive' }}</title><link rel="stylesheet" href="{{ asset('css/learner.css').'?v='.filemtime(public_path('css/learner.css')) }}"><link rel="stylesheet" href="{{ asset('css/upload.css').'?v='.filemtime(public_path('css/upload.css')) }}"><script src="{{ asset('js/learner-theme.js') }}"></script></head>
 <body><a class="skip" href="#main">{{ __('Skip to content') }}</a><header class="header"><div class="nav-wrap"><a class="brand" href="{{ route(auth()->check() ? 'learn.account' : 'learn.home') }}"><img class="brand-logo" src="{{ asset('dist/img/logo.svg') }}" alt=""> Learn to Drive<span class="brand-tag">{{ __('NEPAL') }}</span></a><nav aria-label="{{ __('Main navigation') }}">
 @php($libraryActive=request()->routeIs('learn.library.home') || (request()->routeIs('learn.library','learn.detail') && request()->route('type')!=='notice'))
 @auth
@@ -38,4 +38,4 @@
 @if(auth()->check() && auth()->user()->hasPremium() && !request()->routeIs('learn.premium.chat','learn.mfa.*'))
 @include('learner.chat-widget')
 @endif
-<script src="{{ asset('js/learner-auth.js') }}" defer></script><script src="{{ asset('js/learner-navigation.js') }}" defer></script></body></html>
+<script src="{{ asset('js/learner-auth.js') }}" defer></script><script src="{{ asset('js/learner-navigation.js') }}" defer></script><script src="{{ asset('js/upload-dropzone.js') }}" defer></script></body></html>

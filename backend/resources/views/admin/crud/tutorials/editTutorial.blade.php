@@ -49,9 +49,11 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="image" class="col-sm-2 col-form-label">Input Tutorial Image :</label>
-                    @if($url=$tutorial->thumbnailUrl())<img src="{{ $url }}" height="200" width="200" alt="">@else<span class="text-muted">No thumbnail yet</span>@endif
                     <div class="col-sm-10">
-                        <input type="file" name="image">
+                        @if($url=$tutorial->thumbnailUrl())<x-upload-field name="image" id="image" :current="$url" current-alt="Current tutorial thumbnail" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('image')" />@else<span class="text-muted">No thumbnail yet</span><x-upload-field name="image" id="image" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('image')" />@endif
+                        @if($errors->has('image'))
+                            <p class="text-danger">{{ $errors->first('image') }}</p>
+                        @endif
                     </div>
                 </div>
             </div>

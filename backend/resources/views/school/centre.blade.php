@@ -11,9 +11,9 @@
 {{ $notifications->links('pagination::simple-default') }}
 <details class="card"><summary>{{ __('Apply as a driving school') }}</summary><p>{{ __('An administrator reviews your school before staff access is enabled.') }}</p><form method="post" action="{{ route('learn.school.apply') }}" enctype="multipart/form-data" class="stack">@csrf
 @foreach(['name'=>'School name','address'=>'Address','phone'=>'Phone','email'=>'School email'] as $field=>$label)<label>{{ __($label) }}<input name="{{ $field }}" value="{{ old($field) }}" type="{{ $field==='email'?'email':'text' }}" required></label>@endforeach
-<label>{{ __('School logo (optional)') }}<input name="logo" type="file" accept="image/jpeg,image/png,image/webp"></label>
-<label>{{ __('Gallery photos (optional)') }}<input name="gallery_images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
-<label>{{ __('Gallery videos (optional)') }}<input name="gallery_videos[]" type="file" accept="video/mp4,video/webm" multiple></label>
+<x-upload-field name="logo" accept="image/jpeg,image/png,image/webp" :label="__('School logo (optional)')" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" />
+<x-upload-field name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple :label="__('Gallery photos (optional)')" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" />
+<x-upload-field name="gallery_videos[]" accept="video/mp4,video/webm" multiple :label="__('Gallery videos (optional)')" :max-size-kb="\App\Models\AppSetting::videoLimitKb()" />
 <p class="muted">{{ __('Images: JPEG, PNG or WebP, up to 2 MB each. Videos: MP4 or WebM, up to 20 MB each. At most 20 gallery items per school. The logo and gallery show on the public school listing once the school is approved.') }}</p>
 <button class="button">{{ __('Submit application') }}</button></form></details>
 @endsection

@@ -18,7 +18,7 @@
 <label class="avatar-choice"><input type="radio" name="preset" value="{{ $preset }}"><img src="{{ asset('dist/img/avatars/'.$preset.'.svg') }}" alt="{{ __('Avatar') }} {{ $loop->iteration }}" width="72" height="72"></label>
 @endforeach
 </fieldset>
-<label>{{ __('Or upload your own photo') }}<input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"></label>
+<x-upload-field name="photo" id="learner-photo" accept=".jpg,.jpeg,.png,.webp" :label="__('Or upload your own photo')" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('photo')" />
 <small class="field-help">{{ __('JPEG, PNG or WebP up to :limit MB.', ['limit' => \App\Models\AppSetting::read('image_upload_limit_mb')]) }}</small>
 <div><button class="button">{{ __('Save profile photo') }}</button></div></form></section>
 <section class="card settings-card" id="personal-details" aria-labelledby="profile-title"><div class="settings-section-heading"><span class="badge">{{ __('PROFILE') }}</span><h2 id="profile-title">{{ __('Personal details') }}</h2><p>{{ __('Keep your name and contact information up to date.') }}</p></div>

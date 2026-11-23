@@ -1048,5 +1048,12 @@
   "JPEG, PNG or WebP up to :limit MB.": "JPEG, PNG वा WebP, :limit MB सम्म।",
   "Save profile photo": "प्रोफाइल फोटो सेभ गर्नुहोस्",
   "Choose a preset avatar or upload your own photo, but not both.": "तयार अवतार छान्नुहोस् वा आफ्नै फोटो अपलोड गर्नुहोस्, दुवै होइन।",
-  "Your profile photo has been updated.": "तपाईंको प्रोफाइल फोटो अद्यावधिक भयो।"
+  "Your profile photo has been updated.": "तपाईंको प्रोफाइल फोटो अद्यावधिक भयो।",
+  "Drag & drop files here or browse": "फाइलहरू यहाँ तानेर छोड्नुहोस् वा ब्राउज गर्नुहोस्",
+  "Remove": "हटाउनुहोस्",
+  "This file type is not accepted.": "यो फाइल प्रकार स्वीकार गरिँदैन।",
+  "This file is larger than :limit MB.": "यो फाइल :limit MB भन्दा ठूलो छ।",
+  "Change profile photo": "प्रोफाइल फोटो परिवर्तन गर्नुहोस्",
+  "Save photo": "फोटो सेभ गर्नुहोस्",
+  "Selected files": "छानिएका फाइलहरू"
 }

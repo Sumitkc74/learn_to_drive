@@ -11,12 +11,12 @@
 <section class="card"><h2>{{ __('School logo and photos') }}</h2><p>{{ __('The logo and gallery show on the public school listing. Images: JPEG, PNG or WebP, up to 2 MB each. Videos: MP4 or WebM, up to 20 MB each. At most 20 gallery items per school.') }}</p>
 @if($school->logoUrl())<p><img src="{{ $school->logoUrl() }}" alt="{{ $school->name }} logo" width="160"></p>@endif
 <form method="post" action="{{ route('learn.school.action',[$school->id,'logo']) }}" enctype="multipart/form-data" class="stack">@csrf
-<label>{{ __('Logo') }}<input name="logo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+<x-upload-field name="logo" accept="image/jpeg,image/png,image/webp" :label="__('Logo')" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" />
 <label><input type="checkbox" name="remove_logo" value="1"> {{ __('Remove current logo') }}</label>
 <button class="button">{{ __('Save logo') }}</button></form>
 <form method="post" action="{{ route('learn.school.action',[$school->id,'gallery']) }}" enctype="multipart/form-data" class="stack">@csrf
-<label>{{ __('Gallery photos') }}<input name="gallery_images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
-<label>{{ __('Gallery videos') }}<input name="gallery_videos[]" type="file" accept="video/mp4,video/webm" multiple></label>
+<x-upload-field name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple :label="__('Gallery photos')" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" />
+<x-upload-field name="gallery_videos[]" accept="video/mp4,video/webm" multiple :label="__('Gallery videos')" :max-size-kb="\App\Models\AppSetting::videoLimitKb()" />
 <button class="button">{{ __('Add to gallery') }}</button></form>
 @foreach($school->getMedia(\App\Support\SchoolMedia::GALLERY_COLLECTION) as $media)<div>
 @if(\App\Support\SchoolMedia::isVideo($media))<video src="{{ $media->getUrl() }}" controls preload="none" width="240"></video>@else<img src="{{ $media->getUrl() }}" alt="" width="240">@endif

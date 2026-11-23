@@ -27,9 +27,11 @@
             <div class="form-group row">
                 <div class="col-sm-10 input-group">
                     <label for="image" class="col-sm-2 col-form-label">Input Test Image :</label>
-                    <img src="{{ $visionTest->getFirstMediaUrl() }}" height="200" width="200">
                     <div class="col-sm-10">
-                        <input type="file" name="image">
+                        <x-upload-field name="image" id="image" :current="$visionTest->getFirstMediaUrl()" current-alt="Current vision test image" :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('image')" />
+                        @if($errors->has('image'))
+                            <p class="text-danger">{{ $errors->first('image') }}</p>
+                        @endif
                     </div>
                 </div>
             </div>
