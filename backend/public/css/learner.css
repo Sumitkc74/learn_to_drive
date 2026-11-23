@@ -200,3 +200,4 @@ html,body{overflow-x:clip}
 html[data-theme=dark] .notice-row:hover{background:#29323d}
 html[data-theme=dark] .notice-panel-head,html[data-theme=dark] .notice-row{border-bottom-color:#475569}
 html[data-theme=dark] .notice-row-date,html[data-theme=dark] .notice-row-snippet{color:#c7c7c7}
+.chips{display:flex;flex-wrap:wrap;gap:10px}.chip{display:inline-block;border:1px solid #d1d5db;background:#fff;border-radius:30px;padding:10px 16px;text-decoration:none;font-weight:650;min-height:44px}.chip:hover{border-color:#b8a20e}.chip-selected{background:var(--ink);color:#fff;border-color:var(--ink)}

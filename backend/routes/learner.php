@@ -26,6 +26,10 @@ Route::prefix('learn')->name('learn.')->group(function () {
     Route::get('register',[AuthController::class,'registerForm'])->name('register');
     Route::post('register',[AuthController::class,'register'])->middleware('throttle:5,1');
     Route::post('logout',[AuthController::class,'logout'])->name('logout');
+    // The private-lessons page itself is public: guests can browse the
+    // school, instructor, vehicles and usual times. Only submitting a
+    // request (and cancelling one) stays behind sign-in.
+    Route::get('private-lessons', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'index'])->name('private-lessons');
     Route::middleware(\App\Http\Middleware\LearnerSession::class)->group(function () {
         Route::post('lesson-payments/booking/{booking}',[\App\Http\Controllers\Learner\SchoolPaymentController::class,'checkout'])->whereNumber('booking')->middleware('throttle:5,1')->name('lesson-payment.checkout');
         Route::get('lesson-payments/{payment}',[\App\Http\Controllers\Learner\SchoolPaymentController::class,'show'])->name('lesson-payment.show');
@@ -50,7 +54,6 @@ Route::prefix('learn')->name('learn.')->group(function () {
         Route::get('driving-lessons/bookings', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'bookings'])->name('lessons.bookings');
         Route::post('driving-lessons/{lesson}/book', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'book'])->whereNumber('lesson')->middleware('throttle:10,1')->name('lessons.book');
         Route::delete('driving-lessons/bookings/{booking}', [\App\Http\Controllers\Learner\DrivingLessonController::class, 'cancel'])->whereNumber('booking')->middleware('throttle:10,1')->name('lessons.cancel');
-        Route::get('private-lessons', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'index'])->name('private-lessons');
         Route::post('private-lessons', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'store'])->middleware('throttle:10,1')->name('private-lessons.store');
         Route::post('private-lessons/{privateRequest}/cancel', [\App\Http\Controllers\Learner\PrivateLessonController::class, 'cancel'])->whereNumber('privateRequest')->middleware('throttle:10,1')->name('private-lessons.cancel');
         Route::get('instructor/lessons', [\App\Http\Controllers\School\LessonController::class, 'index'])->name('instructor.lessons');

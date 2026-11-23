@@ -8,7 +8,16 @@ class AuthController extends \App\Http\Controllers\Controller {
         if (auth()->user()->schoolMembershipsForStaff()->exists()) return redirect()->route('learn.school.dashboard');
         return redirect()->route('learn.account');
     }
-    public function loginForm(){return auth()->check()?$this->dashboard():view('learner.auth',['register'=>false]);}
+    public function loginForm(Request $request){
+        // A "sign in to continue" link (e.g. from the private-lessons page)
+        // passes its destination as ?redirect=; remember it with the normal
+        // intended-URL mechanism so sign-in brings the user back there.
+        $redirect = $request->query('redirect');
+        if (is_string($redirect) && str_starts_with($redirect, url('/learn/private-lessons'))) {
+            $request->session()->put('url.intended', $redirect);
+        }
+        return auth()->check()?$this->dashboard():view('learner.auth',['register'=>false]);
+    }
     public function registerForm(){return auth()->check()?$this->dashboard():view('learner.auth',['register'=>true]);}
     public function login(Request $request){
         $data=$request->validate(['email'=>['required','email'],'password'=>['required','string']]);
@@ -18,6 +27,7 @@ class AuthController extends \App\Http\Controllers\Controller {
         if($request->user()->mfa_secret)return redirect()->route('learn.mfa.challenge');
         $intended=$request->session()->pull('url.intended');
         if(is_string($intended) && str_starts_with($intended,url('/learn/verify-email/'))) return redirect()->to($intended);
+        if(is_string($intended) && str_starts_with($intended,url('/learn/private-lessons'))) return redirect()->to($intended);
         return $this->dashboard();
     }
     public function register(Request $request){

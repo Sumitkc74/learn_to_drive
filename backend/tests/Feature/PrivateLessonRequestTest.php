@@ -38,19 +38,85 @@ class PrivateLessonRequestTest extends TestCase
         ], $overrides));
     }
 
-    public function test_guest_is_redirected_to_sign_in(): void
+    public function test_guest_can_browse_the_page_but_cannot_submit(): void
     {
-        $this->get(route('learn.private-lessons'))->assertRedirect(route('learn.login'));
+        [$teacher, $school, $car] = $this->offering();
+        $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
+            // Guests see the school, instructor, car and usual times…
+            ->assertSee($teacher->name)->assertSee($car->name)->assertSee($car->registration)
+            ->assertSee('9:00 AM')
+            // …and the sign-in action instead of the request form.
+            ->assertSee('Sign in to request this lesson')
+            ->assertDontSee('Request this lesson')
+            ->assertDontSee('name="starts_at"', false);
         $this->post(route('learn.private-lessons.store'), $this->payload())->assertRedirect(route('learn.login'));
     }
 
-    public function test_learner_sees_form_with_instructors_and_vehicles(): void
+    public function test_guest_sign_in_returns_to_private_lessons_with_selection(): void
+    {
+        [$teacher, $school] = $this->offering();
+        $learner = User::factory()->create(['is_active' => true]);
+        $target = route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]);
+        $this->get(route('learn.login', ['redirect' => $target]))->assertOk();
+        $this->post(route('learn.login'), ['email' => $learner->email, 'password' => 'password'])->assertRedirect($target);
+        // And back on the page the selection is still there.
+        $this->get($target)->assertOk()->assertSee('<option value="' . $school->id . '" selected', false);
+    }
+
+    public function test_sign_in_ignores_a_redirect_off_the_private_lessons_page(): void
+    {
+        $learner = User::factory()->create(['is_active' => true]);
+        $this->get(route('learn.login', ['redirect' => 'https://example.com/evil']))->assertOk();
+        $this->post(route('learn.login'), ['email' => $learner->email, 'password' => 'password'])->assertRedirect(route('learn.account'));
+    }
+
+    public function test_learner_sees_picker_with_instructors_and_vehicles(): void
     {
         [$teacher, $school, $car] = $this->offering();
         $learner = User::factory()->create(['is_active' => true]);
-        $this->actingAs($learner)->get(route('learn.private-lessons', ['school' => $school->id]))->assertOk()
-            ->assertSee('Request a private lesson')->assertSee($teacher->name)->assertSee($car->name)
+        $this->actingAs($learner)->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
+            ->assertSee($teacher->name)->assertSee($car->name)
             ->assertSee($car->registration)->assertSee('Show instructors and vehicles');
+    }
+
+    public function test_time_chips_come_from_the_instructors_usual_times(): void
+    {
+        [$teacher, $school, $car] = $this->offering();
+        $slot = DrivingLesson::create(['lesson_vehicle_id' => $car->id,
+            'starts_at' => now()->addDays(2)->setTime(9, 0), 'ends_at' => now()->addDays(2)->setTime(10, 0),
+            'price_npr' => 1500, 'meeting_point' => 'School gate']);
+        $label = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('g:i A');
+        $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
+            ->assertSee('Time')->assertSee($label);
+    }
+
+    public function test_picking_chips_submits_the_same_values_as_the_old_form(): void
+    {
+        [$teacher, $school, $car] = $this->offering();
+        $slot = DrivingLesson::create(['lesson_vehicle_id' => $car->id,
+            'starts_at' => now()->addDays(3)->setTime(9, 0), 'ends_at' => now()->addDays(3)->setTime(10, 0),
+            'price_npr' => 1500, 'meeting_point' => 'School gate']);
+        $learner = User::factory()->create(['is_active' => true]);
+        $day = now()->addDays(4)->timezone('Asia/Kathmandu')->toDateString();
+        $time = '11:00';
+        $params = ['school' => $school->id, 'instructor' => $teacher->id, 'vehicle' => $car->id,
+            'day' => $day, 'time' => $time, 'duration' => 90, 'meeting_point' => 'School gate'];
+        $this->actingAs($learner)->get(route('learn.private-lessons', $params))->assertOk()
+            ->assertSee('Your request')
+            ->assertSee('name="starts_at" value="' . $day . 'T' . $time . '"', false)
+            ->assertSee('name="duration" value="90"', false)
+            ->assertSee('name="meeting_point" value="School gate"', false)
+            ->assertSee('Request this lesson');
+        $this->actingAs($learner)->post(route('learn.private-lessons.store'), [
+            'driving_school_id' => (string) $school->id, 'instructor_id' => (string) $teacher->id,
+            'lesson_vehicle_id' => (string) $car->id, 'starts_at' => $day . 'T' . $time,
+            'duration' => '90', 'meeting_point' => 'School gate',
+        ])->assertRedirect(route('learn.private-lessons'))->assertSessionHas('success');
+        $this->assertDatabaseHas('private_lesson_requests', [
+            'learner_id' => $learner->id, 'driving_school_id' => $school->id, 'instructor_id' => $teacher->id,
+            'lesson_vehicle_id' => $car->id, 'status' => 'Pending', 'duration_minutes' => 90,
+            'meeting_point' => 'School gate',
+        ]);
     }
 
     public function test_request_page_preselects_school_from_query(): void

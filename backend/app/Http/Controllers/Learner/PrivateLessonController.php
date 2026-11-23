@@ -12,7 +12,12 @@ class PrivateLessonController extends Controller
 {
     public function index(Request $request)
     {
-        $data = $request->validate(['school' => ['nullable', 'integer', 'min:1'], 'instructor' => ['nullable', 'integer', 'min:1']]);
+        $data = $request->validate([
+            'school' => ['nullable', 'integer', 'min:1'], 'instructor' => ['nullable', 'integer', 'min:1'],
+            'vehicle' => ['nullable', 'integer', 'min:1'], 'day' => ['nullable', 'date_format:Y-m-d'],
+            'time' => ['nullable', 'date_format:H:i'], 'duration' => ['nullable', 'integer', 'min:15', 'max:180'],
+            'meeting_point' => ['nullable', 'string', 'max:255'],
+        ]);
         $schools = DrivingSchool::where('status', 'Approved')->orderBy('name')->get(['id', 'name']);
         $school = isset($data['school']) ? DrivingSchool::where('status', 'Approved')->findOrFail($data['school']) : null;
         $instructorIds = LessonVehicle::query()->when($school, fn ($q) => $q->where('driving_school_id', $school->id))->distinct()->pluck('instructor_id');
@@ -25,9 +30,47 @@ class PrivateLessonController extends Controller
         $vehicles = LessonVehicle::query()->when($school, fn ($q) => $q->where('driving_school_id', $school->id))
             ->when($instructor, fn ($q) => $q->where('instructor_id', $instructor->id))
             ->with(['instructor:id,name', 'school:id,name'])->orderBy('name')->get();
-        $myRequests = PrivateLessonRequest::where('learner_id', $request->user()->id)
-            ->with(['school:id,name', 'instructor:id,name', 'vehicle', 'lesson'])->latest('id')->paginate(15);
-        return view('learner.private-lessons', compact('schools', 'school', 'instructors', 'instructor', 'vehicles', 'myRequests'));
+        $vehicle = isset($data['vehicle']) ? $vehicles->firstWhere('id', (int) $data['vehicle']) : null;
+        $vehicle ??= $vehicles->first();
+        // Tap-first picker data. Day chips cover the next 7 days; time chips
+        // are the instructor's usual start times taken from their upcoming
+        // available lessons (clock times, so any chosen day works), falling
+        // back to common daytime slots when the instructor has no lessons
+        // yet. Past times are dropped when the chosen day is today.
+        $dayChips = collect(range(0, 6))->map(fn ($i) => now()->timezone('Asia/Kathmandu')->addDays($i)->toDateString())->all();
+        $day = ($data['day'] ?? null) && Carbon::parse($data['day'], 'Asia/Kathmandu')->toDateString() >= now()->timezone('Asia/Kathmandu')->toDateString() ? $data['day'] : null;
+        $timeChips = [];
+        if ($instructor) {
+            $timeChips = DrivingLesson::availableProvider()->where('cancelled', false)->where('starts_at', '>', now())
+                ->whereDoesntHave('bookings', fn ($b) => $b->where('status', 'Booked'))
+                ->whereHas('vehicle', fn ($v) => $v->where('instructor_id', $instructor->id)
+                    ->when($school, fn ($q) => $q->where('driving_school_id', $school->id)))
+                ->orderBy('starts_at')->take(30)->pluck('starts_at')
+                ->map(fn ($s) => $s->copy()->timezone('Asia/Kathmandu')->format('H:i'))->unique()->sort()->values()->all();
+        }
+        if (empty($timeChips)) $timeChips = ['09:00', '11:00', '13:00', '15:00', '17:00'];
+        if ($day === now()->timezone('Asia/Kathmandu')->toDateString()) {
+            $nowTime = now()->timezone('Asia/Kathmandu')->format('H:i');
+            $timeChips = array_values(array_filter($timeChips, fn ($t) => $t > $nowTime));
+        }
+        $time = $data['time'] ?? null;
+        $duration = (int) ($data['duration'] ?? 60);
+        // Meeting-point presets: the school's address first, then the
+        // instructor's most recent lesson meeting points.
+        $meetingPresets = collect();
+        if ($school?->address) $meetingPresets->push($school->address);
+        if ($instructor) {
+            $meetingPresets = $meetingPresets->merge(DrivingLesson::whereHas('vehicle', fn ($v) => $v->where('instructor_id', $instructor->id))
+                ->where('cancelled', false)->orderByDesc('starts_at')->take(20)->pluck('meeting_point')->unique()->filter());
+        }
+        $meetingPresets = $meetingPresets->unique()->take(4)->values();
+        $meetingPoint = $data['meeting_point'] ?? null;
+        if (!$meetingPoint && $school?->address) $meetingPoint = $school->address;
+        $canSubmit = $school && $instructor && $vehicle && $day && $time && $meetingPoint;
+        $myRequests = $request->user() ? PrivateLessonRequest::where('learner_id', $request->user()->id)
+            ->with(['school:id,name', 'instructor:id,name', 'vehicle', 'lesson'])->latest('id')->paginate(15) : null;
+        return view('learner.private-lessons', compact('schools', 'school', 'instructors', 'instructor', 'vehicles', 'vehicle',
+            'dayChips', 'day', 'timeChips', 'time', 'duration', 'meetingPresets', 'meetingPoint', 'canSubmit', 'myRequests'));
     }
 
     public function store(Request $request)

@@ -1027,5 +1027,15 @@
   "Lesson": "पाठ",
   "Payment": "भुक्तानी",
   "No payment": "भुक्तानी छैन",
-  "No lesson bookings yet.": "अहिलेसम्म कुनै पाठ बुकिङ छैन।"
+  "No lesson bookings yet.": "अहिलेसम्म कुनै पाठ बुकिङ छैन।",
+  "Day": "दिन",
+  "Time": "समय",
+  "Pick a day and a time above to request.": "अनुरोध गर्न माथिबाट दिन र समय छान्नुहोस्।",
+  "Choose a school and instructor above to pick a day and time.": "दिन र समय छान्न माथिबाट विद्यालय र प्रशिक्षक छान्नुहोस्।",
+  "No vehicles for this instructor yet.": "यो प्रशिक्षकका लागि अझै सवारी साधन छैनन्।",
+  "No times left today.": "आजका लागि समय बाँकी छैन।",
+  "Or another point": "वा अर्को स्थान",
+  "Use this point": "यो स्थान प्रयोग गर्नुहोस्",
+  "Request this lesson": "यो पाठ अनुरोध गर्नुहोस्",
+  "Sign in to request this lesson": "यो पाठ अनुरोध गर्न साइन इन गर्नुहोस्"
 }
