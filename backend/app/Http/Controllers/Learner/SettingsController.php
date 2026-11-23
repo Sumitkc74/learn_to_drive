@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Learner;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -52,6 +53,31 @@ class SettingsController extends Controller
         if($user->isDirty('phoneNumber')) $user->forceFill(['phone_verified_at'=>null,'phone_verification_code'=>null,'phone_verification_expires_at'=>null]);
         $user->save();
         return redirect()->route('learn.settings')->with('success',$field==='email'?__('Email updated. Verify your new address below.'):__('Your details have been updated.'));
+    }
+
+    public function avatar(Request $request)
+    {
+        $user = $request->user();
+        $presets = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4', 'avatar-5', 'avatar-6'];
+        $data = $request->validate([
+            'preset' => ['nullable', 'string', Rule::in($presets)],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:'.AppSetting::imageLimitKb()],
+        ]);
+        $hasPreset = ! empty($data['preset']);
+        $hasPhoto = $request->hasFile('photo');
+        if ($hasPreset === $hasPhoto) {
+            return back()->withErrors(['avatar' => __('Choose a preset avatar or upload your own photo, but not both.')]);
+        }
+        $user->clearMediaCollection();
+        if ($hasPreset) {
+            // preservingOriginal: the preset file is shared by every user, so
+            // it must be copied into the media library, not moved away.
+            $user->addMedia(public_path('dist/img/avatars/'.$data['preset'].'.svg'))->preservingOriginal()->toMediaCollection();
+        } else {
+            $user->addMedia($data['photo'])->toMediaCollection();
+        }
+
+        return redirect()->route('learn.settings')->with('success', __('Your profile photo has been updated.'));
     }
 
     public function password(Request $request)

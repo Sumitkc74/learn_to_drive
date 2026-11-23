@@ -5,10 +5,22 @@
 <div class="settings-layout">
 <aside class="settings-sidebar">
 <div class="settings-identity"><span class="settings-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($user->name,0,1)) }}</span><strong>{{ $user->name }}</strong><span>{{ __('Member since') }} {{ $user->created_at?->locale(app()->getLocale())->translatedFormat('M Y') }}</span></div>
-<nav aria-label="Account settings sections" class="settings-nav"><a href="#personal-details">{{ __('Personal details') }} <span aria-hidden="true">↗</span></a><a href="#password-security">{{ __('Password & security') }} <span aria-hidden="true">↗</span></a><a href="#sign-in-options">{{ __('Connected accounts') }}</a><a href="#two-step-verification">{{ __('Two-step verification') }}</a></nav>
+<nav aria-label="Account settings sections" class="settings-nav"><a href="#profile-photo">{{ __('Profile photo') }} <span aria-hidden="true">↗</span></a><a href="#personal-details">{{ __('Personal details') }} <span aria-hidden="true">↗</span></a><a href="#password-security">{{ __('Password & security') }} <span aria-hidden="true">↗</span></a><a href="#sign-in-options">{{ __('Connected accounts') }}</a><a href="#two-step-verification">{{ __('Two-step verification') }}</a></nav>
 <p class="settings-note">{{ __('Your learning history stays with your account when you update these details.') }}</p>
 </aside>
 <div class="settings-sections">
+<section class="card settings-card" id="profile-photo" aria-labelledby="avatar-title"><div class="settings-section-heading"><span class="badge">{{ __('PROFILE') }}</span><h2 id="avatar-title">{{ __('Profile photo') }}</h2><p>{{ __('Choose one of the ready-made avatars or upload your own photo.') }}</p></div>
+<form class="stack" action="{{ route('learn.settings.avatar') }}" method="post" enctype="multipart/form-data">@csrf @method('PATCH')
+@error('avatar')<p class="text-danger">{{ $message }}</p>@enderror
+<div class="settings-current-avatar"><img src="{{ $user->avatar_url }}" alt="{{ __('Your current profile photo') }}" width="72" height="72"></div>
+<fieldset class="avatar-choices"><legend>{{ __('Choose an avatar') }}</legend>
+@foreach(['avatar-1','avatar-2','avatar-3','avatar-4','avatar-5','avatar-6'] as $preset)
+<label class="avatar-choice"><input type="radio" name="preset" value="{{ $preset }}"><img src="{{ asset('dist/img/avatars/'.$preset.'.svg') }}" alt="{{ __('Avatar') }} {{ $loop->iteration }}" width="72" height="72"></label>
+@endforeach
+</fieldset>
+<label>{{ __('Or upload your own photo') }}<input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"></label>
+<small class="field-help">{{ __('JPEG, PNG or WebP up to :limit MB.', ['limit' => \App\Models\AppSetting::read('image_upload_limit_mb')]) }}</small>
+<div><button class="button">{{ __('Save profile photo') }}</button></div></form></section>
 <section class="card settings-card" id="personal-details" aria-labelledby="profile-title"><div class="settings-section-heading"><span class="badge">{{ __('PROFILE') }}</span><h2 id="profile-title">{{ __('Personal details') }}</h2><p>{{ __('Keep your name and contact information up to date.') }}</p></div>
 @foreach(['name'=>'Full name','email'=>'Email address','phoneNumber'=>'Phone number'] as $field=>$label)
 <details class="settings-detail" @if($errors->has($field) || ($field==='email' && $errors->has('current_password') && old('_edit_field')==='email')) open @endif>

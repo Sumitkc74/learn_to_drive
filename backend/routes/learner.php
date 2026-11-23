@@ -90,6 +90,7 @@ Route::prefix('learn')->name('learn.')->group(function () {
         Route::get('verify-email/{id}/{hash}',[\App\Http\Controllers\Learner\EmailSecurityController::class,'verify'])->middleware(['signed','throttle:6,1'])->name('verification.verify');
         Route::get('settings',[\App\Http\Controllers\Learner\SettingsController::class,'edit'])->name('settings');
         Route::patch('settings/profile',[\App\Http\Controllers\Learner\SettingsController::class,'profile'])->middleware('throttle:10,1')->name('settings.profile');
+        Route::patch('settings/avatar',[\App\Http\Controllers\Learner\SettingsController::class,'avatar'])->middleware('throttle:10,1')->name('settings.avatar');
         Route::put('settings/password',[\App\Http\Controllers\Learner\SettingsController::class,'password'])->middleware('throttle:5,1')->name('settings.password');
         Route::get('account',[LibraryController::class,'account'])->name('account');
         Route::get('saved',[\App\Http\Controllers\Learner\BookmarkController::class,'index'])->name('saved');

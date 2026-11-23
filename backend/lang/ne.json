@@ -1038,5 +1038,15 @@
   "Use this point": "यो स्थान प्रयोग गर्नुहोस्",
   "Request this lesson": "यो पाठ अनुरोध गर्नुहोस्",
   "Sign in to request this lesson": "यो पाठ अनुरोध गर्न साइन इन गर्नुहोस्",
-  "View details": "विवरण हेर्नुहोस्"
+  "View details": "विवरण हेर्नुहोस्",
+  "Profile photo": "प्रोफाइल फोटो",
+  "Choose one of the ready-made avatars or upload your own photo.": "तयार अवतारहरूमध्ये एउटा छान्नुहोस् वा आफ्नै फोटो अपलोड गर्नुहोस्।",
+  "Choose an avatar": "अवतार छान्नुहोस्",
+  "Your current profile photo": "तपाईंको हालको प्रोफाइल फोटो",
+  "Avatar": "अवतार",
+  "Or upload your own photo": "वा आफ्नै फोटो अपलोड गर्नुहोस्",
+  "JPEG, PNG or WebP up to :limit MB.": "JPEG, PNG वा WebP, :limit MB सम्म।",
+  "Save profile photo": "प्रोफाइल फोटो सेभ गर्नुहोस्",
+  "Choose a preset avatar or upload your own photo, but not both.": "तयार अवतार छान्नुहोस् वा आफ्नै फोटो अपलोड गर्नुहोस्, दुवै होइन।",
+  "Your profile photo has been updated.": "तपाईंको प्रोफाइल फोटो अद्यावधिक भयो।"
 }
