@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Observers\AdminAuditObserver;
 use App\Observers\QuestionMediaReadinessObserver;
 use App\Services\AdminSystemHealth;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +34,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // The admin theme is AdminLTE 3.2 on Bootstrap 4.6, with no Tailwind
+        // loaded anywhere. Laravel's default Tailwind pagination view draws
+        // the prev/next arrows as <svg class="w-5 h-5">, and without
+        // Tailwind those size classes do nothing, so the arrows render
+        // huge on every admin list. Use the Bootstrap 4 pagination view
+        // instead; it styles the same ->links() output with .pagination /
+        // .page-link, which the admin CSS already provides.
+        Paginator::useBootstrap();
+
         \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
         // Render terminates TLS in front of the app, and the APP_URL value
         // in the Render dashboard can drift back to http (live pagination
