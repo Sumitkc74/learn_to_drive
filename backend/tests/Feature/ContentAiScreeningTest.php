@@ -18,6 +18,23 @@ class ContentAiScreeningTest extends TestCase {
         $this->assertSame('Ready',$record->fresh()->ai_status);
         $this->assertSame(23,\Illuminate\Support\Facades\DB::table('content_ai_usage')->sum('tokens'));
     }
+    public function test_screening_uses_flash_lite_while_chat_and_translation_stay_on_flash(): void {
+        config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-3.5-flash','premium.chat_model'=>'gemini-3.5-flash','content-screening.daily_limit'=>100]);
+        // The screening model is deliberately not set here: it must default to Flash-Lite.
+        $this->assertSame('gemini-3.5-flash-lite', config('content-screening.gemini_model'));
+        $record=\App\Models\GovernmentNoticeImport::create(['source_name'=>'Official','source_domain'=>'dotm.gov.np','source_url'=>'https://dotm.gov.np/notice','title'=>'Notice','content_hash'=>hash('sha256','notice-flash-lite'),'status'=>'Pending','fetched_at'=>now()]);
+        $page=new \Illuminate\Http\Client\Response(new \GuzzleHttp\Psr7\Response(200,[],'<html><body><main><h1>Notice</h1><p>Driving licence notice</p></main></body></html>'));
+        $this->mock(\App\Services\RedirectFollowingRequest::class)->shouldReceive('get')->once()->andReturn($page);
+        Http::fake(['*'=>Http::response(['usageMetadata'=>['totalTokenCount'=>11],'candidates'=>[['finishReason'=>'STOP','content'=>['parts'=>[['text'=>json_encode(['verdict'=>'Ready','summary'=>'Review dates','issues'=>[]])]]]]]])]);
+        app(ContentAiScreening::class)->screen($record);
+        $this->assertSame('Ready',$record->fresh()->ai_status);
+        $recorded=Http::recorded();
+        $this->assertNotEmpty($recorded);
+        $this->assertStringContainsString('models/gemini-3.5-flash-lite:generateContent', $recorded[0][0]->url());
+        // Chat and translation still point at Flash; only screening moved.
+        $this->assertSame('gemini-3.5-flash', config('pdf-translation.gemini_model'));
+        $this->assertSame('gemini-3.5-flash', config('premium.chat_model'));
+    }
     public function test_notice_screening_refuses_cross_host_redirect(): void {
         config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-test','content-screening.daily_limit'=>100]);
         $record=\App\Models\GovernmentNoticeImport::create(['source_name'=>'Official','source_domain'=>'dotm.gov.np','source_url'=>'https://dotm.gov.np/notice','title'=>'Notice','content_hash'=>hash('sha256','notice-redirect'),'status'=>'Pending','fetched_at'=>now()]);

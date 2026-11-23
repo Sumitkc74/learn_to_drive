@@ -30,7 +30,7 @@ class ContentAiScreening {
         $record->forceFill(['ai_status'=>'Running','ai_report'=>null,'ai_activity_at'=>now()])->saveQuietly();
         try {
             $key = config('pdf-translation.gemini_key');
-            $model = config('pdf-translation.gemini_model');
+            $model = config('content-screening.gemini_model');
             if (!$key || !preg_match('/^[a-zA-Z0-9._-]+$/',(string)$model)) throw new RuntimeException('Gemini API key is not configured or the model name is invalid.');
             $parts = [['text'=>json_encode(['title'=>$record->title,'source'=>$record->source_url,'kind'=>$record->kind])]];
             if ($record instanceof LearningContentImport) {
