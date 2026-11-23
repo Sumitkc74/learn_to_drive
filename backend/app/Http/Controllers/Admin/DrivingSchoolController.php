@@ -25,7 +25,7 @@ class DrivingSchoolController extends Controller
         $data = $request->validate(['status' => ['nullable', Rule::in(['Pending', 'Approved', 'Suspended'])], 'search' => ['nullable', 'string', 'max:100']]);
         $schools = DrivingSchool::withCount('memberships')
             ->when($data['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
-            ->when($data['search'] ?? null, fn ($q, $search) => $q->where(fn ($b) => $b->where('name', 'like', '%'.$search.'%')->orWhere('address', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%')->orWhere('phone', 'like', '%'.$search.'%')))
+            ->when($data['search'] ?? null, fn ($q, $search) => $q->where(fn ($b) => $b->where('name', 'like', '%'.$search.'%')->orWhere('address', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%')->orWhere('phone', 'like', '%'.$search.'%')->when(ctype_digit($search), fn ($c) => $c->orWhere('driving_schools.id', $search))))
             ->latest('id')->paginate(20)->withQueryString();
 
         return view('admin.schools.index', compact('schools'));

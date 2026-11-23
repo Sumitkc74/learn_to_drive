@@ -12,7 +12,7 @@
     <div class="ltd-table-controls__primary">
         <div class="ltd-table-controls__search">
             <label for="table-search-{{ $items->getPageName() }}">Search</label>
-            <div class="ltd-search-input"><i class="fas fa-search" aria-hidden="true"></i><input id="table-search-{{ $items->getPageName() }}" type="search" name="search" maxlength="100" value="{{ request('search') }}" placeholder="Search by keyword…" class="form-control"></div>
+            <div class="ltd-search-input"><i class="fas fa-search" aria-hidden="true"></i><input id="table-search-{{ $items->getPageName() }}" type="search" name="search" maxlength="100" value="{{ request('search') }}" placeholder="{{ __('Search by keyword or ID…') }}" class="form-control"></div>
         </div>
         <button type="submit" class="btn btn-primary ltd-table-controls__search-button"><i class="fas fa-search mr-1"></i>Search</button>
         @if(request()->hasAny(array_merge(['search'], $advancedParameters)))

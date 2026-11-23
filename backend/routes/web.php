@@ -230,4 +230,15 @@ Route::post('/admin/update-notice/{id}', [NoticeController::class, 'updateNotice
 Route::delete('/admin/delete-notice/{id}', [NoticeController::class, 'deleteNotice'])->name('deleteNotice');
 Route::patch('/admin/notices-trash/{id}/restore', [NoticeController::class, 'restoreNotice'])->name('restoreNotice');
 Route::delete('/admin/notices-trash/{id}', [NoticeController::class, 'forceDeleteNotice'])->name('forceDeleteNotice');
+
+// Bulk delete for the admin content lists. Each action validates the
+// submitted IDs and reuses the same single-delete behaviour as the
+// per-row Delete button (soft delete to Trash for questions/notices).
+Route::delete('/admin/bulk-delete-questions', [QuestionController::class, 'bulkDeleteQuestions'])->name('bulkDeleteQuestions');
+Route::delete('/admin/bulk-delete-exam-papers', [ExamPaperController::class, 'bulkDeleteExamPapers'])->name('bulkDeleteExamPapers');
+Route::delete('/admin/bulk-delete-exam-information', [ExamInformationController::class, 'bulkDeleteExamInformation'])->name('bulkDeleteExamInformation');
+Route::delete('/admin/bulk-delete-tutorials', [TutorialController::class, 'bulkDeleteTutorials'])->name('bulkDeleteTutorials');
+Route::delete('/admin/bulk-delete-notices', [NoticeController::class, 'bulkDeleteNotices'])->name('bulkDeleteNotices');
+Route::delete('/admin/bulk-delete-traffic-signs', [TrafficSignController::class, 'bulkDeleteTrafficSigns'])->name('bulkDeleteTrafficSigns');
+Route::delete('/admin/bulk-delete-vision-tests', [VisionTestController::class, 'bulkDeleteVisionTests'])->name('bulkDeleteVisionTests');
 });

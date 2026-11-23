@@ -35,6 +35,7 @@
         @include('admin.layout.ai-chat')
         <script src="{{ asset('js/admin-chat.js') }}" defer></script>
         <script src="{{ asset('js/upload-dropzone.js') }}" defer></script>
+        <script src="{{ asset('js/bulk-delete.js') }}" defer></script>
 
         <script>
             (function () {

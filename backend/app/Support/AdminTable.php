@@ -22,6 +22,13 @@ class AdminTable
                     $method = $index === 0 ? 'where' : 'orWhere';
                     $builder->{$method}($column, 'like', '%' . $search . '%');
                 }
+                // A numeric search term also matches the record ID exactly,
+                // so an admin can jump straight to a record by its ID. The
+                // column is qualified with the model's table so the condition
+                // stays unambiguous if the query joins other tables.
+                if (ctype_digit($search)) {
+                    $builder->orWhere($builder->getModel()->getTable().'.id', $search);
+                }
             });
         }
 

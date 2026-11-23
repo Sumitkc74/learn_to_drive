@@ -100,6 +100,22 @@ class QuestionController extends Controller
         return redirect()->to('/admin/questions')->with('success','Question Deleted Successfully');
     }
 
+    // Delete the selected questions (bulk delete from the list). Reuses the
+    // same soft delete as the per-row Delete button, so records go to Trash.
+    public function bulkDeleteQuestions(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:questions,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            Question::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count question moved to Trash.|:count questions moved to Trash.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
+
     public function restoreQuestion($id)
     {
         Question::onlyTrashed()->findOrFail($id)->restore();

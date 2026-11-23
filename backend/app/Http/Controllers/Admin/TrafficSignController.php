@@ -82,4 +82,20 @@ class TrafficSignController extends Controller
         TrafficSign::findOrFail($id)->delete();
         return redirect()->back()->with('success','Traffic Sign Deleted Successfully');
     }
+
+    // Delete the selected traffic signs (bulk delete from the list). Reuses
+    // the same delete as the per-row Delete button.
+    public function bulkDeleteTrafficSigns(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:traffic_signs,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            TrafficSign::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count traffic sign deleted.|:count traffic signs deleted.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
 }

@@ -78,4 +78,20 @@ class VisionTestController extends Controller
         VisionTest::findOrFail($id)->delete();
         return redirect()->back();
     }
+
+    // Delete the selected vision tests (bulk delete from the list). Reuses
+    // the same delete as the per-row Delete button.
+    public function bulkDeleteVisionTests(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:vision_tests,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            VisionTest::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count vision test deleted.|:count vision tests deleted.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
 }

@@ -22,7 +22,11 @@ class MediaLibraryController extends Controller {
         if (!empty($data['type'])) $query->where('model_type',(new (self::TYPES[$data['type']][0]))->getMorphClass());
         if (($data['format'] ?? '') === 'image') $query->whereIn('mime_type',['image/jpeg','image/png','image/webp']);
         if (($data['format'] ?? '') === 'pdf') $query->where('mime_type','application/pdf');
-        if (!empty($data['search'])) $query->where('file_name','like','%'.$data['search'].'%');
+        if (!empty($data['search'])) $query->where(function ($q) use ($data) {
+            $q->where('file_name', 'like', '%'.$data['search'].'%');
+            // A numeric search term also matches the media record ID exactly.
+            if (ctype_digit($data['search'])) $q->orWhere('media.id', $data['search']);
+        });
         $files = $query->with('model')->latest('id')->paginate(24)->withQueryString();
         $rows = $files->getCollection()->map(function ($media) use ($map) {
             [$key,$type] = $map[$media->model_type];

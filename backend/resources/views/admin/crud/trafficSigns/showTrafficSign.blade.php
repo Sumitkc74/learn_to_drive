@@ -33,10 +33,16 @@
             'sortOptions' => ['created_at' => 'Date added', 'name' => 'English name', 'nepaliSignName' => 'Nepali name', 'id' => 'ID'],
         ])
 
+        @include('admin.crud.partials.bulk-delete', [
+            'action' => route('bulkDeleteTrafficSigns'),
+            'confirm' => __('Delete the selected traffic signs? This cannot be undone.'),
+        ])
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                 <tr>
+                    <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                     <th>ID</th>
                     <th>Traffic Sign</th>
                     <th>Nepali Sign Name</th>
@@ -49,6 +55,7 @@
                 <tbody>
                     @foreach ($trafficSigns as $row)
                     <tr>
+                        <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
                         <td>{{ $row->id }}</td>
                         <td>{{ $row->name }}</td>
                         <td>{{ $row->nepaliSignName }}</td>

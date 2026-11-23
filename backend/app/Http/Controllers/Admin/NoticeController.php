@@ -80,6 +80,22 @@ class NoticeController extends Controller
         return redirect()->back()->with('success','Notice Deleted Successfully');
     }
 
+    // Delete the selected notices (bulk delete from the list). Reuses the
+    // same soft delete as the per-row Delete button, so records go to Trash.
+    public function bulkDeleteNotices(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:notices,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            Notice::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count notice moved to Trash.|:count notices moved to Trash.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
+
     public function restoreNotice($id)
     {
         Notice::onlyTrashed()->findOrFail($id)->restore();

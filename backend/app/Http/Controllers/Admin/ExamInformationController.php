@@ -56,4 +56,20 @@ class ExamInformationController extends Controller
         ExamInformation::findOrFail($id)->delete();
         return redirect()->back()->with('success','Exam information deleted successfully.');
     }
+
+    // Delete the selected exam information records (bulk delete from the
+    // list). Reuses the same delete as the per-row Delete button.
+    public function bulkDeleteExamInformation(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:exam_information,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            ExamInformation::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count exam information record deleted.|:count exam information records deleted.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
 }

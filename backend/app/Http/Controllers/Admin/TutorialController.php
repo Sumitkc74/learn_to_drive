@@ -85,4 +85,20 @@ class TutorialController extends Controller
         Tutorial::findOrFail($id)->delete();
         return redirect()->back()->with('success','Tutorial Deleted Successfully');
     }
+
+    // Delete the selected tutorials (bulk delete from the list). Reuses the
+    // same delete as the per-row Delete button.
+    public function bulkDeleteTutorials(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:tutorials,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            Tutorial::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count tutorial deleted.|:count tutorials deleted.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
 }

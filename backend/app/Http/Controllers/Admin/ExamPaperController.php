@@ -56,4 +56,20 @@ class ExamPaperController extends Controller
         ExamPaper::findOrFail($id)->delete();
         return redirect()->back()->with('success','Question bank deleted successfully.');
     }
+
+    // Delete the selected question banks (bulk delete from the list). Reuses
+    // the same delete as the per-row Delete button.
+    public function bulkDeleteExamPapers(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:50', 'distinct'],
+            'ids.*' => ['integer', 'exists:exam_papers,id'],
+        ]);
+
+        foreach ($data['ids'] as $id) {
+            ExamPaper::findOrFail($id)->delete();
+        }
+
+        return redirect()->back()->with('success', trans_choice(':count question bank deleted.|:count question banks deleted.', count($data['ids']), ['count' => count($data['ids'])]));
+    }
 }

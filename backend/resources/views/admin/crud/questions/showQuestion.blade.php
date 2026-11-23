@@ -33,10 +33,16 @@
             ],
         ])
 
+        @include('admin.crud.partials.bulk-delete', [
+            'action' => route('bulkDeleteQuestions'),
+            'confirm' => __('Delete the selected questions? They will be moved to Trash.'),
+        ])
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
                         <th>ID</th>
                         <th>Question</th>
                         <th>Category</th>
@@ -50,6 +56,7 @@
                 <tbody>
                     @foreach ($questions as $row)
                     <tr>
+                        <td><input type="checkbox" name="ids[]" value="{{ $row->id }}" form="bulk-delete-form" class="bulk-delete-row" aria-label="{{ __('Select row') }}"></td>
                         <td>{{ $row->id }}</td>
                         <td><div class="d-flex align-items-center">@if($row->image_url)<img src="{{ $row->image_url }}" alt="" width="52" height="52" class="rounded mr-2" style="object-fit:cover">@endif<span>{{ $row->question }}</span></div></td>
                         <td>{{ $row->category }}</td>
