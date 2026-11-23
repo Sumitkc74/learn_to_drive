@@ -278,10 +278,10 @@ class AdminReviewFixesTest extends TestCase
 
         $this->actingAs($this->admin())->get(route('governmentNotices'))
             ->assertOk()
-            ->assertSee('AI screening: 7 Failed · 31 Flagged · 1 Ready · 0 Deferred · 0 in progress · 0 not screened (39 total)');
+            ->assertSee('AI screening (awaiting decision): 6 Failed · 31 Flagged · 1 Ready · 0 Deferred · 0 in progress · 0 not screened (38 awaiting decision)');
         $this->actingAs($this->admin())->get(route('reviewOperations', ['type' => 'government']))
             ->assertOk()
-            ->assertSee('AI screening: 6 Failed · 31 Flagged · 1 Ready · 0 Deferred · 0 in progress · 0 not screened (38 total)');
+            ->assertSee('AI screening (awaiting decision): 6 Failed · 31 Flagged · 1 Ready · 0 Deferred · 0 in progress · 0 not screened (38 awaiting decision)');
     }
 
     public function test_school_status_filter_is_case_insensitive(): void

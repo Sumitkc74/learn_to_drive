@@ -18,8 +18,10 @@ class GovernmentNoticeImport extends Model
     /**
      * AI screening counts over one set of records, so the Government
      * Notices page and the Review Operations government tab can never
-     * disagree: both render the counts this method returns for the set
-     * they list. Pass 'Pending' for the review queue, null for all rows.
+     * disagree: both callers pass 'Pending', so both render the counts
+     * for the review queue only (approved/rejected rows are excluded,
+     * even though their ai_status stays as last screened). Pass null
+     * only for an ad-hoc count over all rows.
      */
     public static function screeningCounts(?string $status = null): array
     {

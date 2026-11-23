@@ -60,4 +60,29 @@ class GovernmentNoticeRescreenTest extends TestCase
         $response->assertSee('Retry 1 flagged AI screening(s)');
         $response->assertSee(route('contentScreening.retryFlagged'), false);
     }
+
+    public function test_government_imports_page_shows_pending_only_screening_counts(): void
+    {
+        Queue::fake();
+        $pending = $this->notice();
+        $pending->forceFill(['ai_status' => 'Flagged'])->save();
+        $approved = $this->notice(['status' => 'Approved']);
+        $approved->forceFill(['ai_status' => 'Flagged'])->save();
+
+        $response = $this->actingAs($this->admin())->get(route('governmentNotices'))->assertOk();
+
+        // The approved import keeps its Flagged ai_status but is no longer
+        // awaiting decision, so it must not inflate the counts or the button.
+        $response->assertSee('AI screening (awaiting decision):', false);
+        $response->assertSee('1 Flagged', false);
+        $response->assertSee('(1 awaiting decision)', false);
+        $response->assertSee('Retry 1 flagged AI screening(s)', false);
+        $response->assertDontSee('Retry 2 flagged AI screening(s)', false);
+
+        // The button number matches what retryFlagged actually queues.
+        $this->actingAs($this->admin())->post(route('contentScreening.retryFlagged'))->assertRedirect();
+        Queue::assertPushed(ScreenImportedContent::class, 1);
+        $this->assertSame('Queued', $pending->fresh()->ai_status);
+        $this->assertSame('Flagged', $approved->fresh()->ai_status);
+    }
 }
