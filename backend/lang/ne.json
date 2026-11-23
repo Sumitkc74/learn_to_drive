@@ -1011,5 +1011,21 @@
   "View all notices": "सबै सूचनाहरू हेर्नुहोस्",
   "No notices yet.": "अहिलेसम्म कुनै सूचना छैन।",
   "Try five free questions": "पाँचवटा निःशुल्क प्रश्नहरू प्रयास गर्नुहोस्",
-  "Premium — coming soon": "प्रिमियम — चाँडै आउँदैछ"
+  "Premium — coming soon": "प्रिमियम — चाँडै आउँदैछ",
+  "Lessons": "पाठहरू",
+  "Lesson bookings": "पाठ बुकिङहरू",
+  "Every driving lesson published by a school, with its booking state.": "स्कूलले प्रकाशित गरेका सबै ड्राइभिङ पाठहरू, बुकिङ अवस्थासहित।",
+  "Every lesson booking, with learner, lesson and payment state.": "सबै पाठ बुकिङहरू, शिक्षार्थी, पाठ र भुक्तानी अवस्थासहित।",
+  "Schools": "स्कूलहरू",
+  "Status": "स्थिति",
+  "Date and time": "मिति र समय",
+  "Duration": "अवधि",
+  "Booked by": "बुक गर्ने",
+  "min": "मिनेट",
+  "No lessons yet.": "अहिलेसम्म कुनै पाठ छैन।",
+  "Learner": "शिक्षार्थी",
+  "Lesson": "पाठ",
+  "Payment": "भुक्तानी",
+  "No payment": "भुक्तानी छैन",
+  "No lesson bookings yet.": "अहिलेसम्म कुनै पाठ बुकिङ छैन।"
 }

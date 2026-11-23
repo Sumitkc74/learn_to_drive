@@ -50,6 +50,8 @@
         <li><a href="{{ route('governmentNotices') }}" class="ltd-nav__item {{ Request::is('admin/government-notices*') ? 'is-active' : '' }}"><i class="fas fa-landmark"></i> Government Notices</a></li>
         <li class="ltd-nav__section">People</li>
         <li><a href="{{ route('admin.schools.index') }}" class="ltd-nav__item {{ Request::is('admin/schools*') ? 'is-active' : '' }}"><i class="fas fa-school"></i> Driving Schools</a></li>
+        <li><a href="{{ route('admin.lessons.index') }}" class="ltd-nav__item {{ Request::is('admin/lessons*') ? 'is-active' : '' }}"><i class="fas fa-calendar-alt"></i> Lessons</a></li>
+        <li><a href="{{ route('admin.lesson-bookings.index') }}" class="ltd-nav__item {{ Request::is('admin/lesson-bookings*') ? 'is-active' : '' }}"><i class="fas fa-calendar-check"></i> Lesson bookings</a></li>
         <li><a href="{{ route('allUser') }}" class="ltd-nav__item {{ Request::is('admin/users*', 'admin/add-user', 'admin/edit-user/*') ? 'is-active' : '' }}"><i class="fas fa-users"></i> Users</a></li>
         <li><a href="{{ route('admin.premium-payments.index') }}" class="ltd-nav__item {{ Request::is('admin/premium-payments*') ? 'is-active' : '' }}"><i class="fas fa-credit-card"></i> Premium Payments</a></li>
         <li><a href="{{ route('admin.school-payments') }}" class="ltd-nav__item {{ Request::is('admin/school-payments*') ? 'is-active' : '' }}"><i class="fas fa-money-bill"></i> School Payments</a></li>

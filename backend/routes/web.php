@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\VisionTestController;
 use App\Http\Controllers\Admin\ExamInformationController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\TutorialController;
+use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\NoticeImportController;
 use App\Http\Controllers\Admin\ProfileVerificationController;
@@ -56,6 +57,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/school-payments',[\App\Http\Controllers\Admin\SchoolPaymentController::class,'index'])->name('admin.school-payments');
+    Route::get('/admin/lessons', [LessonController::class, 'lessons'])->name('admin.lessons.index');
+    Route::get('/admin/lesson-bookings', [LessonController::class, 'bookings'])->name('admin.lesson-bookings.index');
     Route::post('/admin/school-payments/{payment}/refund',[\App\Http\Controllers\Admin\SchoolPaymentController::class,'refund'])->middleware('throttle:5,1')->name('admin.school-payments.refund');
     Route::get('/admin/bulk-import', [\App\Http\Controllers\Admin\BulkImportController::class, 'index'])->name('bulkImport');
     Route::get('/admin/bulk-import/{type}/template', [\App\Http\Controllers\Admin\BulkImportController::class, 'template'])->name('bulkImport.template');

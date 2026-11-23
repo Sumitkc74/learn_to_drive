@@ -13,7 +13,7 @@ class AdminFoundationCompletionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_dashboard_counters_are_not_links_and_activity_is_last(): void
+    public function test_dashboard_counters_are_links_and_activity_is_last(): void
     {
         $this->actingAs(User::where('is_seed_admin', true)->firstOrFail());
         $question = Question::create(['question' => str_repeat('LongSubject', 45), 'option1' => 'A', 'option2' => 'B', 'option3' => 'C', 'option4' => 'D', 'correctOption' => 'A']);
@@ -22,7 +22,20 @@ class AdminFoundationCompletionTest extends TestCase
         @$dom->loadHTML($response->getContent());
         $xpath = new \DOMXPath($dom);
         $this->assertSame(6, $xpath->query('//div[@class="ltd-stat-card"]')->length);
-        $this->assertSame(0, $xpath->query('//div[@class="ltd-stat-card"]//a | //a[.//div[@class="ltd-stat-card"]]')->length);
+        $links = $xpath->query('//a[div[@class="ltd-stat-card"]]');
+        $this->assertSame(6, $links->length);
+        $hrefs = [];
+        foreach ($links as $link) {
+            $hrefs[] = $link->getAttribute('href');
+        }
+        $this->assertSame([
+            route('allUser'),
+            route('allUser', ['role' => 'PremiumUser']),
+            route('allUser', ['joined' => 'this_month']),
+            route('admin.schools.index'),
+            route('admin.schools.index', ['status' => 'Pending']),
+            route('admin.lesson-bookings.index'),
+        ], $hrefs);
         $this->assertSame(1, $xpath->query('//main/div[last()][contains(@class,"ltd-activity")]')->length);
         $response->assertSee($question->question);
     }

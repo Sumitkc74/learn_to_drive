@@ -522,6 +522,14 @@ body.ltd-body {
     border: 1px solid var(--border);
 }
 
+.ltd-stats > a {
+    text-decoration: none;
+}
+
+.ltd-stats > a > .ltd-stat-card {
+    height: 100%;
+}
+
 .ltd-stat-card__icon {
     width: 46px;
     height: 46px;
