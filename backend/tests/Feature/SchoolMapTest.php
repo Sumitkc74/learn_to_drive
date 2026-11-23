@@ -14,21 +14,27 @@ class SchoolMapTest extends TestCase
 
     public function test_public_map_only_lists_approved_schools_and_public_details(): void
     {
-        DrivingSchool::create(['name' => 'Mapped Academy', 'status' => 'Approved', 'address' => 'Kathmandu', 'latitude' => 27.7, 'longitude' => 85.3, 'email' => 'private@example.com']);
+        DrivingSchool::create(['name' => 'Mapped Academy', 'status' => 'Approved', 'address' => 'Kathmandu', 'phone' => '9800000002', 'latitude' => 27.7, 'longitude' => 85.3, 'email' => 'private@example.com']);
         DrivingSchool::create(['name' => 'Unmapped Academy', 'status' => 'Approved']);
         DrivingSchool::create(['name' => 'Pending Academy', 'status' => 'Pending', 'latitude' => 27, 'longitude' => 85]);
         DrivingSchool::create(['name' => 'Suspended Academy', 'status' => 'Suspended']);
         $content = $this->get(route('learn.schools'))->assertOk()->getContent();
-        // Everything before the first <dialog> is the names-only list.
+        // Everything before the first <dialog> is the row-card list.
         [$list, $dialogs] = array_pad(explode('<dialog', $content, 2), 2, '');
         $this->assertStringContainsString('Mapped Academy', $list);
         $this->assertStringContainsString('Unmapped Academy', $list);
         $this->assertStringContainsString('data-lat="27.7"', $content);
-        $this->assertStringNotContainsString('Kathmandu', $list);
+        // Row cards show the name, area and phone — email stays dialog-only.
+        $this->assertStringContainsString('Kathmandu', $list);
+        $this->assertStringContainsString('9800000002', $list);
         $this->assertStringNotContainsString('private@example.com', $list);
         $this->assertStringNotContainsString('Location not added yet', $list);
         $this->assertStringNotContainsString('Pending Academy', $content);
         $this->assertStringNotContainsString('Suspended Academy', $content);
+        // Each card links to its dialog and to its filtered classes page.
+        $this->assertStringContainsString('View details', $list);
+        $this->assertStringContainsString('data-open-school-dialog="school-1"', $list);
+        $this->assertStringContainsString(route('learn.lessons', ['school' => 1]), $list);
         // The details live inside the dialog, not in the list.
         $this->assertStringContainsString('Kathmandu', $dialogs);
         $this->assertStringContainsString('private@example.com', $dialogs);
@@ -36,7 +42,33 @@ class SchoolMapTest extends TestCase
         $this->get(route('learn.schools', ['q' => 'Kathmandu']))->assertOk()->assertSee('Mapped Academy')->assertDontSee('Unmapped Academy');
     }
 
-    public function test_school_dialog_contains_logo_gallery_contact_and_upcoming_lessons(): void
+    public function test_find_schools_renders_row_cards_with_logo_area_phone_and_actions(): void
+    {
+        $school = DrivingSchool::create(['name' => 'Row Card Academy', 'status' => 'Approved',
+            'address' => 'Pokhara', 'phone' => '9800000003', 'email' => 'row@example.com',
+            'latitude' => 28.2, 'longitude' => 83.9]);
+        $school->addMedia(UploadedFile::fake()->image('logo.png'))->toMediaCollection(SchoolMedia::LOGO_COLLECTION);
+        $content = $this->get(route('learn.schools'))->assertOk()->getContent();
+        [$list, $dialogs] = array_pad(explode('<dialog', $content, 2), 2, '');
+        // One full-width row card: logo left, name + area + phone middle,
+        // actions right. Email stays dialog-only.
+        $this->assertStringContainsString('logo.png', $list);
+        $this->assertStringContainsString('Row Card Academy', $list);
+        $this->assertStringContainsString('Pokhara', $list);
+        $this->assertStringContainsString('9800000003', $list);
+        $this->assertStringNotContainsString('row@example.com', $list);
+        $this->assertStringContainsString('View details', $list);
+        $this->assertStringContainsString('data-open-school-dialog="school-'.$school->id.'"', $list);
+        $this->assertStringContainsString('Show upcoming classes', $list);
+        $this->assertStringContainsString(route('learn.lessons', ['school' => $school->id]), $list);
+        // Map hooks ride on the card itself.
+        $this->assertStringContainsString('data-school-marker', $list);
+        $this->assertStringContainsString('data-school-id="'.$school->id.'"', $list);
+        $this->assertStringContainsString('data-lat="28.2"', $list);
+        $this->assertStringContainsString('data-lng="83.9"', $list);
+    }
+
+    public function test_school_dialog_contains_logo_gallery_and_contact_but_no_lessons(): void
     {
         $teacher = User::factory()->create(['is_active' => true, 'name' => 'Dialog Instructor']);
         $school = DrivingSchool::create(['name' => 'Dialog Academy', 'status' => 'Approved',
@@ -52,27 +84,28 @@ class SchoolMapTest extends TestCase
         $learner = User::factory()->create(['is_active' => true]);
         $content = $this->actingAs($learner)->get(route('learn.schools'))->assertOk()->getContent();
         [$list, $dialogs] = array_pad(explode('<dialog', $content, 2), 2, '');
-        // The list below the map shows only the name.
+        // The row card below the map shows the name, area and phone.
         $this->assertStringContainsString('Dialog Academy', $list);
-        $this->assertStringNotContainsString('Lakeside', $list);
-        $this->assertStringNotContainsString('9800000001', $list);
+        $this->assertStringContainsString('Lakeside', $list);
+        $this->assertStringContainsString('9800000001', $list);
         $this->assertStringNotContainsString('dialog@example.com', $list);
         $this->assertStringNotContainsString('Dialog car', $list);
-        // The dialog holds the logo, contact details, gallery and the lesson.
+        // The dialog holds the logo, contact details and gallery — but no
+        // lessons: the lessons page is the one place that lists them.
         $this->assertStringContainsString('logo.png', $dialogs);
         $this->assertStringContainsString('photo.png', $dialogs);
         $this->assertStringContainsString('Lakeside', $dialogs);
         $this->assertStringContainsString('9800000001', $dialogs);
         $this->assertStringContainsString('dialog@example.com', $dialogs);
-        $this->assertStringContainsString('Dialog Instructor', $dialogs);
-        $this->assertStringContainsString('Dialog car', $dialogs);
-        $this->assertStringContainsString('DIALOG-1', $dialogs);
-        $this->assertStringContainsString('1,500', $dialogs);
-        $this->assertStringContainsString('School gate', $dialogs);
-        $this->assertStringContainsString(route('learn.lessons.book', $slot), $dialogs);
+        $this->assertStringNotContainsString('Dialog Instructor', $dialogs);
+        $this->assertStringNotContainsString('Dialog car', $dialogs);
+        $this->assertStringNotContainsString('DIALOG-1', $dialogs);
+        $this->assertStringNotContainsString('1,500', $dialogs);
+        $this->assertStringNotContainsString('School gate', $dialogs);
+        $this->assertStringNotContainsString(route('learn.lessons.book', $slot), $dialogs);
     }
 
-    public function test_school_dialog_shows_sign_in_prompt_to_guests(): void
+    public function test_school_dialog_shows_no_lesson_or_sign_in_prompt_to_guests(): void
     {
         $teacher = User::factory()->create(['is_active' => true]);
         $school = DrivingSchool::create(['name' => 'Guest Academy', 'status' => 'Approved']);
@@ -82,27 +115,12 @@ class SchoolMapTest extends TestCase
         $slot = DrivingLesson::create(['lesson_vehicle_id' => $car->id, 'starts_at' => now()->addDays(2),
             'ends_at' => now()->addDays(2)->addHour(), 'price_npr' => 1500, 'meeting_point' => 'School gate']);
         $dialogs = array_pad(explode('<dialog', $this->get(route('learn.schools'))->assertOk()->getContent(), 2), 2, '')[1];
-        $this->assertStringContainsString('Guest car', $dialogs);
-        $this->assertStringContainsString('Sign in to book', $dialogs);
+        // Guests see the link to the classes page instead of the lesson
+        // itself; booking (and its sign-in prompt) lives on that page.
+        $this->assertStringContainsString('Show upcoming classes', $dialogs);
+        $this->assertStringNotContainsString('Guest car', $dialogs);
+        $this->assertStringNotContainsString('Sign in to book', $dialogs);
         $this->assertStringNotContainsString(route('learn.lessons.book', $slot), $dialogs);
-    }
-
-    public function test_dialog_shows_at_most_five_upcoming_lessons_per_school(): void
-    {
-        $teacher = User::factory()->create(['is_active' => true]);
-        $school = DrivingSchool::create(['name' => 'Busy Academy', 'status' => 'Approved']);
-        SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $teacher->id, 'role' => 'Instructor']);
-        $car = LessonVehicle::create(['driving_school_id' => $school->id, 'instructor_id' => $teacher->id,
-            'name' => 'Busy car', 'registration' => 'BUSY-1', 'transmission' => 'Manual']);
-        for ($day = 1; $day <= 7; $day++) {
-            DrivingLesson::create(['lesson_vehicle_id' => $car->id, 'starts_at' => now()->addDays($day),
-                'ends_at' => now()->addDays($day)->addHour(), 'price_npr' => 1000 + $day, 'meeting_point' => 'Gate '.$day]);
-        }
-        $dialogs = array_pad(explode('<dialog', $this->get(route('learn.schools'))->assertOk()->getContent(), 2), 2, '')[1];
-        $this->assertStringContainsString('Gate 1', $dialogs);
-        $this->assertStringContainsString('Gate 5', $dialogs);
-        $this->assertStringNotContainsString('Gate 6', $dialogs);
-        $this->assertStringNotContainsString('Gate 7', $dialogs);
     }
 
     public function test_school_names_are_escaped_and_empty_search_is_supported(): void

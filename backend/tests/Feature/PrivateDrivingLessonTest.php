@@ -162,6 +162,20 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false);
     }
 
+    public function test_school_dialog_lists_no_lessons_only_links_to_the_classes_page(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        $this->get(route('learn.schools'))->assertOk()
+            // The dialog keeps both action links…
+            ->assertSee('Book a private driving lesson')
+            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false)
+            // …but no longer renders the school's lessons inline: the
+            // lessons page is the one place that lists them.
+            ->assertDontSee('Upcoming lessons')
+            ->assertDontSee('Book this lesson')
+            ->assertDontSee('No upcoming lessons from this school yet.');
+    }
+
     public function test_upcoming_classes_page_shows_time_car_and_instructor_on_each_card(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();

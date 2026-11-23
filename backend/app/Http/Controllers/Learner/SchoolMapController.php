@@ -3,16 +3,12 @@
 namespace App\Http\Controllers\Learner;
 
 use App\Http\Controllers\Controller;
-use App\Models\{DrivingLesson, DrivingSchool, SchoolJoinRequest};
+use App\Models\{DrivingSchool, SchoolJoinRequest};
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class SchoolMapController extends Controller
 {
-    // Upcoming lessons shown inside each school's dialog. Bounded at 5
-    // per school so the page never loads every lesson for every school.
-    public const DIALOG_LESSONS_PER_SCHOOL = 5;
-
     public function index(Request $request)
     {
         $data = $request->validate(['q' => ['nullable', 'string', 'max:100']]);
@@ -25,20 +21,7 @@ class SchoolMapController extends Controller
             ->withQueryString();
         $memberSchoolIds = $request->user()?->schoolMemberships()->pluck('driving_school_id')->all() ?? [];
 
-        // One query for the bookable lessons of every school on this page,
-        // grouped by school and capped per school. Same availability rules
-        // as the lessons index: approved provider, future, not cancelled,
-        // no confirmed booking.
-        $upcomingLessons = DrivingLesson::availableProvider()
-            ->where('cancelled', false)->where('starts_at', '>', now())
-            ->whereDoesntHave('bookings', fn ($b) => $b->where('status', 'Booked'))
-            ->whereHas('vehicle', fn ($v) => $v->whereIn('driving_school_id', $schools->pluck('id')))
-            ->with(['vehicle.school.media', 'vehicle.instructor'])
-            ->orderBy('starts_at')->take(self::DIALOG_LESSONS_PER_SCHOOL * max(1, $schools->count()))
-            ->get()->groupBy(fn ($lesson) => $lesson->vehicle->driving_school_id)
-            ->map(fn ($lessons) => $lessons->take(self::DIALOG_LESSONS_PER_SCHOOL));
-
-        return response()->view('learner.schools', compact('schools', 'search', 'memberSchoolIds', 'upcomingLessons'))
+        return response()->view('learner.schools', compact('schools', 'search', 'memberSchoolIds'))
             ->header('Referrer-Policy', 'strict-origin-when-cross-origin');
     }
 
