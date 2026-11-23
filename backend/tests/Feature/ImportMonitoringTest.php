@@ -7,13 +7,13 @@ use App\Models\User;
 use Tests\TestCase;
 class ImportMonitoringTest extends TestCase {
     use RefreshDatabase;
-    public function test_history_records_success_and_safe_failure_and_admin_access(): void {
+    public function test_history_records_success_and_real_failure_message_and_admin_access(): void {
         $history=app(ContentSourceHistory::class);
         $history->run('sample',fn()=>['added'=>2,'known'=>3]);
-        try {$history->run('sample',fn()=>throw new \RuntimeException('secret-provider-detail'));} catch (\RuntimeException $e) {}
+        try {$history->run('sample',fn()=>throw new \RuntimeException('Connection refused for https://example.org/feed'));} catch (\RuntimeException $e) {}
         $this->assertDatabaseHas('content_source_runs',['status'=>'Success','added'=>2,'known'=>3]);
-        $this->assertDatabaseHas('content_source_runs',['status'=>'Failed']);
-        $this->actingAs(User::factory()->create(['role'=>'Admin']))->get(route('importHistory'))->assertOk()->assertSee('sample')->assertDontSee('secret-provider-detail');
+        $this->assertDatabaseHas('content_source_runs',['status'=>'Failed','error'=>'Connection refused for https://example.org/feed']);
+        $this->actingAs(User::factory()->create(['role'=>'Admin']))->get(route('importHistory'))->assertOk()->assertSee('sample')->assertSee('Connection refused');
         $this->actingAs(User::factory()->create(['role'=>'User']))->get(route('importHistory'))->assertForbidden();
     }
     public function test_daily_limit_does_not_allow_extra_requests_and_resets_next_day(): void {

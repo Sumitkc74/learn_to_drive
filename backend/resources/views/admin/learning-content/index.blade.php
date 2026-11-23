@@ -36,6 +36,7 @@
         <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt mr-2"></i>Check Source</button>
     </form>
     <p class="text-muted small mt-3 mb-0">New resources enter Pending review. Repeated source checks preserve existing reviews. Approved references are not published to learners.</p>
+    @include('admin.partials.source-last-check')
 </div>
 <div class="ltd-panel">
     @include('admin.crud.partials.table-controls', ['items' => $imports, 'sortOptions' => ['created_at' => 'Date added', 'title' => 'Title', 'status' => 'Review status', 'fetched_at' => 'Date fetched'], 'filters' => [

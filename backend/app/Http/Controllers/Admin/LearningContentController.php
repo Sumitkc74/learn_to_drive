@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use App\Models\LearningContentImport;
 use App\Models\TrafficSign;
+use App\Services\ContentSourceHistory;
 use App\Services\LearningContentCollector;
 use App\Services\LearningContentDownload;
 use App\Support\AdminTable;
@@ -124,7 +125,7 @@ class LearningContentController extends Controller
                 'kind' => ['allowed' => array_keys($categories)],
             ]);
 
-        return view('admin.learning-content.index', compact('imports', 'sources', 'categories', 'category'));
+        return view('admin.learning-content.index', compact('imports', 'sources', 'categories', 'category') + ['lastChecks' => app(ContentSourceHistory::class)->latestRuns(array_keys($sources)), 'sourceLabels' => array_map(fn ($source) => $source['name'], $sources)]);
     }
 
     public function fetch(Request $request, LearningContentCollector $collector)

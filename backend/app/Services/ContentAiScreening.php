@@ -22,6 +22,22 @@ class ContentAiScreening {
         if ($record->ai_status === null) return; // Previously reviewed/imported records remain usable.
         abort_unless(in_array($record->ai_status,['Ready','Flagged']) && hash_equals((string)$record->ai_hash,$this->fingerprint($record)),409,'Complete AI screening for the current source before human approval.');
     }
+    /**
+     * Transient provider errors: the call never reached a verdict because
+     * Gemini was busy or unreachable. These deserve a delayed retry
+     * instead of an immediate Failed — a 503 storm otherwise burns the
+     * whole retry budget within minutes. A connection error against a
+     * source host is a permanent fetch failure, so a cURL error only
+     * counts as transient when it names the Gemini endpoint.
+     */
+    private function isTransientProviderError(\Throwable $e): bool
+    {
+        $message = $e->getMessage();
+        if (preg_match('/Gemini API error \(HTTP (429|503)\)/', $message) === 1) return true;
+
+        return str_contains($message, 'generativelanguage.googleapis.com');
+    }
+
     public function screen($record): void {
         // The Running marker is bookkeeping, not an admin-visible change:
         // save it quietly so the audit observer writes one entry for the
@@ -34,11 +50,15 @@ class ContentAiScreening {
             if (!$key || !preg_match('/^[a-zA-Z0-9._-]+$/',(string)$model)) throw new RuntimeException('Gemini API key is not configured or the model name is invalid.');
             $parts = [['text'=>json_encode(['title'=>$record->title,'source'=>$record->source_url,'kind'=>$record->kind])]];
             if ($record instanceof LearningContentImport) {
-                if (!$record->file_path) {
+                // The stored file lives on the local learning-content disk,
+                // which a redeploy can wipe. A missing file is re-downloaded
+                // instead of failing: only a failed re-download (or a file
+                // still missing / over 8 MB afterwards) throws below.
+                if (!$record->file_path || !Storage::disk('learning-content')->exists($record->file_path)) {
                     $file = app(LearningContentDownload::class)->fetch($record);
                     $record->refresh();
                     if ($record->status !== 'Pending') return;
-                    if (!$record->file_path) $record->forceFill($file)->save();
+                    $record->forceFill($file)->save();
                 }
                 $disk = Storage::disk('learning-content');
                 if (!$disk->exists($record->file_path) || $disk->size($record->file_path)>8*1024*1024) throw new RuntimeException('Source file is missing from storage or exceeds the 8 MB limit.');
@@ -117,6 +137,27 @@ class ContentAiScreening {
             // The detail comes from our own checks and from Google's error
             // body; it never contains the API key.
             $detail = $e->getMessage() !== '' ? $e->getMessage() : get_class($e);
+            if ($this->isTransientProviderError($e)) {
+                // Same three-retry budget the recovery command enforces:
+                // re-queue while the count stays within it, and only fail
+                // once it is exhausted.
+                $retries = (int) $record->ai_retry_count + 1;
+                if ($retries <= 3) {
+                    $delay = \App\Jobs\ScreenImportedContent::backoffDelay($retries);
+                    // Back in Queued with the retry scheduled: the job gate
+                    // in ScreenImportedContent::handle() only runs Queued
+                    // records, and ai_activity_at at the run time keeps the
+                    // five-minute recovery command from re-queueing it early.
+                    $record->forceFill([
+                        'ai_status' => 'Queued',
+                        'ai_retry_count' => $retries,
+                        'ai_activity_at' => now()->addSeconds($delay),
+                        'ai_report' => 'Gemini was temporarily unavailable. Screening will retry automatically in '.(int) ceil($delay / 60).' minute(s).'."\n\nTechnical detail: ".mb_substr($detail, 0, 1000),
+                    ])->save();
+                    \App\Jobs\ScreenImportedContent::dispatch($record instanceof LearningContentImport ? 'learning' : 'notice', $record->id)->delay($delay)->afterCommit();
+                    return;
+                }
+            }
             $record->forceFill(['ai_status'=>'Failed','ai_activity_at'=>now(),'ai_report'=>'Screening failed. Check Gemini configuration, source availability, and the 8 MB AI file limit, then retry.'."\n\nTechnical detail: ".mb_substr($detail,0,1000)])->save();
         }
     }

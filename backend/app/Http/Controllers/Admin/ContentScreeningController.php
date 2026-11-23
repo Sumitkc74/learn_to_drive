@@ -15,13 +15,17 @@ class ContentScreeningController extends \App\Http\Controllers\Controller {
     }
     public function retryFlagged() {
         $count=0;
+        // One stagger sequence for the whole bulk retry, so the queued
+        // screenings reach Gemini seconds apart instead of all at once.
+        $index=0;
         foreach (['learning'=>\App\Models\LearningContentImport::class,'notice'=>\App\Models\GovernmentNoticeImport::class] as $kind=>$class) {
-            $class::where('status','Pending')->where('ai_status','Flagged')->orderBy('id')->chunkById(100,function($rows) use($kind,$class,&$count) {
-                foreach ($rows as $row) \Illuminate\Support\Facades\DB::transaction(function () use ($row,$kind,$class,&$count) {
+            $class::where('status','Pending')->where('ai_status','Flagged')->orderBy('id')->chunkById(100,function($rows) use($kind,$class,&$count,&$index) {
+                foreach ($rows as $row) \Illuminate\Support\Facades\DB::transaction(function () use ($row,$kind,$class,&$count,&$index) {
                     $record=$class::lockForUpdate()->find($row->id);
                     if (!$record || $record->status!=='Pending' || $record->ai_status!=='Flagged') return;
-                    $record->forceFill(['ai_status'=>'Queued','ai_report'=>null,'ai_retry_count'=>0,'ai_activity_at'=>now()])->save();
-                    \App\Jobs\ScreenImportedContent::dispatch($kind,$record->id)->afterCommit();
+                    $delay=\App\Jobs\ScreenImportedContent::staggerDelay($index++);
+                    $record->forceFill(['ai_status'=>'Queued','ai_report'=>null,'ai_retry_count'=>0,'ai_activity_at'=>now()->addSeconds($delay)])->save();
+                    \App\Jobs\ScreenImportedContent::dispatch($kind,$record->id)->delay($delay)->afterCommit();
                     $count++;
                 });
             });
@@ -30,13 +34,17 @@ class ContentScreeningController extends \App\Http\Controllers\Controller {
     }
     public function retryFailed() {
         $count=0;
+        // One stagger sequence for the whole bulk retry, so the queued
+        // screenings reach Gemini seconds apart instead of all at once.
+        $index=0;
         foreach (['learning'=>\App\Models\LearningContentImport::class,'notice'=>\App\Models\GovernmentNoticeImport::class] as $kind=>$class) {
-            $class::where('status','Pending')->where('ai_status','Failed')->orderBy('id')->chunkById(100,function($rows) use($kind,$class,&$count) {
-                foreach ($rows as $row) \Illuminate\Support\Facades\DB::transaction(function () use ($row,$kind,$class,&$count) {
+            $class::where('status','Pending')->where('ai_status','Failed')->orderBy('id')->chunkById(100,function($rows) use($kind,$class,&$count,&$index) {
+                foreach ($rows as $row) \Illuminate\Support\Facades\DB::transaction(function () use ($row,$kind,$class,&$count,&$index) {
                     $record=$class::lockForUpdate()->find($row->id);
                     if (!$record || $record->status!=='Pending' || $record->ai_status!=='Failed') return;
-                    $record->forceFill(['ai_status'=>'Queued','ai_report'=>null,'ai_retry_count'=>0,'ai_activity_at'=>now()])->save();
-                    \App\Jobs\ScreenImportedContent::dispatch($kind,$record->id)->afterCommit();
+                    $delay=\App\Jobs\ScreenImportedContent::staggerDelay($index++);
+                    $record->forceFill(['ai_status'=>'Queued','ai_report'=>null,'ai_retry_count'=>0,'ai_activity_at'=>now()->addSeconds($delay)])->save();
+                    \App\Jobs\ScreenImportedContent::dispatch($kind,$record->id)->delay($delay)->afterCommit();
                     $count++;
                 });
             });

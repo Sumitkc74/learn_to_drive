@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GovernmentNoticeImport;
 use App\Models\Notice;
+use App\Services\ContentSourceHistory;
 use App\Services\DotmNoticeImporter;
 use App\Support\AdminTable;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class GovernmentNoticeImportController extends Controller
     {
         if (!$request->query->has('sort')) $request->query->set('sort', 'fetched_at');
         $imports = AdminTable::paginate(GovernmentNoticeImport::with('reviewer'), $request, ['title', 'source_name', 'source_url'], ['id', 'title', 'status', 'fetched_at', 'reviewed_at'], ['status' => ['allowed' => ['Pending', 'Approved', 'Rejected']]]);
-        return view('admin.crud.notices.government-imports', compact('imports') + ['screeningCounts' => GovernmentNoticeImport::screeningCounts('Pending')]);
+        return view('admin.crud.notices.government-imports', compact('imports') + ['screeningCounts' => GovernmentNoticeImport::screeningCounts('Pending')] + ['lastChecks' => app(ContentSourceHistory::class)->latestRuns(['government-notices']), 'sourceLabels' => ['government-notices' => 'Government notices']]);
     }
 
     public function fetch(DotmNoticeImporter $importer)
