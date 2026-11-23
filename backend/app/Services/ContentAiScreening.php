@@ -4,6 +4,17 @@ use App\Models\LearningContentImport;
 use Illuminate\Support\Facades\{Http, Storage};
 use RuntimeException;
 class ContentAiScreening {
+    /** Same host/scheme/port checks as DotmNoticeImporter, applied to every redirect hop while fetching a notice page. */
+    private function allowedNoticeRedirect(string $url): bool
+    {
+        $parts = parse_url($url);
+
+        return is_array($parts) && ($parts['scheme'] ?? '') === 'https'
+            && in_array(strtolower((string) ($parts['host'] ?? '')), ['dotm.gov.np', 'www.dotm.gov.np'], true)
+            && ! isset($parts['user']) && ! isset($parts['pass'])
+            && (! isset($parts['port']) || $parts['port'] === 443);
+    }
+
     public function fingerprint($record): string {
         return hash('sha256', json_encode([$record->title,$record->source_url,$record->asset_url,$record->file_hash]));
     }
@@ -43,11 +54,33 @@ class ContentAiScreening {
                 $parts[]=['inlineData'=>['mimeType'=>$mime,'data'=>base64_encode($bytes)]];
                 $scope='Saved PDF/image';
             } else {
-                $response=app(PublicWebsiteRequest::class)->get($record->source_url);
+                // Government notices live on dotm.gov.np only. Fetch them with
+                // the same-host redirect follower used by the importer: the
+                // generic public-website fetcher refuses every redirect, so a
+                // notice whose URL 301s (e.g. a moved page) failed screening
+                // as "could not be fetched (HTTP 301)". Redirects off the
+                // official domain are still refused below.
+                $response = $record instanceof \App\Models\GovernmentNoticeImport
+                    ? app(RedirectFollowingRequest::class)->get(
+                        $record->source_url,
+                        fn ($url) => $this->allowedNoticeRedirect($url),
+                        fn ($url) => Http::withOptions([
+                            'allow_redirects' => false, 'stream' => true,
+                            'verify' => config('official-content.ca_bundle') ?: true,
+                        ])->timeout(25)->withHeaders([
+                            'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (one-page public notice check)',
+                            'Accept' => 'text/html,application/xhtml+xml',
+                        ])->get($url)
+                    )
+                    : app(PublicWebsiteRequest::class)->get($record->source_url);
                 if (!$response->successful()) throw new RuntimeException('Official page could not be fetched (HTTP '.$response->status().').');
                 $stream=$response->toPsrResponse()->getBody(); $html='';
                 try { while (!$stream->eof()) { $html.=$stream->read(65536); if (strlen($html)>2*1024*1024) throw new RuntimeException('Official page exceeds the 2 MB read limit.'); } } finally { $stream->close(); }
-                $parts[]=['text'=>mb_substr(strip_tags($html),0,18000)];
+                // Extract the notice body from the page's main content region.
+                // strip_tags over the whole document kept the <style> and
+                // <script> text, so screening received raw CSS and navigation
+                // instead of the notice itself.
+                $parts[]=['text'=>mb_substr(app(NoticePageTextExtractor::class)->extract($html),0,18000)];
                 $scope='Notice page text (first 18,000 characters); linked documents not checked';
             }
             $hash=$this->fingerprint($record);

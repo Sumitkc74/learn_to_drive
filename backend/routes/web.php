@@ -91,6 +91,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/import-history', [\App\Http\Controllers\Admin\ImportHistoryController::class, 'index'])->name('importHistory');
     Route::post('/admin/content-screening/{kind}/{id}', [\App\Http\Controllers\Admin\ContentScreeningController::class, 'retry'])->whereNumber('id')->middleware('throttle:10,1')->name('contentScreening.retry');
     Route::post('/admin/content-screening/retry-failed', [\App\Http\Controllers\Admin\ContentScreeningController::class, 'retryFailed'])->middleware('throttle:3,10')->name('contentScreening.retryFailed');
+    Route::post('/admin/content-screening/retry-flagged', [\App\Http\Controllers\Admin\ContentScreeningController::class, 'retryFlagged'])->middleware('throttle:3,10')->name('contentScreening.retryFlagged');
     Route::post('/admin/learning-content/upload-pdf', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'upload'])->middleware('throttle:5,10')->name('pdfTranslations.upload');
     Route::post('/admin/learning-content/{resource}/translate', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'start'])->whereNumber('resource')->middleware('throttle:3,10')->name('pdfTranslations.start');
     Route::get('/admin/pdf-translations/{translation}', [\App\Http\Controllers\Admin\PdfTranslationController::class, 'show'])->name('pdfTranslations.show');

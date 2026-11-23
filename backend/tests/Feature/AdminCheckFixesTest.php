@@ -31,8 +31,8 @@ class AdminCheckFixesTest extends TestCase
     private function notice(array $overrides = []): GovernmentNoticeImport
     {
         return GovernmentNoticeImport::create(array_merge([
-            'source_name' => 'Official', 'source_domain' => 'example.org',
-            'source_url' => 'https://example.org/notice', 'title' => 'Notice',
+            'source_name' => 'Official', 'source_domain' => 'dotm.gov.np',
+            'source_url' => 'https://dotm.gov.np/notice', 'title' => 'Notice',
             'content_hash' => hash('sha256', 'notice-'.Str::random(8)),
             'status' => 'Pending', 'fetched_at' => now(),
         ], $overrides));
@@ -43,7 +43,7 @@ class AdminCheckFixesTest extends TestCase
         config(['pdf-translation.gemini_key' => 'fake', 'pdf-translation.gemini_model' => 'gemini-test', 'content-screening.daily_limit' => 100]);
         $record = $this->notice();
         $page = new \Illuminate\Http\Client\Response(new \GuzzleHttp\Psr7\Response(200, [], 'Driving licence notice'));
-        $this->mock(\App\Services\PublicWebsiteRequest::class)->shouldReceive('get')->once()->andReturn($page);
+        $this->mock(\App\Services\RedirectFollowingRequest::class)->shouldReceive('get')->once()->andReturn($page);
         Http::fake(['*' => Http::response(['error' => ['code' => 400, 'message' => 'API key not valid. Please pass a valid API key.', 'status' => 'INVALID_ARGUMENT']], 400)]);
 
         app(ContentAiScreening::class)->screen($record);
