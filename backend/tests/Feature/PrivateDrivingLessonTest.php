@@ -23,14 +23,15 @@ class PrivateDrivingLessonTest extends TestCase
         return [$teacher, $school, $car, $slot];
     }
 
-    public function test_public_search_shows_car_registration_but_hides_private_email_and_unapproved_or_removed_instructors(): void
+    public function test_public_search_hides_car_registration_and_private_email_and_unapproved_or_removed_instructors(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();
-        // The lesson card is a bookable offer: the car's registration is
-        // shown so the learner knows which car they are booking. The
+        // The lesson card is a bookable offer: the car's name and type are
+        // shown, but the registration is hidden on the public listing so a
+        // test-looking plate never reads as fake data to visitors. The
         // instructor's email stays private.
         $this->get(route('learn.lessons'))->assertOk()->assertSee('Training car')->assertSee('1,500')
-            ->assertSee($car->registration)->assertDontSee($teacher->email);
+            ->assertDontSee($car->registration)->assertDontSee($teacher->email);
         $this->get(route('learn.lessons', ['transmission' => 'Automatic']))->assertOk()->assertDontSee('Training car');
         $school->update(['status' => 'Suspended']);
         $this->get(route('learn.lessons'))->assertOk()->assertDontSee('Training car');
@@ -124,11 +125,11 @@ class PrivateDrivingLessonTest extends TestCase
         $this->post(route('learn.instructor.vehicles'), $payload)->assertSessionHasErrors('registration');
     }
 
-    public function test_lesson_card_shows_school_logo_and_car_registration(): void
+    public function test_lesson_card_shows_school_logo_but_hides_car_registration(): void
     {
         [$teacher, $school, $car, $slot] = $this->offering();
         $school->addMedia(UploadedFile::fake()->image('logo.png'))->toMediaCollection(SchoolMedia::LOGO_COLLECTION);
-        $this->get(route('learn.lessons'))->assertOk()->assertSee('logo.png')->assertSee($car->registration);
+        $this->get(route('learn.lessons'))->assertOk()->assertSee('logo.png')->assertDontSee($car->registration);
         // Without a logo the card falls back to the school's initial.
         [$otherTeacher, $otherSchool, $otherCar] = $this->offering();
         $otherSchool->update(['name' => 'Zebra Academy']);
@@ -186,8 +187,9 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee($date)
             ->assertSee($time)
             ->assertSee('Training car')
+            ->assertSee('Training car · Manual')
             ->assertSee($teacher->name)
-            ->assertSee($car->registration)
+            ->assertDontSee($car->registration)
             ->assertSee('Nepal time')
             // The card is one compact row: values only, no label tags.
             ->assertSee('class="card lesson-row"', false)
@@ -196,6 +198,22 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee('School reception')
             ->assertDontSee('<dl')
             ->assertDontSee('<dt>');
+    }
+
+    public function test_public_lesson_listing_shows_car_type_but_not_registration_while_own_booking_keeps_it(): void
+    {
+        [$teacher, $school, $car, $slot] = $this->offering();
+        // Mirror the live test-data plate: the public listing must show
+        // the car type but never the plate itself.
+        $car->update(['registration' => 'TEST0002']);
+        $this->get(route('learn.lessons'))->assertOk()
+            ->assertSee('Training car · Manual')
+            ->assertDontSee('TEST0002');
+        // The learner's own booking is operational, not public: the plate
+        // stays visible there so they can identify their car.
+        $learner = User::factory()->create(['is_active' => true]);
+        $this->actingAs($learner)->post(route('learn.lessons.book', $slot))->assertSessionHasNoErrors();
+        $this->get(route('learn.lessons.bookings'))->assertOk()->assertSee('TEST0002');
     }
 
     public function test_institute_dropdown_lists_approved_schools_and_filters_classes(): void

@@ -15,7 +15,7 @@
     <button class="button">{{ __('Search') }}</button> <a href="{{ route('learn.lessons', $school ? ['school' => $school->id] : []) }}">{{ __('Clear') }}</a>
 </form>
 <div class="lesson-list">@forelse($lessons as $lesson)
-<article class="card lesson-row">@include('learner.lessons.details')
+<article class="card lesson-row">{{-- The public listing shows the car, not its plate: test-looking registrations read as fake data to visitors. --}}@include('learner.lessons.details', ['hideVehicleRegistration' => true])
     <div class="lesson-action">
     @auth
     @if(request('availability')==='booked')
