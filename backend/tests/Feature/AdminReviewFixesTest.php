@@ -100,6 +100,12 @@ class AdminReviewFixesTest extends TestCase
 
     public function test_backups_page_loads_and_backup_creation_verifies_on_sqlite(): void
     {
+        // The backup archives every disk, including the remote
+        // learning-content disk, so fake them: this test proves backup
+        // creation and verification on sqlite, not any storage backend.
+        foreach (['public', 'learning-content'] as $disk) {
+            Storage::fake($disk);
+        }
         $this->actingAs($this->admin())->get(route('backups'))->assertOk();
         // VACUUM INTO (used for the sqlite snapshot) cannot run inside a
         // transaction, and RefreshDatabase wraps every test in one, so end

@@ -28,9 +28,10 @@ class LearningContentController extends Controller
         ]);
         DB::transaction(function () use ($resource, $data) {
             $source = LearningContentImport::lockForUpdate()->findOrFail($resource->id);
-            $disk = Storage::disk('learning-content');
             abort_unless($source->kind === 'vision-test-image' && $source->status === 'Approved'
-                && $source->file_path && $disk->exists($source->file_path), 409, 'Approve the saved reference first.');
+                && $source->file_path, 409, 'Approve the saved reference first.');
+            $disk = Storage::disk('learning-content');
+            abort_unless($disk->exists($source->file_path), 409, 'Approve the saved reference first.');
             $bytes = $disk->get($source->file_path);
             abort_unless(hash_equals((string) $source->file_hash, hash('sha256', $bytes))
                 && hash_equals((string) $source->file_hash, $data['file_hash']), 409, 'The source image has changed.');
@@ -76,8 +77,9 @@ class LearningContentController extends Controller
         abort_unless(function_exists('imagecreatefromstring'), 503, 'Enable the PHP GD extension to extract signs.');
         DB::transaction(function () use ($resource, $data) {
             $source = LearningContentImport::lockForUpdate()->findOrFail($resource->id);
+            abort_unless($source->kind === 'traffic-sign-sheet' && $source->status !== 'Rejected' && $source->file_path, 409);
             $disk = Storage::disk('learning-content');
-            abort_unless($source->kind === 'traffic-sign-sheet' && $source->status !== 'Rejected' && $source->file_path && $disk->exists($source->file_path), 409);
+            abort_unless($disk->exists($source->file_path), 409);
             $bytes = $disk->get($source->file_path);
             abort_unless(hash_equals((string) $source->file_hash, hash('sha256', $bytes)), 409, 'The source image has changed.');
             $size = @getimagesizefromstring($bytes);
@@ -225,9 +227,13 @@ class LearningContentController extends Controller
             abort_if($locked->assigned_to && $locked->assigned_to !== auth()->id(),409,'This resource is assigned to another admin.');
             if ($data['decision'] === 'Approved') {
                 app(\App\Services\ContentAiScreening::class)->requireScreened($locked);
+                // Check for a saved copy before resolving the disk: the
+                // disk needs its bucket configured, and there is nothing
+                // to look up when no copy was ever saved.
+                abort_unless($locked->file_path, 409, 'Save and inspect a private copy first.');
                 $disk = Storage::disk('learning-content');
-                abort_unless($locked->file_path && $disk->exists($locked->file_path), 409, 'Save and inspect a private copy first.');
-                abort_unless(hash_equals((string) $locked->file_hash, hash_file('sha256', $disk->path($locked->file_path))), 409, 'The saved file has changed. Approval was blocked.');
+                abort_unless($disk->exists($locked->file_path), 409, 'Save and inspect a private copy first.');
+                abort_unless(hash_equals((string) $locked->file_hash, hash('sha256', $disk->get($locked->file_path))), 409, 'The saved file has changed. Approval was blocked.');
                 $locked->forceFill(collect($data)->only(['title', 'language', 'licence_category', 'edition'])->all());
             }
             $locked->forceFill(['status' => $data['decision'], 'review_notes' => $data['review_notes'], 'reviewed_by' => auth()->id(), 'reviewed_at' => now()])->save();

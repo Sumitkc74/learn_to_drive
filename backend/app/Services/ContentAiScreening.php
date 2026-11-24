@@ -50,10 +50,13 @@ class ContentAiScreening {
             if (!$key || !preg_match('/^[a-zA-Z0-9._-]+$/',(string)$model)) throw new RuntimeException('Gemini API key is not configured or the model name is invalid.');
             $parts = [['text'=>json_encode(['title'=>$record->title,'source'=>$record->source_url,'kind'=>$record->kind])]];
             if ($record instanceof LearningContentImport) {
-                // The stored file lives on the local learning-content disk,
-                // which a redeploy can wipe. A missing file is re-downloaded
-                // instead of failing: only a failed re-download (or a file
-                // still missing / over 8 MB afterwards) throws below.
+                // The stored file lives on the private R2
+                // learning-content disk. A file can still be missing —
+                // rows created before the move point at the old local
+                // disk, or a stored copy may have been deleted — so a
+                // missing file is re-downloaded instead of failing: only
+                // a failed re-download (or a file still missing / over
+                // 8 MB afterwards) throws below.
                 if (!$record->file_path || !Storage::disk('learning-content')->exists($record->file_path)) {
                     $file = app(LearningContentDownload::class)->fetch($record);
                     $record->refresh();

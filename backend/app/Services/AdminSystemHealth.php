@@ -6,7 +6,6 @@ use App\Models\LearningContentImport;
 use App\Models\PdfExtractionRun;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class AdminSystemHealth
 {
@@ -24,7 +23,10 @@ class AdminSystemHealth
     {
         $seen = Cache::get(self::HEARTBEAT);
         $age = $seen ? max(0, now()->timestamp - (int) $seen) : null;
-        $root = Storage::disk('learning-content')->path('');
+        // The learning-content disk is remote (private R2), so there is
+        // no local path to probe for it. Check the local scratch
+        // directory the PDF worker stages files into instead.
+        $root = storage_path('app/private/learning-content-tmp');
         $probe = is_dir($root) ? $root : storage_path('app');
         $free = @disk_free_space($probe);
         $total = @disk_total_space($probe);

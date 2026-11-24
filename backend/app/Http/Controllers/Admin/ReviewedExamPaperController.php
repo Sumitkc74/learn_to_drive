@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use App\Models\ExamPaper;
 use App\Models\LearningContentImport;
+use App\Services\LocalPdfTools;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,22 +28,27 @@ class ReviewedExamPaperController extends Controller
         DB::transaction(function () use ($data, $selections, $ids) {
             $sources = LearningContentImport::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             abort_unless($sources->count() === count($selections), 409, 'A selected reference is unavailable.');
-            $disk = Storage::disk('learning-content');
             $files = [];
             foreach ($selections as $index => [$id, $hash]) {
                 $source = $sources->get((int) $id);
                 abort_unless($source->kind === 'question-bank-document' && $source->status === 'Approved'
                     && in_array($source->language, ['English', 'Nepali'], true)
-                    && $source->file_path && $disk->exists($source->file_path), 409, 'Select an approved PDF with a language category and saved copy.');
+                    && $source->file_path, 409, 'Select an approved PDF with a language category and saved copy.');
+                $disk = Storage::disk('learning-content');
+                abort_unless($disk->exists($source->file_path), 409, 'Select an approved PDF with a language category and saved copy.');
                 \Illuminate\Support\Facades\Validator::make($data, [
                     'name' => [new \App\Rules\DocumentLanguage($source->language)],
                     'description' => [new \App\Rules\DocumentLanguage($source->language)],
                 ])->validate();
-                $path = $disk->path($source->file_path);
+                // The disk is remote: verify the bytes from the disk,
+                // then stage a local copy for the media library, which
+                // needs a real file path.
+                $bytes = $disk->get($source->file_path);
                 abort_unless(hash_equals((string) $source->file_hash, $hash)
-                    && hash_equals($hash, hash_file('sha256', $path)), 409, 'A source PDF has changed. Reload and review it again.');
-                abort_unless(filesize($path) <= AppSetting::documentLimitKb() * 1024
-                    && (new \finfo(FILEINFO_MIME_TYPE))->file($path) === 'application/pdf', 422, 'Invalid PDF or document exceeds the upload limit.');
+                    && hash_equals($hash, hash('sha256', $bytes)), 409, 'A source PDF has changed. Reload and review it again.');
+                abort_unless(strlen($bytes) <= AppSetting::documentLimitKb() * 1024
+                    && (new \finfo(FILEINFO_MIME_TYPE))->buffer($bytes) === 'application/pdf', 422, 'Invalid PDF or document exceeds the upload limit.');
+                $path = app(LocalPdfTools::class)->stageBytes($bytes, (string) $source->file_hash);
                 if (Media::where('model_type', (new ExamPaper)->getMorphClass())
                     ->where('custom_properties->source_hash', $hash)->exists()) {
                     throw ValidationException::withMessages(['file_hash' => 'This PDF is already in Question Banks.']);

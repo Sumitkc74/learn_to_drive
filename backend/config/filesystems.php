@@ -31,9 +31,30 @@ return [
     'disks' => [
         'protected-media' => ['driver'=>'local','root'=>storage_path('app/private/media'),'visibility'=>'private','throw'=>true],
 
+        /*
+         | Learning-content review copies live in their own PRIVATE R2
+         | bucket (AWS_LEARNING_CONTENT_BUCKET), separate from the public
+         | media bucket. R2 enforces visibility at the bucket level only —
+         | it has no per-object ACLs — so a prefix inside the public
+         | bucket would still leave these files fetchable through the
+         | public R2 URL. This disk therefore has no 'url' key (no public
+         | URL can ever be generated for a review copy) and no
+         | 'visibility' key (no ACL headers are sent; the bucket being
+         | private is what keeps the files private). Files are served
+         | only through the authenticated admin routes, which stream
+         | them from this disk. Create the bucket in Cloudflare with
+         | public access OFF and give the R2 token Object Read & Write
+         | on it; the endpoint and credentials are shared with the
+         | media disk.
+         */
         'learning-content' => [
-            'driver' => 'local',
-            'root' => storage_path('app/private/learning-content'),
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_LEARNING_CONTENT_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => true,
         ],
 

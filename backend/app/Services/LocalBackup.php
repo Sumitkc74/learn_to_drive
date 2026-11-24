@@ -40,8 +40,11 @@ class LocalBackup {
                 foreach($disk->allFiles() as $file) {
                     if($diskName==='learning-content' && (str_starts_with($file,'pdf-previews/') || str_starts_with($file,'translation-builds/'))) continue;
                     $name='files/'.$diskName.'/'.$file;
-                    $manifest[$name]=hash_file('sha256',$disk->path($file));
-                    if(!$zip->addFile($disk->path($file),$name)) throw new RuntimeException('Could not add an upload.');
+                    // The learning-content disk is remote: hash and zip
+                    // the downloaded bytes instead of a local path.
+                    $contents=$disk->get($file);
+                    $manifest[$name]=hash('sha256',$contents);
+                    if(!$zip->addFromString($name,$contents)) throw new RuntimeException('Could not add an upload.');
                 }
             }
             $zip->addFromString('manifest.json',json_encode($manifest));

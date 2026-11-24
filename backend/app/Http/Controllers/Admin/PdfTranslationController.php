@@ -21,7 +21,7 @@ class PdfTranslationController extends Controller {
             $resource = LearningContentImport::create(['source_key' => 'admin-upload', 'source_name' => 'Admin uploaded PDF',
                 'source_url' => route('learningContent'), 'asset_url' => route('learningContent').'?upload='.Str::uuid(),
                 'url_hash' => hash('sha256', $path), 'kind' => 'question-bank-document', 'title' => $data['title'], 'fetched_at' => now()]);
-            $resource->forceFill(['file_path' => $path, 'file_hash' => hash_file('sha256', Storage::disk('learning-content')->path($path)),
+            $resource->forceFill(['file_path' => $path, 'file_hash' => hash_file('sha256', $request->file('pdf')->getRealPath()),
                 'file_size' => $request->file('pdf')->getSize(), 'mime_type' => 'application/pdf', 'downloaded_at' => now()])->save();
         } catch (\Throwable $e) { Storage::disk('learning-content')->delete($path); throw $e; }
         return redirect()->route('learningContent.show', $resource)->with('success', 'PDF saved privately. Choose its language to start translation.');

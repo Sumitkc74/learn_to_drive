@@ -131,8 +131,9 @@ class PdfQuestionController extends Controller
             abort_unless($locked->status === 'Pending', 409, 'This candidate has already been reviewed.');
             if ($request->input('decision') === 'Imported') {
                 abort_unless($source->status !== 'Rejected' && hash_equals($locked->source_hash, (string) $source->file_hash), 409, 'The source is rejected or has changed.');
+                abort_unless($source->file_path, 409, 'The private source PDF is missing or has changed.');
                 $disk = Storage::disk('learning-content');
-                abort_unless($source->file_path && $disk->exists($source->file_path) && hash_equals($locked->source_hash, hash_file('sha256', $disk->path($source->file_path))), 409, 'The private source PDF is missing or has changed.');
+                abort_unless($disk->exists($source->file_path) && hash_equals($locked->source_hash, hash('sha256', $disk->get($source->file_path))), 409, 'The private source PDF is missing or has changed.');
                 if (Question::withTrashed()->where('question_hash', hash('sha256', QuestionReviewIndex::normalize($data['question'])))->exists()) {
                     throw ValidationException::withMessages(['question' => 'This question already exists, including in trash.']);
                 }

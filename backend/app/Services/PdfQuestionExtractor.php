@@ -14,14 +14,20 @@ class PdfQuestionExtractor
 {
     public function extract(LearningContentImport $resource, int $from, int $to): array
     {
-        $disk = Storage::disk('learning-content');
-        if ($resource->kind !== 'question-bank-document' || $resource->status === 'Rejected' || ! $resource->file_path || ! $disk->exists($resource->file_path)) {
+        if ($resource->kind !== 'question-bank-document' || $resource->status === 'Rejected' || ! $resource->file_path) {
             throw new RuntimeException('Save a private question-bank PDF before extracting. Rejected resources cannot be extracted.');
         }
-        $path = $disk->path($resource->file_path);
-        if (filesize($path) > 20 * 1024 * 1024 || ! hash_equals((string) $resource->file_hash, hash_file('sha256', $path))) {
+        $disk = Storage::disk('learning-content');
+        if (! $disk->exists($resource->file_path)) {
+            throw new RuntimeException('Save a private question-bank PDF before extracting. Rejected resources cannot be extracted.');
+        }
+        // The disk is remote: verify the bytes from the disk, then stage
+        // a local copy for the parser, which needs a real file path.
+        $bytes = $disk->get($resource->file_path);
+        if (strlen($bytes) > 20 * 1024 * 1024 || ! hash_equals((string) $resource->file_hash, hash('sha256', $bytes))) {
             throw new RuntimeException('The saved PDF has changed or exceeds the 20 MB extraction limit.');
         }
+        $path = app(LocalPdfTools::class)->stageBytes($bytes, (string) $resource->file_hash);
         $config = new Config;
         $config->setRetainImageContent(false);
         $config->setDecodeMemoryLimit(32 * 1024 * 1024);
