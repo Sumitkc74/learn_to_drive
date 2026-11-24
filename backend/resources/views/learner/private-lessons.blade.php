@@ -10,8 +10,9 @@
 </form>
 @if($school && $instructor)
 <section class="card"><h2>{{ __('Vehicle') }}</h2><div class="chips">
+{{-- Guest-visible chips show the car, not its plate: test-looking registrations read as fake data to visitors. --}}
 @forelse($vehicles as $v)
-<a class="chip{{ $vehicle && $vehicle->id === $v->id ? ' chip-selected' : '' }}" href="{{ request()->fullUrlWithQuery(['vehicle' => $v->id]) }}">{{ $v->name }} · {{ __($v->transmission) }} · {{ $v->registration }}</a>
+<a class="chip{{ $vehicle && $vehicle->id === $v->id ? ' chip-selected' : '' }}" href="{{ request()->fullUrlWithQuery(['vehicle' => $v->id]) }}">{{ $v->name }} · {{ __($v->transmission) }}</a>
 @empty
 <p>{{ __('No vehicles for this instructor yet.') }}</p>
 @endforelse</div></section>
@@ -45,7 +46,8 @@
     <div><button class="button small">{{ __('Use this point') }}</button></div>
 </form></section>
 <section class="card"><h2>{{ __('Your request') }}</h2>
-<p><strong>{{ $school->name }} · {{ $instructor->name }}@if($vehicle) · {{ $vehicle->name }} · {{ $vehicle->registration }}@endif</strong></p>
+{{-- The summary is visible to guests browsing the picker, so it shows the car without its plate. --}}
+<p><strong>{{ $school->name }} · {{ $instructor->name }}@if($vehicle) · {{ $vehicle->name }}@endif</strong></p>
 <p>@if($day){{ \Carbon\Carbon::parse($day)->format('D, d M Y') }}@else — @endif · @if($time){{ \Carbon\Carbon::createFromFormat('H:i', $time)->format('g:i A') }}@else — @endif · {{ $duration }} {{ __('minutes') }} · {{ $meetingPoint ?? '—' }}</p>
 @auth
     @if($canSubmit)

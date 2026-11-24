@@ -43,7 +43,10 @@ class PrivateLessonRequestTest extends TestCase
         [$teacher, $school, $car] = $this->offering();
         $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
             // Guests see the school, instructor, car and usual times…
-            ->assertSee($teacher->name)->assertSee($car->name)->assertSee($car->registration)
+            // …but not the plate: the guest-visible chips show the car
+            // type only, so a test-looking registration never reads as
+            // fake data to visitors.
+            ->assertSee($teacher->name)->assertSee($car->name)->assertDontSee($car->registration)
             ->assertSee('9:00 AM')
             // …and the sign-in action instead of the request form.
             ->assertSee('Sign in to request this lesson')
@@ -76,7 +79,27 @@ class PrivateLessonRequestTest extends TestCase
         $learner = User::factory()->create(['is_active' => true]);
         $this->actingAs($learner)->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
             ->assertSee($teacher->name)->assertSee($car->name)
-            ->assertSee($car->registration)->assertSee('Show instructors and vehicles');
+            ->assertDontSee($car->registration)->assertSee('Show instructors and vehicles');
+    }
+
+    public function test_picker_hides_car_registration_but_own_request_keeps_it(): void
+    {
+        [$teacher, $school, $car] = $this->offering();
+        // Mirror the live test-data plate.
+        $car->update(['registration' => 'TEST0002']);
+        // The guest-visible picker shows the car type but never the plate —
+        // neither on the vehicle chips nor in the "Your request" summary,
+        // both of which a guest can see.
+        $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
+            ->assertSee('Training car · Manual')
+            ->assertDontSee('TEST0002');
+        // The learner's own request is operational, not public: the plate
+        // stays visible in their own requests list so they can identify
+        // their car.
+        $learner = User::factory()->create(['is_active' => true]);
+        $this->requestFor([$teacher, $school, $car], $learner);
+        $this->actingAs($learner)->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id]))->assertOk()
+            ->assertSee('TEST0002');
     }
 
     public function test_time_chips_come_from_the_instructors_usual_times(): void

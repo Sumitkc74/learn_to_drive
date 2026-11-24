@@ -156,6 +156,12 @@ class DrivingSchoolController extends Controller
                 return $label;
             }
             $before = $school->only(['name', 'status', 'address']);
+            // Owner memberships go with the school (see blockingRelation):
+            // record whose they were so the audit trail shows it.
+            $ownerIds = $school->memberships()->where('role', 'Owner')->pluck('user_id')->all();
+            if ($ownerIds !== []) {
+                $before['owner_user_ids'] = $ownerIds;
+            }
             $school->delete();
             $this->audit($request, $school, 'school.deleted', $before, []);
             return null;
@@ -171,9 +177,17 @@ class DrivingSchoolController extends Controller
     // school is empty. Courses are checked before batches: a batch always
     // belongs to a course, so a school with batches is caught by the
     // courses check first and the batches check is belt-and-braces.
+    //
+    // Owner memberships alone do NOT block: deleting the school removes
+    // them with it (school_memberships.driving_school_id cascades on
+    // delete) while the user accounts themselves are untouched, and a
+    // member's memberships at other schools survive. Any other member —
+    // student, instructor, manager — still blocks, and the remaining
+    // checks still run, so an owner-only school with vehicles, lessons,
+    // bookings, payments, join requests, courses or batches is refused.
     private function blockingRelation(DrivingSchool $school): ?string
     {
-        if ($school->memberships()->exists()) {
+        if ($school->memberships()->where('role', '!=', 'Owner')->exists()) {
             return __('members');
         }
         if (LessonVehicle::where('driving_school_id', $school->id)->exists()) {

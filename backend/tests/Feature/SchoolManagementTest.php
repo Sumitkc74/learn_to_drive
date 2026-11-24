@@ -116,6 +116,50 @@ class SchoolManagementTest extends TestCase
         $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
     }
 
+    public function test_admin_can_delete_school_with_only_owner_member(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [$owner, $school] = $this->staff('Owner');
+        // The owner also manages a real school: that membership — and the
+        // real school — must survive deleting the test school.
+        $realSchool = DrivingSchool::create(['name' => 'Real Academy', 'status' => 'Approved']);
+        SchoolMembership::create(['driving_school_id' => $realSchool->id, 'user_id' => $owner->id, 'role' => 'Manager']);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))
+            ->assertRedirect(route('admin.schools.index'))
+            ->assertSessionHas('success');
+        $this->assertDatabaseMissing('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseMissing('school_memberships', ['driving_school_id' => $school->id, 'user_id' => $owner->id]);
+        $this->assertDatabaseHas('users', ['id' => $owner->id]);
+        $this->assertDatabaseHas('driving_schools', ['id' => $realSchool->id]);
+        $this->assertDatabaseHas('school_memberships', ['driving_school_id' => $realSchool->id, 'user_id' => $owner->id, 'role' => 'Manager']);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'school.deleted', 'subject_id' => $school->id]);
+    }
+
+    public function test_admin_cannot_delete_school_with_owner_and_manager(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [$owner, $school] = $this->staff('Owner');
+        $manager = User::factory()->create(['is_active' => true]);
+        SchoolMembership::create(['driving_school_id' => $school->id, 'user_id' => $manager->id, 'role' => 'Manager']);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseHas('school_memberships', ['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
+    }
+
+    public function test_admin_cannot_delete_owner_only_school_with_lessons(): void
+    {
+        $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);
+        [$owner, $school] = $this->staff('Owner');
+        $instructor = User::factory()->create(['is_active' => true]);
+        $vehicle = LessonVehicle::create(['driving_school_id' => $school->id, 'instructor_id' => $instructor->id,
+            'name' => 'Training sedan', 'registration' => 'BA 1 KHA 1234', 'transmission' => 'Manual']);
+        DrivingLesson::create(['lesson_vehicle_id' => $vehicle->id, 'starts_at' => now()->addDay(),
+            'ends_at' => now()->addDay()->addHour(), 'price_npr' => 1500, 'meeting_point' => 'School gate']);
+        $this->actingAs($admin)->delete(route('admin.schools.destroy', $school))->assertSessionHas('error');
+        $this->assertDatabaseHas('driving_schools', ['id' => $school->id]);
+        $this->assertDatabaseHas('school_memberships', ['driving_school_id' => $school->id, 'user_id' => $owner->id, 'role' => 'Owner']);
+    }
+
     public function test_admin_cannot_delete_school_with_lesson_booking_and_payment(): void
     {
         $admin = User::factory()->create(['role' => 'Admin', 'is_active' => true]);

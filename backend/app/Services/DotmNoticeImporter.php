@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\GovernmentNoticeImport;
 use DOMDocument;
 use DOMXPath;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -20,14 +21,82 @@ class DotmNoticeImporter
         if (!app(ScrapingSourceSettings::class)->enabled('government-notices')) return ['found'=>0,'created'=>0,'duplicates'=>0];
         return app(ContentSourceHistory::class)->run('government-notices', fn()=> $this->collect());
     }
+
+    /**
+     * Homepage first, then each configured listing page (paginated).
+     * Every source is attempted even if an earlier one failed, so one
+     * dead listing cannot block the rest; failures are collected and
+     * thrown at the end so the run is recorded as Failed with the real
+     * error instead of silently skipping the page.
+     */
     private function collect(): array
     {
-        $sourceUrl = config('services.dotm.notices_url', 'https://dotm.gov.np/');
+        $failures = [];
+        $totals = ['found' => 0, 'created' => 0, 'duplicates' => 0];
+
+        $this->addTotals($totals, $this->collectFromPages(config('services.dotm.notices_url', 'https://dotm.gov.np/'), 1, $failures));
+        foreach ($this->listingUrls() as $listingUrl) {
+            $this->addTotals($totals, $this->collectFromPages($listingUrl, $this->listingMaxPages(), $failures));
+        }
+
+        if ($failures !== []) {
+            throw new RuntimeException('Official notice check failed for: '.implode('; ', $failures));
+        }
+
+        return $totals;
+    }
+
+    /**
+     * Fetch one source: page 1, then ?page=2, ?page=3, ... up to
+     * $maxPages. Every page is fetched even when the previous one
+     * yielded nothing new — a notice that rotated off the homepage
+     * sits on a later page of its listing while the first page is
+     * already fully known, so stopping at "nothing new" would miss
+     * exactly the notices this exists to find. A 404 on a follow-up
+     * page just means the listing has no more pages.
+     */
+    private function collectFromPages(string $sourceUrl, int $maxPages, array &$failures): array
+    {
+        $totals = ['found' => 0, 'created' => 0, 'duplicates' => 0];
+
+        try {
+            $this->validateSourceUrl($sourceUrl);
+        } catch (\Throwable $exception) {
+            $failures[] = $sourceUrl.' ('.$exception->getMessage().')';
+
+            return $totals;
+        }
+
+        for ($page = 1; $page <= $maxPages; $page++) {
+            $pageUrl = $page === 1 ? $sourceUrl : $this->pageUrl($sourceUrl, $page);
+            try {
+                $html = $this->fetchHtml($pageUrl);
+            } catch (RequestException $exception) {
+                if ($page > 1 && $exception->response && $exception->response->status() === 404) {
+                    break;
+                }
+                $failures[] = $pageUrl.' ('.$exception->getMessage().')';
+                break;
+            } catch (\Throwable $exception) {
+                $failures[] = $pageUrl.' ('.$exception->getMessage().')';
+                break;
+            }
+            $this->addTotals($totals, $this->storeLinks($this->extractLinks($html, $pageUrl)));
+        }
+
+        return $totals;
+    }
+
+    private function validateSourceUrl(string $sourceUrl): void
+    {
         $host = strtolower((string) parse_url($sourceUrl, PHP_URL_HOST));
         if (parse_url($sourceUrl, PHP_URL_USER)!==null || parse_url($sourceUrl, PHP_URL_PASS)!==null || !in_array(parse_url($sourceUrl, PHP_URL_PORT),[null,443],true) || parse_url($sourceUrl, PHP_URL_SCHEME) !== 'https' || !in_array($host, self::ALLOWED_HOSTS, true)) {
             throw new RuntimeException('The configured DoTM source is not on the official allowlist.');
         }
+    }
 
+    private function fetchHtml(string $sourceUrl): string
+    {
         $response = app(RedirectFollowingRequest::class)->get(
             $sourceUrl,
             fn ($url) => $this->allowedRedirect($url),
@@ -35,7 +104,7 @@ class DotmNoticeImporter
                 'allow_redirects' => false, 'stream' => true,
                 'verify' => config('official-content.ca_bundle') ?: true,
             ])->timeout(20)->retry(2, 1000)->withHeaders([
-                'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (one-page public notice check)',
+                'User-Agent' => 'LearnToDrive-OfficialNoticeChecker/1.0 (public notice check)',
                 'Accept' => 'text/html,application/xhtml+xml',
             ])->get($url)
         )->throw();
@@ -49,7 +118,12 @@ class DotmNoticeImporter
                 if(strlen($html)>2*1024*1024)throw new RuntimeException('Official source exceeds the 2 MB limit.');
             }
         } finally { $stream->close(); }
-        $links = $this->extractLinks($html, $sourceUrl);
+
+        return $html;
+    }
+
+    private function storeLinks(array $links): array
+    {
         $created = 0;
         foreach ($links as $link) {
             $hash = hash('sha256', $link['url'].'|'.$link['title']);
@@ -60,6 +134,30 @@ class DotmNoticeImporter
         }
 
         return ['found' => count($links), 'created' => $created, 'duplicates' => count($links) - $created];
+    }
+
+    private function pageUrl(string $sourceUrl, int $page): string
+    {
+        return $sourceUrl.(str_contains($sourceUrl, '?') ? '&' : '?').'page='.$page;
+    }
+
+    private function listingUrls(): array
+    {
+        $urls = config('services.dotm.listing_urls', []);
+
+        return is_array($urls) ? array_values(array_filter(array_map('trim', $urls))) : [];
+    }
+
+    private function listingMaxPages(): int
+    {
+        return max(1, (int) config('services.dotm.listing_max_pages', 3));
+    }
+
+    private function addTotals(array &$totals, array $pageTotals): void
+    {
+        $totals['found'] += $pageTotals['found'];
+        $totals['created'] += $pageTotals['created'];
+        $totals['duplicates'] += $pageTotals['duplicates'];
     }
 
     /** Same host/scheme/port checks as the initial source validation, applied to every redirect hop. */

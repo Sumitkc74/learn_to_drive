@@ -24,16 +24,20 @@ class ContentAiScreening {
     }
     /**
      * Transient provider errors: the call never reached a verdict because
-     * Gemini was busy or unreachable. These deserve a delayed retry
-     * instead of an immediate Failed — a 503 storm otherwise burns the
-     * whole retry budget within minutes. A connection error against a
-     * source host is a permanent fetch failure, so a cURL error only
-     * counts as transient when it names the Gemini endpoint.
+     * Gemini was busy, unreachable, or answered with something unusable
+     * (a malformed, empty, or otherwise unexpected response body). These
+     * deserve a delayed retry instead of an immediate Failed — a 503 storm
+     * otherwise burns the whole retry budget within minutes, and a single
+     * garbled answer is a provider-side oddity, not a dead source. A
+     * connection error against a source host is a permanent fetch failure,
+     * so a cURL error only counts as transient when it names the Gemini
+     * endpoint.
      */
     private function isTransientProviderError(\Throwable $e): bool
     {
         $message = $e->getMessage();
         if (preg_match('/Gemini API error \(HTTP (429|503)\)/', $message) === 1) return true;
+        if (str_contains($message, 'Gemini returned an unexpected response.')) return true;
 
         return str_contains($message, 'generativelanguage.googleapis.com');
     }

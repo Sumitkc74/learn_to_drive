@@ -9,6 +9,21 @@ return [
 
     'dotm' => [
         'notices_url' => env('DOTM_NOTICES_URL', 'https://dotm.gov.np/'),
+        // Category listing pages checked alongside the homepage. The
+        // homepage only shows the latest notices, so once a link rotates
+        // off it the importer would never see it again; each listing
+        // keeps its own older items. A page that fails to fetch is
+        // recorded as a failed source run (see DotmNoticeImporter).
+        // /category/printed-license is deliberately NOT listed: it 404s.
+        'listing_urls' => array_values(array_filter(array_map('trim', explode(',', env('DOTM_LISTING_URLS', implode(',', [
+            'https://dotm.gov.np/category/details-of-printed-licenses/',
+            'https://dotm.gov.np/category/details-of-printed-essential-driver-s-licenses-/',
+            'https://dotm.gov.np/category/highlights-content/',
+            'https://dotm.gov.np/category/fare-rate/',
+        ])))))),
+        // How many pages (?page=1..N) of each listing to check per run.
+        // The site itself paginates these listings to 3 pages.
+        'listing_max_pages' => (int) env('DOTM_LISTING_MAX_PAGES', 3),
     ],
 
     /*

@@ -100,6 +100,40 @@ class ContentAiScreeningTest extends TestCase {
         $this->assertStringContainsString('retry automatically in 2 minute',$fresh->ai_report);
         Queue::assertPushed(ScreenImportedContent::class, function ($job) { return $job->delay === 120; });
     }
+    public function test_unexpected_gemini_response_requeues_with_backoff_instead_of_failing(): void {
+        Queue::fake();
+        config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-test','content-screening.daily_limit'=>100]);
+        $record=\App\Models\GovernmentNoticeImport::create(['source_name'=>'Official','source_domain'=>'dotm.gov.np','source_url'=>'https://dotm.gov.np/notice-garbled','title'=>'Notice','content_hash'=>hash('sha256','notice-garbled'),'status'=>'Pending','fetched_at'=>now()]);
+        $page=new \Illuminate\Http\Client\Response(new \GuzzleHttp\Psr7\Response(200,[],'<html><body><main><h1>Notice</h1><p>Driving licence notice</p></main></body></html>'));
+        $this->mock(\App\Services\RedirectFollowingRequest::class)->shouldReceive('get')->once()->andReturn($page);
+        // Gemini answers 200 with a STOP finish but a body that is not the
+        // expected verdict JSON — the malformed-response case a live import
+        // hit after its 503 cleared. A provider-side oddity, not a dead
+        // source, so it re-queues like a 503 instead of failing at once.
+        Http::fake(['*'=>Http::response(['candidates'=>[['finishReason'=>'STOP','content'=>['parts'=>[['text'=>'not json at all']]]]]])]);
+        app(ContentAiScreening::class)->screen($record);
+        $fresh=$record->fresh();
+        $this->assertSame('Queued',$fresh->ai_status);
+        $this->assertSame(1,$fresh->ai_retry_count);
+        $this->assertStringContainsString('retry automatically in 2 minute',$fresh->ai_report);
+        Queue::assertPushed(ScreenImportedContent::class, function ($job) { return $job->delay === 120; });
+    }
+    public function test_unexpected_gemini_response_fails_when_retry_budget_is_exhausted(): void {
+        Queue::fake();
+        config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-test','content-screening.daily_limit'=>100]);
+        $record=\App\Models\GovernmentNoticeImport::create(['source_name'=>'Official','source_domain'=>'dotm.gov.np','source_url'=>'https://dotm.gov.np/notice-garbled-budget','title'=>'Notice','content_hash'=>hash('sha256','notice-garbled-budget'),'status'=>'Pending','fetched_at'=>now()]);
+        $record->forceFill(['ai_retry_count'=>3])->save();
+        $page=new \Illuminate\Http\Client\Response(new \GuzzleHttp\Psr7\Response(200,[],'<html><body><main><h1>Notice</h1><p>Driving licence notice</p></main></body></html>'));
+        $this->mock(\App\Services\RedirectFollowingRequest::class)->shouldReceive('get')->once()->andReturn($page);
+        Http::fake(['*'=>Http::response(['candidates'=>[['finishReason'=>'STOP','content'=>['parts'=>[['text'=>'{"verdict":"Maybe"}']]]]]])]);
+        app(ContentAiScreening::class)->screen($record);
+        $fresh=$record->fresh();
+        $this->assertSame('Failed',$fresh->ai_status);
+        $this->assertSame(3,$fresh->ai_retry_count);
+        // No delayed retry was queued: the only pushes are the observer's
+        // undelayed dispatch on create.
+        $this->assertCount(0, Queue::pushed(ScreenImportedContent::class)->filter(fn ($job) => $job->delay !== null));
+    }
     public function test_gemini_timeout_requeues_instead_of_failing(): void {
         Queue::fake();
         config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-test','content-screening.daily_limit'=>100]);
