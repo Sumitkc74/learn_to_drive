@@ -1,7 +1,8 @@
 <?php
 namespace App\Services;
 use App\Models\LearningContentImport;
-use Illuminate\Support\Facades\{Http, Storage};
+use App\Support\LearningContentStorage;
+use Illuminate\Support\Facades\Http;
 use RuntimeException;
 class ContentAiScreening {
     /** Same host/scheme/port checks as DotmNoticeImporter, applied to every redirect hop while fetching a notice page. */
@@ -49,6 +50,13 @@ class ContentAiScreening {
         // the outcome) listing the same ai_status/ai_report/ai_activity_at.
         $record->forceFill(['ai_status'=>'Running','ai_report'=>null,'ai_activity_at'=>now()])->saveQuietly();
         try {
+            // Storage is a precondition for screening a learning record:
+            // fail with the fix-it message before checking the Gemini
+            // key, so a missing bucket is never misreported as a key
+            // problem. Government notices do not use this disk.
+            if ($record instanceof LearningContentImport && ! LearningContentStorage::disk()) {
+                throw new RuntimeException(LearningContentStorage::UNAVAILABLE_MESSAGE);
+            }
             $key = config('pdf-translation.gemini_key');
             $model = config('content-screening.gemini_model');
             if (!$key || !preg_match('/^[a-zA-Z0-9._-]+$/',(string)$model)) throw new RuntimeException('Gemini API key is not configured or the model name is invalid.');
@@ -61,15 +69,14 @@ class ContentAiScreening {
                 // missing file is re-downloaded instead of failing: only
                 // a failed re-download (or a file still missing / over
                 // 8 MB afterwards) throws below.
-                if (!$record->file_path || !Storage::disk('learning-content')->exists($record->file_path)) {
+                if (!$record->file_path || !LearningContentStorage::hasStoredFile($record)) {
                     $file = app(LearningContentDownload::class)->fetch($record);
                     $record->refresh();
                     if ($record->status !== 'Pending') return;
                     $record->forceFill($file)->save();
                 }
-                $disk = Storage::disk('learning-content');
-                if (!$disk->exists($record->file_path) || $disk->size($record->file_path)>8*1024*1024) throw new RuntimeException('Source file is missing from storage or exceeds the 8 MB limit.');
-                $bytes = $disk->get($record->file_path);
+                $bytes = LearningContentStorage::storedBytes($record);
+                if ($bytes === null || strlen($bytes)>8*1024*1024) throw new RuntimeException('Source file is missing from storage or exceeds the 8 MB limit.');
                 if (!hash_equals((string)$record->file_hash,hash('sha256',$bytes))) throw new RuntimeException('Downloaded file does not match the recorded hash.');
                 $duplicate=LearningContentImport::where('file_hash',$record->file_hash)->where('id','<',$record->id)->first();
                 if ($duplicate) {

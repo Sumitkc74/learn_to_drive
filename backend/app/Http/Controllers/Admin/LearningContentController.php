@@ -10,9 +10,9 @@ use App\Services\ContentSourceHistory;
 use App\Services\LearningContentCollector;
 use App\Services\LearningContentDownload;
 use App\Support\AdminTable;
+use App\Support\LearningContentStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -30,9 +30,10 @@ class LearningContentController extends Controller
             $source = LearningContentImport::lockForUpdate()->findOrFail($resource->id);
             abort_unless($source->kind === 'vision-test-image' && $source->status === 'Approved'
                 && $source->file_path, 409, 'Approve the saved reference first.');
-            $disk = Storage::disk('learning-content');
-            abort_unless($disk->exists($source->file_path), 409, 'Approve the saved reference first.');
-            $bytes = $disk->get($source->file_path);
+            LearningContentStorage::diskOrAbort();
+            abort_unless(LearningContentStorage::hasStoredFile($source), 409, 'Approve the saved reference first.');
+            $bytes = LearningContentStorage::storedBytes($source);
+            abort_unless($bytes !== null, 503, LearningContentStorage::UNAVAILABLE_MESSAGE);
             abort_unless(hash_equals((string) $source->file_hash, hash('sha256', $bytes))
                 && hash_equals((string) $source->file_hash, $data['file_hash']), 409, 'The source image has changed.');
             $key = hash('sha256', 'vision:'.$source->file_hash);
@@ -57,7 +58,10 @@ class LearningContentController extends Controller
 
     public function extract(LearningContentImport $resource)
     {
-        abort_unless($resource->kind === 'traffic-sign-sheet' && $resource->status !== 'Rejected' && $resource->file_path && Storage::disk('learning-content')->exists($resource->file_path), 404);
+        abort_unless($resource->kind === 'traffic-sign-sheet' && $resource->status !== 'Rejected' && $resource->file_path, 404);
+        LearningContentStorage::diskOrAbort();
+        abort_if(LearningContentStorage::unavailable($resource), 503, LearningContentStorage::UNAVAILABLE_MESSAGE);
+        abort_unless(LearningContentStorage::hasStoredFile($resource), 404);
 
         return view('admin.learning-content.extract', compact('resource'));
     }
@@ -78,9 +82,10 @@ class LearningContentController extends Controller
         DB::transaction(function () use ($resource, $data) {
             $source = LearningContentImport::lockForUpdate()->findOrFail($resource->id);
             abort_unless($source->kind === 'traffic-sign-sheet' && $source->status !== 'Rejected' && $source->file_path, 409);
-            $disk = Storage::disk('learning-content');
-            abort_unless($disk->exists($source->file_path), 409);
-            $bytes = $disk->get($source->file_path);
+            LearningContentStorage::diskOrAbort();
+            abort_unless(LearningContentStorage::hasStoredFile($source), 409);
+            $bytes = LearningContentStorage::storedBytes($source);
+            abort_unless($bytes !== null, 503, LearningContentStorage::UNAVAILABLE_MESSAGE);
             abort_unless(hash_equals((string) $source->file_hash, hash('sha256', $bytes)), 409, 'The source image has changed.');
             $size = @getimagesizefromstring($bytes);
             abort_unless($size && $size[0] * $size[1] <= 40000000 && $size[0] >= $data['x'] + $data['width'] && $size[1] >= $data['y'] + $data['height'], 422, 'Select a rectangle inside the source image.');
@@ -127,7 +132,7 @@ class LearningContentController extends Controller
                 'kind' => ['allowed' => array_keys($categories)],
             ]);
 
-        return view('admin.learning-content.index', compact('imports', 'sources', 'categories', 'category') + ['lastChecks' => app(ContentSourceHistory::class)->latestRuns(array_keys($sources)), 'sourceLabels' => array_map(fn ($source) => $source['name'], $sources)]);
+        return view('admin.learning-content.index', compact('imports', 'sources', 'categories', 'category') + ['screeningCounts' => LearningContentImport::screeningCounts('Pending')] + ['lastChecks' => app(ContentSourceHistory::class)->latestRuns(array_keys($sources)), 'sourceLabels' => array_map(fn ($source) => $source['name'], $sources)]);
     }
 
     public function fetch(Request $request, LearningContentCollector $collector)
@@ -147,22 +152,34 @@ class LearningContentController extends Controller
     public function show(LearningContentImport $resource)
     {
         $resource->load(['creator', 'reviewer']);
-        $hasFile = $resource->file_path && Storage::disk('learning-content')->exists($resource->file_path);
-        return view('admin.learning-content.show', compact('resource', 'hasFile'));
+        $hasFile = LearningContentStorage::hasStoredFile($resource);
+        $storageUnavailable = LearningContentStorage::unavailable($resource);
+
+        return view('admin.learning-content.show', compact('resource', 'hasFile', 'storageUnavailable'));
     }
 
     public function download(LearningContentImport $resource, LearningContentDownload $downloader)
     {
         abort_unless($resource->status === 'Pending', 409, 'This resource has already been reviewed.');
-        if ($resource->file_path && Storage::disk('learning-content')->exists($resource->file_path)) {
+        if (LearningContentStorage::hasStoredFile($resource)) {
             return back()->with('success', 'A private copy is already available.');
+        }
+        if (! LearningContentStorage::disk()) {
+            return back()->withErrors(['download' => LearningContentStorage::UNAVAILABLE_MESSAGE]);
         }
         try {
             $file = $downloader->fetch($resource);
         } catch (\Throwable $exception) {
             report($exception);
 
-            return back()->withErrors(['download' => 'Download failed. Check the source availability, file type, and upload size limit.']);
+            // A failed save surfaces the storage message, not the
+            // generic download failure: the source was reachable, the
+            // disk was not.
+            $message = $exception->getMessage() === LearningContentStorage::UNAVAILABLE_MESSAGE
+                ? LearningContentStorage::UNAVAILABLE_MESSAGE
+                : 'Download failed. Check the source availability, file type, and upload size limit.';
+
+            return back()->withErrors(['download' => $message]);
         }
         try {
             DB::transaction(function () use ($resource, $file) {
@@ -170,15 +187,15 @@ class LearningContentController extends Controller
                 abort_unless($locked->status === 'Pending', 409, 'This resource has already been reviewed.');
             abort_if($locked->assigned_to && $locked->assigned_to !== auth()->id(),409,'This resource is assigned to another admin.');
                 // Do not replace a copy another reviewer may already be inspecting.
-                if ($locked->file_path && Storage::disk('learning-content')->exists($locked->file_path)) {
-                    Storage::disk('learning-content')->delete($file['file_path']);
+                if ($locked->file_path && LearningContentStorage::hasStoredFile($locked)) {
+                    LearningContentStorage::delete($file['file_path']);
 
                     return;
                 }
                 $locked->forceFill($file)->save();
             });
         } catch (\Throwable $exception) {
-            Storage::disk('learning-content')->delete($file['file_path']);
+            LearningContentStorage::delete($file['file_path']);
             throw $exception;
         }
 
@@ -187,15 +204,18 @@ class LearningContentController extends Controller
 
     public function file(Request $request, LearningContentImport $resource)
     {
-        abort_unless($resource->file_path && Storage::disk('learning-content')->exists($resource->file_path), 404);
+        abort_unless($resource->file_path, 404);
+        $disk = LearningContentStorage::diskOrAbort();
+        abort_if(LearningContentStorage::unavailable($resource), 503, LearningContentStorage::UNAVAILABLE_MESSAGE);
+        abort_unless(LearningContentStorage::hasStoredFile($resource), 404);
 
         if ($request->boolean('inline') && $resource->mime_type === 'application/pdf') {
-            return Storage::disk('learning-content')->response($resource->file_path, 'review.pdf', ['Content-Type'=>'application/pdf','X-Content-Type-Options'=>'nosniff','Cache-Control'=>'private, no-store']);
+            return $disk->response($resource->file_path, 'review.pdf', ['Content-Type'=>'application/pdf','X-Content-Type-Options'=>'nosniff','Cache-Control'=>'private, no-store']);
         }
         if ($request->boolean('preview')) {
             abort_unless(in_array($resource->kind, ['traffic-sign-sheet', 'vision-test-image'], true) && in_array($resource->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true), 404);
 
-            return Storage::disk('learning-content')->response($resource->file_path, null, [
+            return $disk->response($resource->file_path, null, [
                 'Content-Type' => $resource->mime_type,
                 'X-Content-Type-Options' => 'nosniff',
                 'Cache-Control' => 'private, no-store',
@@ -203,7 +223,7 @@ class LearningContentController extends Controller
             ]);
         }
 
-        return Storage::disk('learning-content')->download($resource->file_path, 'official-resource-'.$resource->id.'.'.pathinfo($resource->file_path, PATHINFO_EXTENSION), [
+        return $disk->download($resource->file_path, 'official-resource-'.$resource->id.'.'.pathinfo($resource->file_path, PATHINFO_EXTENSION), [
             'Content-Type' => $resource->mime_type,
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store',
@@ -231,9 +251,11 @@ class LearningContentController extends Controller
                 // disk needs its bucket configured, and there is nothing
                 // to look up when no copy was ever saved.
                 abort_unless($locked->file_path, 409, 'Save and inspect a private copy first.');
-                $disk = Storage::disk('learning-content');
-                abort_unless($disk->exists($locked->file_path), 409, 'Save and inspect a private copy first.');
-                abort_unless(hash_equals((string) $locked->file_hash, hash('sha256', $disk->get($locked->file_path))), 409, 'The saved file has changed. Approval was blocked.');
+                LearningContentStorage::diskOrAbort();
+                abort_unless(LearningContentStorage::hasStoredFile($locked), 409, 'Save and inspect a private copy first.');
+                $bytes = LearningContentStorage::storedBytes($locked);
+                abort_unless($bytes !== null, 503, LearningContentStorage::UNAVAILABLE_MESSAGE);
+                abort_unless(hash_equals((string) $locked->file_hash, hash('sha256', $bytes)), 409, 'The saved file has changed. Approval was blocked.');
                 $locked->forceFill(collect($data)->only(['title', 'language', 'licence_category', 'edition'])->all());
             }
             $locked->forceFill(['status' => $data['decision'], 'review_notes' => $data['review_notes'], 'reviewed_by' => auth()->id(), 'reviewed_at' => now()])->save();

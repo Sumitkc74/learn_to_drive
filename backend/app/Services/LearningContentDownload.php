@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\AppSetting;
 use App\Models\LearningContentImport;
+use App\Support\LearningContentStorage;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -64,7 +64,12 @@ class LearningContentDownload
             $extension = $extensions[$mime];
         }
         $path = Str::uuid().'.'.$extension;
-        Storage::disk('learning-content')->put($path, $contents);
+        // A failed save means the learning-content disk cannot be
+        // written (bucket unset or the R2 token lacks access): say so
+        // plainly instead of dying on the adapter error.
+        if (! LearningContentStorage::put($path, $contents)) {
+            throw new RuntimeException(LearningContentStorage::UNAVAILABLE_MESSAGE);
+        }
 
         return ['file_path' => $path, 'mime_type' => $mime, 'file_size' => strlen($contents), 'file_hash' => hash('sha256', $contents), 'downloaded_at' => now()];
     }

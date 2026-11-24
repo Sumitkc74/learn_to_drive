@@ -1,6 +1,7 @@
 @extends('admin.layout.master')
 @section('title', 'Review Learning Resource')
 @section('content')
+@if($storageUnavailable ?? false)<div class="alert alert-warning" role="alert">Learning-content storage is not configured — set AWS_LEARNING_CONTENT_BUCKET in Render and check the R2 token covers the new bucket. Saved files cannot be previewed, downloaded, or approved until then.</div>@endif
 <div class="row"><div class="col-lg-6"><div class="ltd-panel" style="position:sticky;top:1rem">
 <h2>Original file</h2>
 @if($hasFile)

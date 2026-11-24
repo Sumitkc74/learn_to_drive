@@ -38,6 +38,7 @@
     <p class="text-muted small mt-3 mb-0">New resources enter Pending review. Repeated source checks preserve existing reviews. Approved references are not published to learners.</p>
     @include('admin.partials.source-last-check')
 </div>
+@include('admin.crud.notices.screening-counts', ['flaggedHint' => 'Re-queues every flagged screening for a fresh check. Human approval is still required.'])
 <div class="ltd-panel">
     @include('admin.crud.partials.table-controls', ['items' => $imports, 'sortOptions' => ['created_at' => 'Date added', 'title' => 'Title', 'status' => 'Review status', 'fetched_at' => 'Date fetched'], 'filters' => [
         'status' => ['label' => 'Review status', 'options' => ['Pending' => 'Pending', 'Approved' => 'Approved', 'Rejected' => 'Rejected']],
