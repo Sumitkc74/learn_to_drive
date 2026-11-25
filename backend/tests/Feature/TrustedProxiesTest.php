@@ -89,11 +89,11 @@ class TrustedProxiesTest extends TestCase
         $this->assertSame(['203.0.113.10', '198.51.100.0/24'], $config['trusted_proxies']);
     }
 
-    public function test_non_production_with_unset_env_trusts_no_proxies(): void
+    public function test_unset_env_trusts_all_proxies_in_any_environment(): void
     {
         $config = $this->networkConfigWithEnv(['APP_ENV' => 'testing', 'TRUSTED_PROXIES' => null]);
 
-        $this->assertSame([], $config['trusted_proxies']);
+        $this->assertSame('*', $config['trusted_proxies']);
     }
 
     public function test_paginator_uses_https_when_forwarded_proto_is_https_and_proxies_are_trusted(): void
