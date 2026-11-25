@@ -55,7 +55,7 @@ class SchoolLessonGateway {
             $booking=\App\Models\LessonBooking::whereKey($p->lesson_booking_id)->lockForUpdate()->firstOrFail();
             $locked=SchoolLessonPayment::whereKey($p->id)->lockForUpdate()->firstOrFail();
             if($locked->status!=='Pending')return;
-            $status=$booking->status==='Booked'?'Paid':'RefundRequested';
+            $status=in_array($booking->status,['Booked','Completed'],true)?'Paid':'RefundRequested';
             $split=[];
             if($status==='Paid'){
                 // The split uses the school's agreed rate at payment time;

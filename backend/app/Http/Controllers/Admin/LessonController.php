@@ -47,7 +47,7 @@ class LessonController extends Controller
                     'allowed' => $schools->keys()->map(fn ($id) => (string) $id)->all(),
                     'apply' => fn ($query, $value) => $query->whereHas('lesson.vehicle', fn ($v) => $v->where('driving_school_id', (int) $value)),
                 ],
-                'status' => ['allowed' => ['Booked', 'Cancelled']],
+                'status' => ['allowed' => ['Booked', 'Cancelled', 'Completed']],
             ]
         );
 

@@ -3,6 +3,7 @@ namespace Tests\Feature;
 use App\Models\{DrivingSchool,DrivingLesson,LessonVehicle,LessonBooking,SchoolLessonPayment,User};
 use App\Services\SchoolLessonGateway;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 class SchoolLessonPaymentTest extends TestCase {
@@ -54,6 +55,17 @@ class SchoolLessonPaymentTest extends TestCase {
         $this->delete(route('learn.lessons.cancel',$booking->id));
         $this->post(route('learn.lesson-payment.verify',$p->id))->assertSessionHas('success');
         $this->assertSame('RefundRequested',$p->fresh()->status);
+    }
+    public function test_verified_payment_for_completed_booking_is_paid_not_refund_requested():void {
+        [$user,$booking,$p]=$this->booking();$p->update(['provider_id'=>'pidx-test']);
+        // The lesson has since ended: move it to the past and let the
+        // completion command mark the booking Completed.
+        $booking->lesson->update(['starts_at'=>now()->subDay(),'ends_at'=>now()->subDay()->addHour()]);
+        Artisan::call('lessons:mark-completed');
+        $this->assertSame('Completed',$booking->fresh()->status);
+        Http::fake(['*/epayment/lookup/'=>Http::response(['status'=>'Completed','pidx'=>'pidx-test','total_amount'=>150000,'transaction_id'=>'txn-test','refunded'=>false])]);
+        $this->post(route('learn.lesson-payment.verify',$p->id))->assertSessionHas('success');
+        $this->assertSame('Paid',$p->fresh()->status);
     }
     public function test_esewa_checks_order_merchant_and_amount():void {
         [$user,$booking,$p]=$this->booking();$p->update(['gateway'=>'esewa','merchant'=>'EPAYTEST']);

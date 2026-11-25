@@ -15,7 +15,7 @@ class CheckNetworkSecurity extends Command
             'Debug output disabled' => !config('app.debug'),
             'HTTPS application URL' => parse_url(config('app.url'), PHP_URL_SCHEME) === 'https',
             'Secure session cookies' => (bool) config('session.secure'),
-            'Explicit proxy trust (no wildcard)' => !in_array('*', config('network.trusted_proxies', []), true),
+            'Explicit proxy trust (no wildcard)' => !in_array('*', (array) config('network.trusted_proxies', []), true),
         ];
         foreach ($checks as $label => $passed) $this->line(($passed ? 'PASS: ' : 'FAIL: ').$label);
         $this->comment('This checks configuration only. Verify TLS, firewall, proxy IPs and forwarded-header sanitization on the hosting server.');

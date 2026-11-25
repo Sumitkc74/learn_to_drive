@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('content:check-revisions')->dailyAt('03:00')->timezone('Asia/Kathmandu')->withoutOverlapping();
         $schedule->command('content:recover-screening')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('notices:archive-old')->dailyAt('02:20')->timezone('Asia/Kathmandu')->withoutOverlapping();
+        $schedule->command('lessons:mark-completed')->dailyAt('02:30')->timezone('Asia/Kathmandu')->withoutOverlapping();
         if (\Illuminate\Support\Facades\Schema::hasTable('scraping_sources')) {
             foreach(app(\App\Services\ScrapingSourceSettings::class)->all() as $key=>$source) {
                 if (!$source['enabled']) continue;

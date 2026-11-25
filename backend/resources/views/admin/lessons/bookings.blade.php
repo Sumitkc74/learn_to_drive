@@ -27,7 +27,7 @@
             'sortOptions' => ['created_at' => 'Date booked', 'id' => 'ID'],
             'filters' => [
                 'school' => ['label' => __('Schools'), 'options' => $schools->mapWithKeys(fn ($name, $id) => [(string) $id => $name])->all()],
-                'status' => ['label' => __('Status'), 'options' => ['Booked' => __('Booked'), 'Cancelled' => __('Cancelled')]],
+                'status' => ['label' => __('Status'), 'options' => ['Booked' => __('Booked'), 'Cancelled' => __('Cancelled'), 'Completed' => __('Completed')]],
             ],
         ])
 
