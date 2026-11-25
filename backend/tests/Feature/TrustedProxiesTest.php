@@ -96,6 +96,38 @@ class TrustedProxiesTest extends TestCase
         $this->assertSame('*', $config['trusted_proxies']);
     }
 
+    public function test_star_env_value_returns_the_string_wildcard_not_an_array(): void
+    {
+        // Regression: TRUSTED_PROXIES='*' used to come back as ['*'], which
+        // Laravel treats as a list of literal IPs — '*' matches no real IP,
+        // so no proxy was trusted and paginator links stayed http live.
+        $config = $this->networkConfigWithEnv(['APP_ENV' => 'testing', 'TRUSTED_PROXIES' => '*']);
+
+        $this->assertSame('*', $config['trusted_proxies']);
+    }
+
+    public function test_star_among_explicit_ips_returns_the_string_wildcard(): void
+    {
+        $config = $this->networkConfigWithEnv(['APP_ENV' => 'testing', 'TRUSTED_PROXIES' => '*, 203.0.113.10']);
+
+        $this->assertSame('*', $config['trusted_proxies']);
+    }
+
+    public function test_paginator_uses_https_when_env_star_is_set(): void
+    {
+        // End-to-end proof of the regression: the env value '*' (as the
+        // dashboard holds it) must produce https paginator links, not http.
+        $this->admin();
+        $this->seedSchools();
+        config(['network.trusted_proxies' => $this->networkConfigWithEnv(['TRUSTED_PROXIES' => '*'])['trusted_proxies']]);
+
+        $response = $this->withHeaders(['X-Forwarded-Proto' => 'https'])->get('/admin/schools?page=2');
+
+        $response->assertOk();
+        $response->assertSee('https://localhost/admin/schools?page=1', false);
+        $response->assertDontSee('http://localhost/admin/schools?page=1', false);
+    }
+
     public function test_paginator_uses_https_when_forwarded_proto_is_https_and_proxies_are_trusted(): void
     {
         $this->admin();
