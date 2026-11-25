@@ -14,6 +14,7 @@
     </head>
 
     <body class="ltd-body">
+        <a class="ltd-skip-link" href="#ltd-main-content">Skip to main content</a>
         <div class="ltd-app">
 
             @include('admin.layout.sidebar')
@@ -22,7 +23,8 @@
 
                 @include('admin.layout.header')
 
-                <main class="ltd-content">
+                <main class="ltd-content" id="ltd-main-content" tabindex="-1">
+                    @include('admin.partials.breadcrumb')
                     @include('admin.layout.flash')
                     @yield('content')
                 </main>
@@ -62,10 +64,22 @@
                     });
                 }
 
-                // Custom sidebar toggle (mobile) — independent of AdminLTE's pushmenu widget
+                // Custom sidebar toggle (mobile) — independent of AdminLTE's pushmenu widget.
+                // Below the 992px breakpoint the sidebar is off-canvas when closed, so
+                // mark it inert (its links are not reachable) and keep aria-expanded
+                // in sync for screen readers. On desktop the sidebar is always visible.
+                const sidebarMedia = window.matchMedia('(max-width: 992px)');
+                const syncSidebar = () => {
+                    const open = sidebar?.classList.contains('is-open') ?? false;
+                    toggleButton?.setAttribute('aria-expanded', String(open));
+                    if (sidebar) sidebar.inert = sidebarMedia.matches && !open;
+                };
                 toggleButton?.addEventListener('click', function () {
                     sidebar?.classList.toggle('is-open');
+                    syncSidebar();
                 });
+                sidebarMedia.addEventListener?.('change', syncSidebar);
+                syncSidebar();
 
                 const applyTheme = (theme) => {
                     const isDark = theme === 'dark';

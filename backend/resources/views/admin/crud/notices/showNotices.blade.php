@@ -9,15 +9,11 @@
             <span class="ltd-page-header__eyebrow">Admin Panel</span>
             <h1>Notices</h1>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Notices</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">Notices</h3>
+            <h2 class="ltd-panel__title mb-0">Notices</h2>
             <div><a href="{{ route('noticeExport', ['format' => 'csv']) }}" class="btn btn-sm btn-outline-primary mr-1"><i class="fas fa-file-csv"></i> Download CSV</a><a href="{{ route('noticeExport', ['format' => 'xlsx']) }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-file-excel"></i> Download Excel</a><a href="{{ route('noticeImport') }}" class="btn btn-sm btn-primary mr-2"><i class="fas fa-file-import"></i> Import from CSV / Excel</a><a href="{{ route('governmentNotices') }}" class="btn btn-sm btn-outline-primary mr-2"><i class="fas fa-landmark"></i> Government Imports</a><a href="{{ route('noticeTrash') }}" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-trash-restore"></i> Trash</a><a href="{{ URL::to('/admin/add-notice/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Notice
             </a></div>
@@ -38,15 +34,15 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle ltd-list-table">
-                <thead>
+                <th scope="col"ead>
                 <tr>
-                    <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
-                    <th>ID</th>
-                    <th>Notice</th>
-                    <th>Status</th>
-                    <th>{{ __('Dates') }}</th>
-                    <th>Added by</th>
-                    <th>Action</th>
+                    <th scope="col"><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Notice</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">{{ __('Dates') }}</th>
+                    <th scope="col">Added by</th>
+                    <th scope="col">Action</th>
                 </tr>
                 </thead>
                 <tbody>

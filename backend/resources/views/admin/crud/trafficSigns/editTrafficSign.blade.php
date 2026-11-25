@@ -10,17 +10,18 @@
 
 
 @section('content')
+<div class="ltd-page-header"><div><h1>Edit Traffic Signs</h1></div></div>
 <div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $trafficSign])</div>
 
     <div class="card-header">
     </div>
     <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/update-traffic-sign/'.$trafficSign->id) }}" method="post" enctype="multipart/form-data">
+        <form action="{{ URL::to('/admin/update-traffic-sign/'.$trafficSign->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">Traffic Sign :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control  @if($errors->has('name')) is-invalid @endif" name="name" placeholder="Enter traffic-sign" value="{{ $trafficSign->name }}">
+                    <input id="name" type="text" class="form-control  @if($errors->has('name')) is-invalid @endif" name="name" placeholder="Enter traffic-sign" value="{{ $trafficSign->name }}">
                     @if($errors->has('name'))
                         <p class="text-danger">{{ $errors->first('name') }}</p>
                     @endif
@@ -30,7 +31,7 @@
             <div class="form-group row">
                 <label for="nepaliSignName" class="col-sm-2 col-form-label">Nepali Sign-Name :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control  @if($errors->has('nepaliSignName')) is-invalid @endif" name="nepaliSignName" placeholder="Enter nepali sign-name" value="{{ $trafficSign->nepaliSignName }}">
+                    <input id="nepaliSignName" type="text" class="form-control  @if($errors->has('nepaliSignName')) is-invalid @endif" name="nepaliSignName" placeholder="Enter nepali sign-name" value="{{ $trafficSign->nepaliSignName }}">
                     @if($errors->has('nepaliSignName'))
                         <p class="text-danger">{{ $errors->first('nepaliSignName') }}</p>
                     @endif
@@ -40,7 +41,7 @@
             <div class="form-group row">
                 <label for="description" class="col-sm-2 col-form-label">Description :</label>
                 <div class="col-sm-10">
-                    <textarea type="text" class="form-control @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter traffic-sign description">
+                    <textarea id="description" class="form-control @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter traffic-sign description">
                         {{ $trafficSign->description }}
                     </textarea>
                     @if($errors->has('description'))

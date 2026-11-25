@@ -18,15 +18,18 @@ class AdminFlashMessagesTest extends TestCase
         foreach (['allUser', 'allQuestion', 'allNotice', 'allTrafficSign', 'allVisionTest', 'allExamPaper', 'allExamInformation', 'allTutorial', 'questionTrash'] as $route) {
             $response = $this->withSession([
                 'success' => 'Unique success message',
+                'error' => 'Unique session error message',
                 'errors' => (new ViewErrorBag)->put('default', new MessageBag(['record' => 'Unique failure message'])),
                 'import_summary' => ['added' => 1, 'skipped' => 0, 'duplicate' => 0, 'invalid' => 0],
             ])->get(route($route))->assertOk();
             $html = $response->getContent();
             $this->assertSame(1, substr_count($html, 'Unique success message'), $route);
+            $this->assertSame(1, substr_count($html, 'Unique session error message'), $route);
             $this->assertSame(1, substr_count($html, 'Unique failure message'), $route);
             $this->assertSame(1, substr_count($html, 'Import summary:'), $route);
             $this->assertSame(1, substr_count($html, 'id="admin-success-alert"'), $route);
-            $this->assertSame(1, substr_count($html, 'id="admin-error-alert"'), $route);
+            $this->assertSame(1, substr_count($html, 'id="admin-session-error-alert"'), $route);
+            $this->assertSame(1, substr_count($html, 'id="admin-validation-errors"'), $route);
         }
     }
 

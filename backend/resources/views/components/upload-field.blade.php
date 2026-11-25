@@ -23,7 +23,7 @@
             <img src="{{ $current }}" alt="{{ $currentAlt }}" data-avatar-img>
             <span class="ltd-avatar-button__edit"><i class="fas fa-camera" aria-hidden="true"></i></span>
         </button>
-        <input id="{{ $inputId }}" name="{{ $name }}" type="file"
+        <input id="{{ $inputId }}" name="{{ $name }}" type="file" aria-label="{{ __('Change profile photo') }}"
             @if($accept) accept="{{ $accept }}" @endif
             @if($required) required @endif
             @if($maxSizeKb) data-max-size-kb="{{ $maxSizeKb }}" @endif
@@ -36,13 +36,14 @@
         @if($hint)<p class="ltd-avatar-help">{{ $hint }}</p>@endif
         <p class="ltd-upload__error" data-file-error role="alert" hidden></p>
     @else
-        @if($label)
-            <label class="ltd-field-label" for="{{ $inputId }}">{{ $label }}</label>
-        @endif
         @if($current)
             <img src="{{ $current }}" alt="{{ $currentAlt }}" class="ltd-upload__current">
         @endif
+        {{-- One label per input: the field caption (when given) is the first
+            line inside the dropzone label, so the accessible name contains
+            the visible label and there is no second <label for>. --}}
         <label class="ltd-upload__dropzone" for="{{ $inputId }}" data-dropzone tabindex="0">
+            @if($label)<span class="ltd-upload__caption">{{ $label }}</span>@endif
             <svg class="ltd-upload__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m6 10 6-6 6 6"/><path d="M4 20h16"/></svg>
             <span class="ltd-upload__text">{{ __('Drag & drop files here or browse') }}</span>
             @if($hint)

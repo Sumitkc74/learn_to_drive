@@ -2,11 +2,12 @@
 @section('title', 'Review Learning Resource')
 @section('content')
 @if($storageUnavailable ?? false)<div class="alert alert-warning" role="alert">Learning-content storage is not configured — set AWS_LEARNING_CONTENT_BUCKET in Render and check the R2 token covers the new bucket. Saved files cannot be previewed, downloaded, or approved until then.</div>@endif
+<div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Learning Content</span><h1>Review Resource</h1></div><a href="{{ route('learningContent') }}" class="btn btn-outline-secondary">Back to Queue</a></div>
 <div class="row"><div class="col-lg-6"><div class="ltd-panel" style="position:sticky;top:1rem">
 <h2>Original file</h2>
 @if($hasFile)
 @if($resource->mime_type === 'application/pdf')<iframe title="Source PDF" src="{{ route('learningContent.file',['resource'=>$resource,'inline'=>1]) }}" style="width:100%;height:75vh;border:0"></iframe>
-@else<img src="{{ route('learningContent.file',['resource'=>$resource,'preview'=>1]) }}" alt="Source image" style="max-width:100%;max-height:75vh;object-fit:contain">@endif
+@else<img src="{{ route('learningContent.file',['resource'=>$resource,'preview'=>1]) }}" alt="{{ $resource->title }}" style="max-width:100%;max-height:75vh;object-fit:contain">@endif
 <a href="{{ route('learningContent.file',$resource) }}">Download original file</a>
 @else<p>Save a private copy to preview it here.</p>@endif
 @if($resource->file_hash)
@@ -20,11 +21,10 @@
 @if($resource->status === 'Approved' && !$resource->parent_resource_id && isset(config('official-content.sources')[$resource->source_key]))
 <p>Source check: <strong>{{ $resource->source_check_status ?? 'Not checked yet' }}</strong> {{ $resource->source_checked_at }}</p>
 <form method="POST" action="{{ route('learningContent.checkRevision',$resource) }}">@csrf<button class="btn btn-outline-primary">Check for updated source file</button></form>
-@foreach(\App\Models\LearningContentImport::where('parent_resource_id',$resource->id)->latest('id')->limit(10)->get() as $revision)<p><a href="{{ route('learningContent.show',$revision) }}">Source revision #{{ $revision->id }}</a> ? {{ $revision->status }}</p>@endforeach
+@foreach(\App\Models\LearningContentImport::where('parent_resource_id',$resource->id)->latest('id')->limit(10)->get() as $revision)<p><a href="{{ route('learningContent.show',$revision) }}">Source revision #{{ $revision->id }}</a> — {{ $revision->status }}</p>@endforeach
 @endif
 </div>
 @include('admin.learning-content.ai-screening' , ['screened' => $resource, 'screeningKind' => 'learning'])
-<div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">Learning Content</span><h1>Review Resource</h1></div><a href="{{ route('learningContent') }}" class="btn btn-outline-secondary">Back to Queue</a></div>
 <div class="ltd-panel mb-4" style="overflow-wrap:anywhere">
     <h2 class="ltd-panel__title">{{ $resource->title }}</h2>
     <p>{{ $resource->source_name }} <span class="badge badge-secondary">{{ $resource->status }}</span></p>
@@ -83,7 +83,7 @@
     @csrf
     <input type="hidden" name="file_hash" value="{{ $resource->file_hash }}">
     <h2 class="ltd-panel__title">Add Individual Vision Test</h2>
-    <div class="form-group"><label for="vision-number">Test number</label><input id="vision-number" name="testNumber" type="number" min="1" value="{{ old('testNumber') }}" class="form-control" required></div>
+    <div class="form-group"><label for="vision-number">Test number</label><input id="vision-number" name="testNumber" type="number" min="1" value="{{ old('testNumber') }}" class="form-control @error('testNumber') is-invalid @enderror" required>@error('testNumber')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
     <label><input type="checkbox" name="confirmed" value="1" required> I reviewed this individual plate and its reuse terms.</label>
     <p class="text-muted">Saving makes this image available to learners in Vision Tests. The original colors and source attribution are retained.</p>
     <button class="btn btn-primary" type="submit">Add to Vision Tests</button>
@@ -95,8 +95,8 @@
     <h2 class="ltd-panel__title">Add to Question Banks</h2>
     <p>This PDF will be saved as its own question bank in the <strong>{{ $resource->language }}</strong> language category.</p>
     <input type="hidden" name="file_hash" value="{{ $resource->file_hash }}">
-    <div class="form-group"><label for="paper-name">Title ({{ $resource->language }})</label><input id="paper-name" name="name" maxlength="255" value="{{ old('name', $resource->title) }}" class="form-control" required></div>
-    <div class="form-group"><label for="paper-description">Description ({{ $resource->language }})</label><textarea id="paper-description" name="description" maxlength="1000" class="form-control" required>{{ old('description') }}</textarea></div>
+    <div class="form-group"><label for="paper-name">Title ({{ $resource->language }})</label><input id="paper-name" name="name" maxlength="255" value="{{ old('name', $resource->title) }}" class="form-control @error('name') is-invalid @enderror" required>@error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+    <div class="form-group"><label for="paper-description">Description ({{ $resource->language }})</label><textarea id="paper-description" name="description" maxlength="1000" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>@error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
     <label><input type="checkbox" name="confirmed" value="1" required> I checked the PDF, its language, category, edition, and reuse terms.</label>
     <p class="text-muted">Adding makes the PDF available to learners in Question Banks. Private originals and source details are retained.</p>
     <button class="btn btn-primary">Add to Question Banks</button>
@@ -111,12 +111,13 @@
         @csrf<input type="hidden" name="decision" value="Approved">
         <div class="ltd-settings-card__heading"><h2>Approve Reference</h2></div>
         <div class="ltd-settings-card__body">
-            <div class="form-group"><label for="resource-title">Readable title</label><input id="resource-title" name="title" value="{{ old('title', $resource->title) }}" maxlength="500" class="form-control" required></div>
-            <div class="form-group"><label for="resource-language">Language</label><select id="resource-language" name="language" class="form-control" required><option value="">Select language</option>@foreach(['Nepali', 'English', 'Bilingual', 'Not applicable'] as $value)<option @selected(old('language') === $value)>{{ $value }}</option>@endforeach</select></div>
-            <div class="form-group"><label for="resource-category">Licence category</label><select id="resource-category" name="licence_category" class="form-control" required><option value="">Select category</option>@foreach(['A/K', 'B', 'All', 'Other', 'Unknown'] as $value)<option @selected(old('licence_category') === $value)>{{ $value }}</option>@endforeach</select></div>
-            <div class="form-group"><label for="resource-edition">Edition or publication date</label><input id="resource-edition" name="edition" value="{{ old('edition') }}" maxlength="100" class="form-control" placeholder="Use Unknown if the source does not specify it" required></div>
-            <div class="form-group"><label for="approval-notes">Review notes</label><textarea id="approval-notes" name="review_notes" maxlength="3000" rows="3" class="form-control" required>{{ old('decision') === 'Approved' ? old('review_notes') : '' }}</textarea></div>
+            <div class="form-group"><label for="resource-title">Readable title</label><input id="resource-title" name="title" value="{{ old('title', $resource->title) }}" maxlength="500" class="form-control @error('title') is-invalid @enderror" required>@error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+            <div class="form-group"><label for="resource-language">Language</label><select id="resource-language" name="language" class="form-control @error('language') is-invalid @enderror" required><option value="">Select language</option>@foreach(['Nepali', 'English', 'Bilingual', 'Not applicable'] as $value)<option @selected(old('language') === $value)>{{ $value }}</option>@endforeach</select>@error('language')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+            <div class="form-group"><label for="resource-category">Licence category</label><select id="resource-category" name="licence_category" class="form-control @error('licence_category') is-invalid @enderror" required><option value="">Select category</option>@foreach(['A/K', 'B', 'All', 'Other', 'Unknown'] as $value)<option @selected(old('licence_category') === $value)>{{ $value }}</option>@endforeach</select>@error('licence_category')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+            <div class="form-group"><label for="resource-edition">Edition or publication date</label><input id="resource-edition" name="edition" value="{{ old('edition') }}" maxlength="100" class="form-control @error('edition') is-invalid @enderror" placeholder="Use Unknown if the source does not specify it" required>@error('edition')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+            <div class="form-group"><label for="approval-notes">Review notes</label><textarea id="approval-notes" name="review_notes" maxlength="3000" rows="3" class="form-control @error('review_notes') is-invalid @enderror" required>{{ old('decision') === 'Approved' ? old('review_notes') : '' }}</textarea>@if(old('decision') === 'Approved')@error('review_notes')<div class="invalid-feedback">{{ $message }}</div>@enderror @endif</div>
             <label class="d-flex" style="gap:.5rem"><input type="checkbox" name="confirmed" value="1" required><span>I inspected the saved file and recorded any edition, accuracy, or reuse concerns in my notes.</span></label>
+            @error('confirmed')<div class="text-danger small">{{ $message }}</div>@enderror
             <p class="small text-muted mb-0">Approval retains a reference for content preparation. It does not publish questions, exam papers, or traffic signs.</p>
         </div>
         @if(in_array($resource->ai_status, ['Queued', 'Running']))<p class="small text-muted mb-0">AI screening is still running — approval becomes available when it reads Ready or Flagged. Use Run / retry AI screening above if it stalls.</p>@elseif($resource->ai_status === 'Failed')<p class="small text-muted mb-0">AI screening failed — run / retry AI screening above before approving.</p>@endif
@@ -125,7 +126,7 @@
     <form class="ltd-settings-card" action="{{ route('learningContent.review', $resource) }}" method="POST">
         @csrf<input type="hidden" name="decision" value="Rejected">
         <div class="ltd-settings-card__heading"><h2>Reject Resource</h2></div>
-        <div class="ltd-settings-card__body"><label for="rejection-notes">Reason</label><textarea id="rejection-notes" name="review_notes" maxlength="3000" rows="4" class="form-control" required>{{ old('decision') === 'Rejected' ? old('review_notes') : '' }}</textarea><p class="small text-muted mt-2">Rejected resources remain in the queue history and are not re-added by later source checks.</p></div>
+        <div class="ltd-settings-card__body"><label for="rejection-notes">Reason</label><textarea id="rejection-notes" name="review_notes" maxlength="3000" rows="4" class="form-control @error('review_notes') is-invalid @enderror" required>{{ old('decision') === 'Rejected' ? old('review_notes') : '' }}</textarea>@if(old('decision') === 'Rejected')@error('review_notes')<div class="invalid-feedback">{{ $message }}</div>@enderror @endif<p class="small text-muted mt-2">Rejected resources remain in the queue history and are not re-added by later source checks.</p></div>
         <div class="ltd-settings-card__actions"><button class="btn btn-outline-danger" type="submit">Reject Resource</button></div>
     </form>
 </div>

@@ -3,7 +3,7 @@
 @section('content')
 <div class="ltd-page-header"><div><span class="ltd-page-header__eyebrow">System Administration</span><h1>Audit Log</h1></div></div>
 <div class="ltd-panel">
-    <div class="mb-3"><h3 class="ltd-panel__title mb-1">Administrative Activity</h3><p class="text-muted mb-0">A read-only history of important user and question changes.</p></div>
+    <div class="mb-3"><h2 class="ltd-panel__title mb-1">Administrative Activity</h2><p class="text-muted mb-0">A read-only history of important user and question changes.</p></div>
     @include('admin.crud.partials.table-controls', [
         'items' => $logs,
         'sortOptions' => ['created_at' => 'Date', 'event' => 'Action', 'subject_type' => 'Resource', 'subject_label' => 'Item', 'id' => 'ID'],
@@ -15,7 +15,7 @@
     @if($logs->isEmpty())
         <div class="text-center py-5"><i class="fas fa-history fa-3x text-muted mb-3"></i><h4>No activity recorded</h4><p class="text-muted mb-0">New user and question changes will appear here.</p></div>
     @else
-        <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Date</th><th>Administrator</th><th>Action</th><th>Resource</th><th>Item</th><th>Changes</th></tr></thead><tbody>
+        <div class="table-responsive"><table class="table table-hover align-middle"><th scope="col"ead><tr><th scope="col">Date</th><th scope="col">Administrator</th><th scope="col">Action</th><th scope="col">Resource</th><th scope="col">Item</th><th scope="col">Changes</th></tr></thead><tbody>
         @foreach($logs as $log)<tr>
             <td>{{ $log->created_at->format('M j, Y g:i A') }}</td><td>{{ $log->actor?->name ?? 'System' }}</td>
             <td><span class="badge badge-{{ $log->event === 'created' || $log->event === 'restored' ? 'success' : ($log->event === 'updated' ? 'info' : 'danger') }}">{{ str_replace('_', ' ', ucfirst($log->event)) }}</span></td>

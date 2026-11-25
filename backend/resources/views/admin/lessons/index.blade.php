@@ -10,15 +10,11 @@
             <h1>{{ __('Lessons') }}</h1>
             <p class="text-muted mb-0">{{ __('Every driving lesson published by a school, with its booking state.') }}</p>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>{{ __('Lessons') }}</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">{{ __('Lessons') }}</h3>
+            <h2 class="ltd-panel__title mb-0">{{ __('Lessons') }}</h2>
             <div><a href="{{ route('admin.lesson-bookings.index') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-calendar-check"></i> {{ __('Lesson bookings') }}</a></div>
         </div>
 
@@ -33,18 +29,18 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead>
+                <th scope="col"ead>
                     <tr>
-                        <th>ID</th>
-                        <th>{{ __('School') }}</th>
-                        <th>{{ __('Instructor') }}</th>
-                        <th>{{ __('Vehicle') }}</th>
-                        <th>{{ __('Meeting point') }}</th>
-                        <th>{{ __('Date and time') }}</th>
-                        <th>{{ __('Duration') }}</th>
-                        <th>{{ __('Price') }}</th>
-                        <th>{{ __('Status') }}</th>
-                        <th>{{ __('Booked by') }}</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">{{ __('School') }}</th>
+                        <th scope="col">{{ __('Instructor') }}</th>
+                        <th scope="col">{{ __('Vehicle') }}</th>
+                        <th scope="col">{{ __('Meeting point') }}</th>
+                        <th scope="col">{{ __('Date and time') }}</th>
+                        <th scope="col">{{ __('Duration') }}</th>
+                        <th scope="col">{{ __('Price') }}</th>
+                        <th scope="col">{{ __('Status') }}</th>
+                        <th scope="col">{{ __('Booked by') }}</th>
                     </tr>
                 </thead>
                 <tbody>

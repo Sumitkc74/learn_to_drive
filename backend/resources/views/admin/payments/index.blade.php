@@ -8,15 +8,11 @@
         <span class="ltd-page-header__eyebrow">Admin Panel</span>
         <h1>Premium Payments</h1>
     </div>
-    <ol class="ltd-breadcrumb">
-        <li><a href="{{ route('adminDashboard') }}">Home</a></li>
-        <li>Premium Payments</li>
-    </ol>
 </div>
 
 <div class="ltd-panel">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h3 class="ltd-panel__title mb-0">Payment history</h3>
+        <h2 class="ltd-panel__title mb-0">Payment history</h2>
     </div>
 
     @include('admin.crud.partials.table-controls', [
@@ -30,15 +26,15 @@
 
     <div class="table-responsive">
         <table class="table table-hover align-middle">
-            <thead>
+            <th scope="col"ead>
                 <tr>
-                    <th>User</th>
-                    <th>Gateway</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Paid</th>
-                    <th>Access</th>
-                    <th>Action</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Gateway</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Paid</th>
+                    <th scope="col">Access</th>
+                    <th scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>

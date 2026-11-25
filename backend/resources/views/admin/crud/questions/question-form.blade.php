@@ -5,7 +5,7 @@
 <div class="ltd-form-card__body">
     @include('admin.crud.questions.translation')
     <section class="ltd-form-section">
-        <h3 class="ltd-form-section__title">Question details</h3>
+        <h2 class="ltd-form-section__title">Question details</h2>
         <div class="form-group">
             <label class="ltd-field-label" for="question">Question text <span class="ltd-required">*</span></label>
             <textarea id="question" name="question" rows="3" maxlength="500" class="form-control @error('question') is-invalid @enderror" required>{{ $value('question') }}</textarea>
@@ -18,14 +18,14 @@
         </div>
     </section>
     <section class="ltd-form-section">
-        <h3 class="ltd-form-section__title">Answer options</h3>
+        <h2 class="ltd-form-section__title">Answer options</h2>
         <div class="row">@foreach(['option1' => 'A', 'option2' => 'B', 'option3' => 'C', 'option4' => 'D'] as $field => $letter)<div class="col-md-6 form-group"><label class="ltd-field-label" for="{{ $field }}">Option {{ $letter }} <span class="ltd-required">*</span></label><input id="{{ $field }}" name="{{ $field }}" value="{{ $value($field) }}" maxlength="255" class="form-control @error($field) is-invalid @enderror" required>@error($field)<div class="invalid-feedback">{{ $message }}</div>@enderror</div>@endforeach</div>
         <label class="ltd-field-label" for="correctOption">Correct answer <span class="ltd-required">*</span></label>
         <select id="correctOption" name="correctOption" class="form-control @error('correctOption') is-invalid @enderror" required>@foreach(['A', 'B', 'C', 'D'] as $letter)<option value="{{ $letter }}" {{ $value('correctOption', 'A') === $letter ? 'selected' : '' }}>Option {{ $letter }}</option>@endforeach</select>
         @error('correctOption')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </section>
     <section class="ltd-form-section">
-        <h3 class="ltd-form-section__title">Learning support</h3>
+        <h2 class="ltd-form-section__title">Learning support</h2>
         <div class="form-group"><label class="ltd-field-label" for="explanation">Answer explanation</label><textarea id="explanation" name="explanation" rows="4" maxlength="2000" class="form-control @error('explanation') is-invalid @enderror" placeholder="Explain why the selected answer is correct.">{{ $value('explanation') }}</textarea>@error('explanation')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
         <div class="form-group mb-0"><label class="ltd-field-label" for="image">Question image <span class="text-muted">(optional)</span></label><x-upload-field name="image" id="image" accept="image/jpeg,image/png,image/webp" :current="$questionItem?->image_url" current-alt="Current question" hint="JPEG, PNG, or WebP; maximum 2 MB. Uploading a new image replaces the current one." :max-size-kb="\App\Models\AppSetting::imageLimitKb()" :invalid="$errors->has('image')" />@error('image')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror</div>
     </section>

@@ -7,7 +7,7 @@
     </div></div>
     <div class="col-lg-7"><div class="ltd-panel h-100"><h2 class="ltd-panel__title">Frequently Missed Questions</h2>
         @if($mostMissed->isEmpty())<p class="text-muted mb-0">More learner attempts are needed before difficult questions can be identified.</p>@else
-        <div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Question</th><th>Category</th><th>Misses</th></tr></thead><tbody>@foreach($mostMissed as $item)<tr><td><a href="{{ route('editQuestion', $item['question']->id) }}">{{ \Illuminate\Support\Str::limit($item['question']->question, 65) }}</a></td><td>{{ $item['question']->category }}</td><td><span class="badge badge-danger">{{ $item['misses'] }}</span></td></tr>@endforeach</tbody></table></div>
+        <div class="table-responsive"><table class="table table-sm table-hover mb-0"><th scope="col"ead><tr><th scope="col">Question</th><th scope="col">Category</th><th scope="col">Misses</th></tr></thead><tbody>@foreach($mostMissed as $item)<tr><td><a href="{{ route('editQuestion', $item['question']->id) }}">{{ \Illuminate\Support\Str::limit($item['question']->question, 65) }}</a></td><td>{{ $item['question']->category }}</td><td><span class="badge badge-danger">{{ $item['misses'] }}</span></td></tr>@endforeach</tbody></table></div>
         @endif
     </div></div>
 </div>

@@ -11,6 +11,7 @@
     --charcoal-field: #4a4a4a;
     --yellow: #FFDE17;
     --yellow-dark: #e6c400;
+    --yellow-text: #6d5c00;
     --muted: #9b9b9b;
     --bg: #f3f3f1;
     --border: #e7e7e5;
@@ -18,7 +19,7 @@
     --surface-secondary: #f8f8f6;
     --surface-contrast: #f3f3f1;
     --text: #2a2a2a;
-    --text-muted: #6b7280;
+    --text-muted: #5f6b7a;
     --sidebar-bg: #2a2a2a;
     --topbar-bg: #ffffff;
     --sidebar-link: #c8c8c8;
@@ -49,6 +50,7 @@ body.ltd-theme-dark {
     --charcoal-deep: #f9fafb;
     --charcoal-field: #334155;
     --muted: #94a3b8;
+    --yellow-text: #e6c400;
     --sidebar-bg: #020617;
     --sidebar-scroll-track: #172033;
     --sidebar-scroll-thumb: #64748b;
@@ -378,7 +380,7 @@ body.ltd-body {
 }
 
 .ltd-topbar__search input::placeholder {
-    color: var(--muted);
+    color: var(--text-muted);
 }
 
 .ltd-topbar__search i {
@@ -462,7 +464,7 @@ body.ltd-body {
 
 .ltd-page-header__eyebrow {
     display: block;
-    color: var(--yellow-dark);
+    color: var(--yellow-text);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -488,7 +490,7 @@ body.ltd-body {
 }
 
 .ltd-breadcrumb a {
-    color: var(--muted);
+    color: var(--text-muted);
     text-decoration: none;
 }
 
@@ -552,7 +554,7 @@ body.ltd-body {
 
 .ltd-stat-card__label {
     font-size: 0.8rem;
-    color: var(--muted);
+    color: var(--text-muted);
     font-weight: 600;
     margin-top: 0.25rem;
 }
@@ -1273,7 +1275,7 @@ body.ltd-body {
 }
 
 .ltd-activity__empty {
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 0.85rem;
     margin: 0;
 }
@@ -1317,7 +1319,7 @@ body.ltd-body {
 .ltd-activity__type {
     font-size: 0.7rem;
     font-weight: 800;
-    color: var(--yellow-dark);
+    color: var(--yellow-text);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     overflow-wrap: anywhere;
@@ -1333,7 +1335,7 @@ body.ltd-body {
 
 .ltd-activity__time {
     font-size: 0.72rem;
-    color: var(--muted);
+    color: var(--text-muted);
     flex-shrink: 0;
     white-space: nowrap;
 }
@@ -1380,4 +1382,247 @@ body.ltd-body {
     .ltd-topbar__left { width: 100%; min-width: 0; }
     .ltd-topbar__search { flex: 1; width: auto; }
     .ltd-topbar__right { width: 100%; justify-content: flex-end; gap: 1rem; }
+}
+
+/* ==========================================================================
+   Accessibility (WCAG 2.1 AA)
+   - Visible keyboard focus on every interactive element.
+   - Text/button/badge colours darkened (or lightened in dark mode) so the
+     contrast against their background is at least 4.5:1. Bootstrap 4's
+     defaults (#007bff, #28a745, #ffc107 text) fail that bar, so the admin
+     theme overrides them here, scoped to .ltd-body so nothing outside the
+     admin area changes. Old -> new (light theme):
+       links #007bff -> #0056b3, btn/badge primary #007bff -> #0069d9,
+       success #28a745 -> #1e7e34, warning text #ffc107 -> #856404,
+       --text-muted #6b7280 -> #5f6b7a, eyebrow yellow #e6c400 -> #6d5c00.
+     Dark theme keeps bright tints (#7fb3ff, #f28b95, #7ddba3) that pass on
+     the dark surface.
+   ========================================================================== */
+
+/* Skip link: hidden until keyboard focus, then shown at the top. */
+.ltd-skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 200;
+    background: var(--yellow);
+    color: #2a2a2a;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    border-radius: 0 0 8px 8px;
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+.ltd-skip-link:focus {
+    top: 0;
+    color: #2a2a2a;
+    text-decoration: none;
+}
+
+/* Visible keyboard focus everywhere in the admin area. */
+.ltd-body :focus-visible {
+    outline: 3px solid var(--yellow);
+    outline-offset: 2px;
+}
+.ltd-body.ltd-theme-dark :focus-visible {
+    outline-color: #ffde17;
+}
+.ltd-body a:focus-visible,
+.ltd-body button:focus-visible,
+.ltd-body input:focus-visible,
+.ltd-body select:focus-visible,
+.ltd-body textarea:focus-visible,
+.ltd-body summary:focus-visible,
+.ltd-body [tabindex]:focus-visible {
+    outline: 3px solid var(--yellow);
+    outline-offset: 2px;
+}
+
+/* Global breadcrumb (rendered once in the admin layout, above the page). */
+.ltd-global-breadcrumb {
+    margin: 0 0 1rem;
+    padding: 0;
+}
+.ltd-global-breadcrumb .ltd-breadcrumb {
+    font-size: 0.85rem;
+}
+
+/* --- Contrast fixes, light theme --- */
+/* NOTE: the link rule is scoped to .ltd-content on purpose. A global
+   .ltd-body a rule leaked the link blue into the dark sidebar (nav links
+   2.0:1 on #2a2a2a), the dark logout pill, and every .btn anchor
+   (1.3:1 on .btn-primary) — and per-component restores lost the
+   specificity fight against the :not() selectors, so the scope is the fix.
+   It also excludes .btn (buttons carry their own text colour) and
+   .ltd-admin-tool (dashboard cards use dark body text by design).
+   Breadcrumb links render in the same link blue, which passes on the page
+   background and keeps every content link one colour. */
+.ltd-body.ltd-theme-light .ltd-content a:not(.btn):not(.ltd-admin-tool) {
+    color: #0056b3;
+}
+.ltd-body.ltd-theme-light .ltd-content a:not(.btn):not(.ltd-admin-tool):hover,
+.ltd-body.ltd-theme-light .ltd-content a:not(.btn):not(.ltd-admin-tool):focus {
+    color: #004085;
+}
+.ltd-body.ltd-theme-light .btn-primary,
+.ltd-body.ltd-theme-light .badge-primary {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+.ltd-body.ltd-theme-light .btn-primary:hover,
+.ltd-body.ltd-theme-light .btn-primary:focus {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+.ltd-body.ltd-theme-light .btn-success,
+.ltd-body.ltd-theme-light .badge-success {
+    background-color: #1e7e34;
+    border-color: #1c7430;
+}
+.ltd-body.ltd-theme-light .btn-success:hover,
+.ltd-body.ltd-theme-light .btn-success:focus {
+    background-color: #186429;
+    border-color: #145523;
+}
+.ltd-body.ltd-theme-light .btn-outline-primary {
+    color: #0069d9;
+    border-color: #0069d9;
+}
+.ltd-body.ltd-theme-light .btn-outline-primary:hover,
+.ltd-body.ltd-theme-light .btn-outline-primary:focus {
+    background-color: #0069d9;
+    border-color: #0069d9;
+    color: #fff;
+}
+.ltd-body.ltd-theme-light .btn-outline-success {
+    color: #1e7e34;
+    border-color: #1e7e34;
+}
+.ltd-body.ltd-theme-light .btn-outline-success:hover,
+.ltd-body.ltd-theme-light .btn-outline-success:focus {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    color: #fff;
+}
+.ltd-body.ltd-theme-light .text-primary {
+    color: #0069d9 !important;
+}
+.ltd-body.ltd-theme-light .text-success {
+    color: #1e7e34 !important;
+}
+.ltd-body.ltd-theme-light .text-warning {
+    color: #856404 !important;
+}
+/* Bootstrap's .text-muted (#6c757d) fails on the page background (#f3f3f1,
+   4.2:1); the --text-muted variable change does not cover this class. */
+.ltd-body.ltd-theme-light .text-muted {
+    color: #5f6b7a !important;
+}
+/* .btn-outline-danger (#dc3545) is 4.3:1 on the card background (#f8f8f6);
+   darken to #c82333 (5.3:1). The hover fill keeps white text readable. */
+.ltd-body.ltd-theme-light .btn-outline-danger {
+    color: #c82333;
+    border-color: #c82333;
+}
+.ltd-body.ltd-theme-light .btn-outline-danger:hover,
+.ltd-body.ltd-theme-light .btn-outline-danger:focus {
+    background-color: #c82333;
+    border-color: #c82333;
+    color: #fff;
+}
+/* .btn-outline-secondary (#6c757d) is 4.2:1 on the page background (#f3f3f1);
+   darken to the same muted tone used for .text-muted. */
+.ltd-body.ltd-theme-light .btn-outline-secondary {
+    color: #5f6b7a;
+    border-color: #5f6b7a;
+}
+.ltd-body.ltd-theme-light .btn-outline-secondary:hover,
+.ltd-body.ltd-theme-light .btn-outline-secondary:focus {
+    background-color: #5f6b7a;
+    border-color: #5f6b7a;
+    color: #fff;
+}
+/* .btn-outline-warning (#ffc107) is 1.6:1 anywhere; use the darkened
+   warning tone from .text-warning. */
+.ltd-body.ltd-theme-light .btn-outline-warning {
+    color: #856404;
+    border-color: #856404;
+}
+.ltd-body.ltd-theme-light .btn-outline-warning:hover,
+.ltd-body.ltd-theme-light .btn-outline-warning:focus {
+    background-color: #856404;
+    border-color: #856404;
+    color: #fff;
+}
+/* Badge fixes (both themes — badge backgrounds are theme-independent).
+   The Vite Bootstrap 5 build sets .badge text to white, which fails on
+   .badge-warning (#ffc107, 1.6:1); restore AdminLTE's dark text. Bootstrap
+   4's .badge-info (#17a2b8, white text 3.0:1) gets a darker background. */
+.ltd-body .badge-warning {
+    color: #1f2d3d;
+}
+.ltd-body .badge-info {
+    background-color: #117a8b;
+    border-color: #0f6d7c;
+}
+
+/* --- Contrast fixes, dark theme --- */
+.ltd-body.ltd-theme-dark .ltd-content a:not(.btn):not(.ltd-admin-tool) {
+    color: #7fb3ff;
+}
+.ltd-body.ltd-theme-dark .ltd-content a:not(.btn):not(.ltd-admin-tool):hover,
+.ltd-body.ltd-theme-dark .ltd-content a:not(.btn):not(.ltd-admin-tool):focus {
+    color: #a8ccff;
+}
+.ltd-body.ltd-theme-dark .btn-outline-primary {
+    color: #7fb3ff;
+    border-color: #7fb3ff;
+}
+.ltd-body.ltd-theme-dark .btn-outline-primary:hover,
+.ltd-body.ltd-theme-dark .btn-outline-primary:focus {
+    background-color: #7fb3ff;
+    border-color: #7fb3ff;
+    color: #111827;
+}
+.ltd-body.ltd-theme-dark .btn-outline-success {
+    color: #7ddba3;
+    border-color: #7ddba3;
+}
+.ltd-body.ltd-theme-dark .btn-outline-success:hover,
+.ltd-body.ltd-theme-dark .btn-outline-success:focus {
+    background-color: #7ddba3;
+    border-color: #7ddba3;
+    color: #111827;
+}
+.ltd-body.ltd-theme-dark .btn-outline-danger {
+    color: #f28b95;
+    border-color: #f28b95;
+}
+.ltd-body.ltd-theme-dark .btn-outline-danger:hover,
+.ltd-body.ltd-theme-dark .btn-outline-danger:focus {
+    background-color: #f28b95;
+    border-color: #f28b95;
+    color: #111827;
+}
+.ltd-body.ltd-theme-dark .btn-outline-secondary {
+    color: #adb5bd;
+    border-color: #adb5bd;
+}
+.ltd-body.ltd-theme-dark .btn-outline-secondary:hover,
+.ltd-body.ltd-theme-dark .btn-outline-secondary:focus {
+    background-color: #adb5bd;
+    border-color: #adb5bd;
+    color: #111827;
+}
+.ltd-body.ltd-theme-dark .text-primary {
+    color: #7fb3ff !important;
+}
+.ltd-body.ltd-theme-dark .text-success {
+    color: #7ddba3 !important;
+}
+.ltd-body.ltd-theme-dark .text-danger {
+    color: #f28b95 !important;
+}
+.ltd-body.ltd-theme-dark .text-muted {
+    color: #9ca3af !important;
 }

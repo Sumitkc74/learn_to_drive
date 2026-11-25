@@ -10,15 +10,11 @@
             <h1>{{ __('Lesson bookings') }}</h1>
             <p class="text-muted mb-0">{{ __('Every lesson booking, with learner, lesson and payment state.') }}</p>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>{{ __('Lesson bookings') }}</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">{{ __('Lesson bookings') }}</h3>
+            <h2 class="ltd-panel__title mb-0">{{ __('Lesson bookings') }}</h2>
             <div><a href="{{ route('admin.lessons.index') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-calendar-alt"></i> {{ __('Lessons') }}</a></div>
         </div>
 
@@ -33,14 +29,14 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead>
+                <th scope="col"ead>
                     <tr>
-                        <th>ID</th>
-                        <th>{{ __('Learner') }}</th>
-                        <th>{{ __('Lesson') }}</th>
-                        <th>{{ __('School') }}</th>
-                        <th>{{ __('Status') }}</th>
-                        <th>{{ __('Payment') }}</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">{{ __('Learner') }}</th>
+                        <th scope="col">{{ __('Lesson') }}</th>
+                        <th scope="col">{{ __('School') }}</th>
+                        <th scope="col">{{ __('Status') }}</th>
+                        <th scope="col">{{ __('Payment') }}</th>
                     </tr>
                 </thead>
                 <tbody>

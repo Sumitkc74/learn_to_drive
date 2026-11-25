@@ -7,6 +7,6 @@
         ['fa-clock', $operations['schools_pending'], 'Pending schools', route('admin.schools.index', ['status' => 'Pending'])],
         ['fa-calendar-check', $operations['lesson_bookings'], 'Lesson bookings', route('admin.lesson-bookings.index')],
     ] as [$icon, $value, $label, $url])
-    <a href="{{ $url }}"><div class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}"></i></div><div><div class="ltd-stat-card__value">{{ $value ?? '—' }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></div></a>
+    <a href="{{ $url }}"><div class="ltd-stat-card"><div class="ltd-stat-card__icon"><i class="fas {{ $icon }}" aria-hidden="true"></i></div><div><div class="ltd-stat-card__value">{{ $value ?? '—' }}</div><div class="ltd-stat-card__label">{{ $label }}</div></div></div></a>
     @endforeach
 </div>

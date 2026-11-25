@@ -1,4 +1,4 @@
-<div class="ltd-panel mb-3"><h3>Import alerts</h3><div class="d-flex flex-wrap" style="gap:1rem">
+<div class="ltd-panel mb-3"><h2>Import alerts</h2><div class="d-flex flex-wrap" style="gap:1rem">
 <a href="{{ route('importHistory') }}">Failed sources: {{ $importAlerts['failed_sources'] ?? 'unavailable' }}</a>
 <a href="{{ route('learningContent') }}">Sources needing re-review: {{ $importAlerts['needs_review'] ?? 'unavailable' }}</a>
 <a href="{{ route('learningContent') }}">Failed AI checks: {{ $importAlerts['failed_ai'] ?? 'unavailable' }} (learning content and notices)</a>

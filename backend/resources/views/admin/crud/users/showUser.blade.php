@@ -9,15 +9,11 @@
             <span class="ltd-page-header__eyebrow">Admin Panel</span>
             <h1>Users</h1>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Users</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">App Users</h3>
+            <h2 class="ltd-panel__title mb-0">App Users</h2>
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ URL::to('/admin/add-user/') }}" class="btn btn-sm btn-success">
                     <i class="nav-icon fas fa-plus"></i> Add User
@@ -38,17 +34,17 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead>
+                <th scope="col"ead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Profile Image</th>
-                        <th>Added by</th>
-                        <th>Action</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Profile Image</th>
+                        <th scope="col">Added by</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>

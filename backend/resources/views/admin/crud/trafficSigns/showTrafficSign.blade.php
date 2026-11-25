@@ -14,15 +14,11 @@
             <span class="ltd-page-header__eyebrow">Admin Panel</span>
             <h1>Traffic Signs</h1>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Traffic Signs</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">Traffic Signs</h3>
+            <h2 class="ltd-panel__title mb-0">Traffic Signs</h2>
             <a href="{{ URL::to('/admin/add-traffic-sign/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Traffic Sign
             </a>
@@ -40,15 +36,15 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle ltd-list-table">
-                <thead>
+                <th scope="col"ead>
                 <tr>
-                    <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
-                    <th>ID</th>
-                    <th>Sign</th>
-                    <th>Traffic Sign</th>
-                    <th>Description</th>
-                    <th>Added by</th>
-                    <th>Action</th>
+                    <th scope="col"><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Sign</th>
+                    <th scope="col">Traffic Sign</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Added by</th>
+                    <th scope="col">Action</th>
                 </tr>
                 </thead>
                 <tbody>

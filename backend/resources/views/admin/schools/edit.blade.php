@@ -3,6 +3,7 @@
 @section('content')
 <div class="ltd-page-header"><h1>{{ $school->name }}</h1><a href="{{ route('admin.schools.index') }}">{{ __('Driving schools') }}</a></div>
 <section class="ltd-panel">
+    <h2>{{ __('School details') }}</h2>
     <p>School ID: {{ $school->id }}</p>
     <p>{{ __('Suspending a school immediately blocks its staff dashboard without deleting learner accounts.') }}</p>
     @foreach($school->memberships as $membership)<p>{{ __('Owner') }}: {{ $membership->user->name }} ({{ $membership->user->email }})</p>@endforeach
@@ -18,11 +19,11 @@
             @foreach($school->getMedia(\App\Support\SchoolMedia::GALLERY_COLLECTION) as $media)
                 <p>
                     @if(\App\Support\SchoolMedia::isVideo($media))
-                        <video src="{{ $media->getUrl() }}" controls preload="none" width="160"></video>
+                        <video src="{{ $media->getUrl() }}" controls preload="none" width="160" aria-label="Gallery video {{ $loop->iteration }} for {{ $school->name }}"></video>
                     @else
-                        <img src="{{ $media->getUrl() }}" alt="" width="160">
+                        <img src="{{ $media->getUrl() }}" alt="Gallery photo {{ $loop->iteration }} for {{ $school->name }}" width="160">
                     @endif
-                    <label class="form-label"><input type="checkbox" name="remove_gallery[]" value="{{ $media->id }}"> {{ __('Remove') }}</label>
+                    <label class="form-label"><input type="checkbox" name="remove_gallery[]" value="{{ $media->id }}"> {{ __('Remove gallery item :number', ['number' => $loop->iteration]) }}</label>
                 </p>
             @endforeach
         @endif

@@ -707,6 +707,7 @@
   "School created. Review its details before approval.": "स्कूल बनाइयो। स्वीकृत गर्नुअघि विवरण जाँच्नुहोस्।",
   "An active school owner is required before approval.": "स्वीकृत गर्नुअघि सक्रिय स्कूल सञ्चालक आवश्यक छ।",
   "School details updated.": "स्कूलको विवरण अद्यावधिक गरियो।",
+  "School details": "स्कूलको विवरण",
   "This account is already a school member. Its role was not changed.": "यो खाता पहिले नै स्कूलको सदस्य हो। यसको भूमिका परिवर्तन गरिएको छैन।",
   "School member added.": "स्कूलको सदस्य थपियो।",
   "Remove membership": "सदस्यता हटाउनुहोस्",
@@ -1093,5 +1094,6 @@
   "Immediately": "तुरुन्तै",
   "Vision test": "दृष्टि परीक्षण",
   "PDF unavailable": "PDF उपलब्ध छैन",
-  "Watch": "हेर्नुहोस्"
+  "Watch": "हेर्नुहोस्",
+  "Remove gallery item :number": "ग्यालेरी वस्तु :number हटाउनुहोस्"
 }

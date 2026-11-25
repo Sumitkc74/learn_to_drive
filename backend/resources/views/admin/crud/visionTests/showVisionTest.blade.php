@@ -8,15 +8,11 @@
             <span class="ltd-page-header__eyebrow">Admin Panel</span>
             <h1>Vision Tests</h1>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Vision Tests</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">Vision Tests</h3>
+            <h2 class="ltd-panel__title mb-0">Vision Tests</h2>
             <a href="{{ route('addVisionTest') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Test
             </a>
@@ -34,14 +30,14 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle ltd-list-table">
-                <thead>
+                <th scope="col"ead>
                     <tr>
-                        <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
-                        <th>ID</th>
-                        <th>Plate</th>
-                        <th>Test</th>
-                        <th>Added by</th>
-                        <th>Action</th>
+                        <th scope="col"><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Plate</th>
+                        <th scope="col">Test</th>
+                        <th scope="col">Added by</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>

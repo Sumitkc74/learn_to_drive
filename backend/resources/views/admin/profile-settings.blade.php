@@ -99,7 +99,7 @@
 
         .ltd-role-badge {
             background: rgba(255, 222, 23, 0.2);
-            color: var(--yellow-dark);
+            color: var(--yellow-text);
         }
 
         .ltd-verification-badge.is-verified {
@@ -116,7 +116,7 @@
             padding: 0;
             border: 0;
             background: transparent;
-            color: var(--yellow-dark);
+            color: var(--yellow-text);
             font-size: 0.76rem;
             font-weight: 800;
             text-decoration: underline;

@@ -14,7 +14,7 @@
 @if($scan['assets'])
 <p class="text-muted">Select files to add as Pending. Titles come from the page and can be edited during review. Website content is not automatically considered official or verified. Up to 50 results are shown; this scan expires after 30 minutes.</p>
 <form method="POST" action="{{ route('websiteImport.store') }}">@csrf<input type="hidden" name="token" value="{{ $scan['token'] }}">
-<div class="table-responsive"><table class="table"><thead><tr><th>Select</th><th>Title</th><th>File URL</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table"><th scope="col"ead><tr><th scope="col">Select</th><th scope="col">Title</th><th scope="col">File URL</th></tr></thead><tbody>
 @foreach($scan['assets'] as $index => $asset)<tr><td><input type="checkbox" name="selected[]" value="{{ $index }}" aria-label="Select {{ $asset['title'] }}"></td><td style="overflow-wrap:anywhere">{{ $asset['title'] }}</td><td style="overflow-wrap:anywhere">{{ $asset['url'] }}</td></tr>@endforeach
 </tbody></table></div><button class="btn btn-success">Add Selected for Review</button>
 </form>

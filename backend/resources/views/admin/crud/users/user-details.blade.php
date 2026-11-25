@@ -40,7 +40,7 @@
     @if($attempts->isEmpty())
         <div class="text-center py-5"><i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i><h4>No attempts yet</h4><p class="text-muted mb-0">This user has not completed any recorded practice or exam attempts.</p></div>
     @else
-        <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Date</th><th>Questions</th><th>Correct</th><th>Score</th></tr></thead><tbody>
+        <div class="table-responsive"><table class="table table-hover align-middle"><th scope="col"ead><tr><th scope="col">Date</th><th scope="col">Questions</th><th scope="col">Correct</th><th scope="col">Score</th></tr></thead><tbody>
         @foreach($attempts as $attempt)<tr><td>{{ $attempt->created_at->format('M j, Y g:i A') }}</td><td>{{ $attempt->question_count }}</td><td>{{ $attempt->correct_count }}</td><td><span class="badge badge-{{ $attempt->score_percentage >= 80 ? 'success' : ($attempt->score_percentage >= 60 ? 'warning' : 'danger') }}">{{ $attempt->score_percentage }}%</span></td></tr>@endforeach
         </tbody></table></div>
     @endif

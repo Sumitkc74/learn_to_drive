@@ -9,15 +9,16 @@
 @endsection
 
 @section('content')
+<div class="ltd-page-header"><div><h1>Edit Tutorial</h1></div></div>
 <div class="ltd-panel mb-3"><span class="text-muted">Added by</span> @include('admin.crud.partials.creator', ['record' => $tutorial])</div>
 
     <div class="card-body">
-        <form role="form" action="{{ URL::to('/admin/update-tutorial/'.$tutorial->id) }}" method="post" enctype="multipart/form-data">
+        <form action="{{ URL::to('/admin/update-tutorial/'.$tutorial->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group row">
                 <label for="title" class="col-sm-2 col-form-label">Tutorial Title :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('title')) is-invalid @endif" name="title" placeholder="Enter tutorial title" value="{{ $tutorial->title }}" >
+                    <input id="title" type="text" class="form-control @if($errors->has('title')) is-invalid @endif" name="title" placeholder="Enter tutorial title" value="{{ $tutorial->title }}" >
                     @if($errors->has('title'))
                         <p class="text-danger">{{ $errors->first('title') }}</p>
                     @endif
@@ -27,7 +28,7 @@
             <div class="form-group row">
                 <label for="description" class="col-sm-2 col-form-label">Description :</label>
                 <div class="col-sm-10">
-                    <textarea type="text" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter tutorial description">
+                    <textarea id="description" class="form-control  @if($errors->has('description')) is-invalid @endif" rows="4" name="description" placeholder="Enter tutorial description">
                         {{ $tutorial->description }}
                     </textarea>
                     @if($errors->has('description'))
@@ -39,7 +40,7 @@
             <div class="form-group row">
                 <label for="videoLink" class="col-sm-2 col-form-label">Tutorial Link :</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @if($errors->has('videoLink')) is-invalid @endif" name="videoLink" placeholder="Enter tutorial link" value="{{ $tutorial->videoLink }}" >
+                    <input id="videoLink" type="text" class="form-control @if($errors->has('videoLink')) is-invalid @endif" name="videoLink" placeholder="Enter tutorial link" value="{{ $tutorial->videoLink }}" >
                     @if($errors->has('videoLink'))
                         <p class="text-danger">{{ $errors->first('videoLink') }}</p>
                     @endif

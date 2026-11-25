@@ -9,15 +9,11 @@
             <span class="ltd-page-header__eyebrow">Admin Panel</span>
             <h1>Tutorials</h1>
         </div>
-        <ol class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Tutorials</li>
-        </ol>
     </div>
 
     <div class="ltd-panel">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h3 class="ltd-panel__title mb-0">Tutorials</h3>
+            <h2 class="ltd-panel__title mb-0">Tutorials</h2>
             <a href="{{ URL::to('/admin/add-tutorial/') }}" class="btn btn-sm btn-success">
                 <i class="nav-icon fas fa-plus"></i> Add Tutorial
             </a>
@@ -35,15 +31,15 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle ltd-list-table">
-                <thead>
+                <th scope="col"ead>
                 <tr>
-                    <th><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
-                    <th>ID</th>
-                    <th>Thumbnail</th>
-                    <th>Tutorial</th>
-                    <th>Video</th>
-                    <th>Added by</th>
-                    <th>Action</th>
+                    <th scope="col"><input type="checkbox" class="bulk-delete-select-all" aria-label="{{ __('Select all on this page') }}"></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Thumbnail</th>
+                    <th scope="col">Tutorial</th>
+                    <th scope="col">Video</th>
+                    <th scope="col">Added by</th>
+                    <th scope="col">Action</th>
                 </tr>
                 </thead>
                 <tbody>

@@ -1,8 +1,8 @@
 <!-- Custom Topbar -->
 <header class="ltd-topbar">
     <div class="ltd-topbar__left">
-        <button class="ltd-topbar__toggle" id="ltdSidebarToggle" type="button" aria-label="Toggle menu">
-            <i class="fas fa-bars"></i>
+        <button class="ltd-topbar__toggle" id="ltdSidebarToggle" type="button" aria-label="Toggle menu" aria-controls="ltdSidebar" aria-expanded="false">
+            <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
 
         <form class="ltd-topbar__search" action="{{ route('adminSearch') }}" method="GET" role="search">
@@ -17,13 +17,13 @@
             <span>Dark mode</span>
         </button>
 
-        <a href="#" class="ltd-topbar__icon-btn" data-widget="fullscreen" role="button" title="Fullscreen">
-            <i class="fas fa-expand-arrows-alt"></i>
+        <a href="#" class="ltd-topbar__icon-btn" data-widget="fullscreen" role="button" aria-label="Toggle fullscreen">
+            <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
         </a>
 
         <a href="{{ route('logout') }}" class="ltd-topbar__logout"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="fas fa-sign-out-alt"></i> Logout
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
         </a>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf

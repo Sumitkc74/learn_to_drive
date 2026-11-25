@@ -7,7 +7,7 @@
 <form id="bulk-delete-form" action="{{ $action }}" method="POST" class="d-flex align-items-center flex-wrap gap-2 mb-3">
     @csrf
     @method('DELETE')
-    <span class="text-muted"><strong class="bulk-delete-count">0</strong> {{ __('selected') }}</span>
-    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ $confirm }}')"><i class="nav-icon fas fa-trash"></i> {{ __('Delete selected') }}</button>
+    <span class="text-muted"><strong class="bulk-delete-count" aria-live="polite">0</strong> {{ __('selected') }}</span>
+    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ $confirm }}')"><i class="nav-icon fas fa-trash" aria-hidden="true"></i> {{ __('Delete selected') }}</button>
     @error('ids')<span class="text-danger">{{ $message }}</span>@enderror
 </form>

@@ -9,7 +9,7 @@
 <label>Status<select name="status" class="form-control"><option value="">All statuses</option>@foreach(['Queued','Running','Review','Generating','Completed','Failed','Cancelled'] as $value)<option @selected(request('status')===$value)>{{ $value }}</option>@endforeach</select></label>
 <button class="btn btn-primary mb-2">Filter</button><a class="btn btn-outline-secondary mb-2" href="{{ route('importProgress') }}">Reset</a><a class="btn btn-outline-primary mb-2" href="{{ request()->fullUrl() }}">Refresh Progress</a>
 </form>
-<div class="table-responsive"><table class="table"><thead><tr><th>Job / source</th><th>Status</th><th>Progress</th><th>Updated</th><th>Next step</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table"><th scope="col"ead><tr><th scope="col">Job / source</th><th scope="col">Status</th><th scope="col">Progress</th><th scope="col">Updated</th><th scope="col">Next step</th></tr></thead><tbody>
 @forelse($runs as $run)
 @php
     $translation = $run->type === 'translation';

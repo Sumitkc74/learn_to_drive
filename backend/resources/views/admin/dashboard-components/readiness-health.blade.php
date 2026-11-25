@@ -24,7 +24,7 @@
 @else<p>Disk capacity is unavailable.</p>@endif
 <p class="small text-muted">Tracked source downloads: {{ number_format($systemHealth['resource_bytes']/1048576,1) }} MB. This excludes previews, OCR tools and logs.</p>
 </div></div>
-<h3 class="h6">Official source checks</h3><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Source</th><th>Last result</th><th>Checked</th><th>Resources found</th></tr></thead><tbody>
+<h3 class="h6">Official source checks</h3><div class="table-responsive"><table class="table table-sm"><th scope="col"ead><tr><th scope="col">Source</th><th scope="col">Last result</th><th scope="col">Checked</th><th scope="col">Resources found</th></tr></thead><tbody>
 @foreach($systemHealth['sources'] as $source)<tr><td>{{ $source['name'] }}</td><td>{{ $source['status'] }}</td><td>{{ $source['checked_at'] ? \Carbon\Carbon::parse($source['checked_at'])->diffForHumans() : 'Not recorded' }}</td><td>{{ $source['found'] ?? '—' }}</td></tr>@endforeach
 </tbody></table></div><p class="small text-muted mb-0">Results are recorded when you check a source. Loading this dashboard does not contact external websites. No earlier check history is assumed.</p>
 @else

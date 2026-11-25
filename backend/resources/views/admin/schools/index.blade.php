@@ -9,7 +9,7 @@
         <label>{{ __('Status') }}<select name="status" class="form-control"><option value="">{{ __('All') }}</option>@foreach(['Pending','Approved','Suspended'] as $status)<option @selected(request('status') === $status)>{{ $status }}</option>@endforeach</select></label>
         <button class="btn btn-primary">{{ __('Filter') }}</button>
     </form>
-    <div class="table-responsive"><table class="table"><thead><tr><th>{{ __('School name') }}</th><th>{{ __('Status') }}</th><th>{{ __('Members') }}</th><th>{{ __('Actions') }}</th></tr></thead><tbody>
+    <div class="table-responsive"><table class="table"><th scope="col"ead><tr><th scope="col">{{ __('School name') }}</th><th scope="col">{{ __('Status') }}</th><th scope="col">{{ __('Members') }}</th><th scope="col">{{ __('Actions') }}</th></tr></thead><tbody>
     @forelse($schools as $school)
         <tr><td>{{ $school->name }}</td><td>{{ __($school->status) }}</td><td>{{ $school->memberships_count }}</td><td><a href="{{ route('admin.schools.edit', $school) }}">{{ __('Manage school') }}</a></td></tr>
     @empty<tr><td colspan="4">{{ __('No schools found.') }}</td></tr>@endforelse

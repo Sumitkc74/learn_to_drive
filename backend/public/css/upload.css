@@ -43,6 +43,13 @@
     font-size: 0.95rem;
 }
 
+/* Field caption rendered as the first line inside the dropzone label
+   (one label per input). Same type scale as .ltd-field-label. */
+.ltd-upload__caption {
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
 .ltd-upload__hint {
     font-size: 0.82rem;
     color: var(--text-muted, var(--muted, #6b7280));

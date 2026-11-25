@@ -9,10 +9,6 @@
             <h1>Dashboard</h1>
             <p class="text-muted mb-0">Review incoming content, prepare drafts, and respond to users.</p>
         </div>
-        <ul class="ltd-breadcrumb">
-            <li><a href="/admin">Home</a></li>
-            <li>Dashboard</li>
-        </ul>
     </div>
 
     @include('admin.dashboard-components.stat-boxes')

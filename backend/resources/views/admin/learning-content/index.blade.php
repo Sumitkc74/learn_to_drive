@@ -8,7 +8,7 @@
     <details class="mb-3"><summary>Upload one PDF for translation</summary>
         <form method="POST" action="{{ route('pdfTranslations.upload') }}" enctype="multipart/form-data" class="mt-3">@csrf
             <div class="form-group"><label for="upload-pdf-title">Title</label><input id="upload-pdf-title" name="title" maxlength="255" class="form-control" required></div>
-            <div class="form-group"><label for="upload-pdf-file">English or Nepali PDF</label><x-upload-field name="pdf" id="upload-pdf-file" accept="application/pdf" :required="true" :max-size-kb="\App\Models\AppSetting::documentLimitKb()" :invalid="$errors->has('pdf')" />@error('pdf')<div class="text-danger">{{ $message }}</div>@enderror</div>
+            <div class="form-group"><x-upload-field name="pdf" id="upload-pdf-file" label="English or Nepali PDF" accept="application/pdf" :required="true" :max-size-kb="\App\Models\AppSetting::documentLimitKb()" :invalid="$errors->has('pdf')" />@error('pdf')<div class="text-danger">{{ $message }}</div>@enderror</div>
             <button class="btn btn-outline-primary">Save PDF for Review</button>
         </form>
     </details>
@@ -44,7 +44,7 @@
         'status' => ['label' => 'Review status', 'options' => ['Pending' => 'Pending', 'Approved' => 'Approved', 'Rejected' => 'Rejected']],
         'kind' => ['label' => 'Content category', 'options' => $categories],
     ]])
-    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Resource</th><th>Source</th><th>Added by</th><th>Status</th><th>Review</th></tr></thead><tbody>
+    <div class="table-responsive"><table class="table table-hover"><th scope="col"ead><tr><th scope="col">Resource</th><th scope="col">Source</th><th scope="col">Added by</th><th scope="col">Status</th><th scope="col">Review</th></tr></thead><tbody>
     @forelse($imports as $item)
         <tr>
             <td style="min-width:200px;max-width:350px;overflow-wrap:anywhere"><a href="{{ route('learningContent.show', $item) }}">{{ $item->title }}</a><div class="small text-muted">{{ $categories[$item->kind] ?? $item->kind }}</div></td>
