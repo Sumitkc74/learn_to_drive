@@ -59,7 +59,7 @@ class SchoolMapTest extends TestCase
         $this->assertStringNotContainsString('row@example.com', $list);
         $this->assertStringContainsString('View details', $list);
         $this->assertStringContainsString('data-open-school-dialog="school-'.$school->id.'"', $list);
-        $this->assertStringContainsString('Show upcoming classes', $list);
+        $this->assertStringContainsString('View available courses', $list);
         $this->assertStringContainsString(route('learn.lessons', ['school' => $school->id]), $list);
         // Map hooks ride on the card itself.
         $this->assertStringContainsString('data-school-marker', $list);
@@ -117,7 +117,7 @@ class SchoolMapTest extends TestCase
         $dialogs = array_pad(explode('<dialog', $this->get(route('learn.schools'))->assertOk()->getContent(), 2), 2, '')[1];
         // Guests see the link to the classes page instead of the lesson
         // itself; booking (and its sign-in prompt) lives on that page.
-        $this->assertStringContainsString('Show upcoming classes', $dialogs);
+        $this->assertStringContainsString('View available courses', $dialogs);
         $this->assertStringNotContainsString('Guest car', $dialogs);
         $this->assertStringNotContainsString('Sign in to book', $dialogs);
         $this->assertStringNotContainsString(route('learn.lessons.book', $slot), $dialogs);

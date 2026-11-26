@@ -157,10 +157,10 @@ class PrivateDrivingLessonTest extends TestCase
         $this->get(route('learn.schools'))->assertOk()
             ->assertSee('Request a private session')
             // The redundant top-level button is gone: no unfiltered
-            // "Upcoming classes" link on the page.
-            ->assertDontSee('<a class="button secondary" href="'.route('learn.lessons').'">Upcoming classes</a>', false)
+            // "View available courses" link on the page.
+            ->assertDontSee('<a class="button secondary" href="'.route('learn.lessons').'">View available courses</a>', false)
             // Each school's dialog links to its own filtered classes.
-            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false);
+            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">View available courses</a>', false);
     }
 
     public function test_school_dialog_lists_no_lessons_only_links_to_the_classes_page(): void
@@ -169,7 +169,7 @@ class PrivateDrivingLessonTest extends TestCase
         $this->get(route('learn.schools'))->assertOk()
             // The dialog keeps both action links…
             ->assertSee('Request a private session')
-            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false)
+            ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">View available courses</a>', false)
             // …but no longer renders the school's lessons inline: the
             // lessons page is the one place that lists them.
             ->assertDontSee('Upcoming lessons')
@@ -183,7 +183,7 @@ class PrivateDrivingLessonTest extends TestCase
         $date = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('d M Y');
         $time = $slot->starts_at->copy()->timezone('Asia/Kathmandu')->format('H:i');
         $this->get(route('learn.lessons'))->assertOk()
-            ->assertSee('Upcoming classes')
+            ->assertSee('Available courses')
             ->assertSee($date)
             ->assertSee($time)
             ->assertSee('Training car')
@@ -283,6 +283,6 @@ class PrivateDrivingLessonTest extends TestCase
             ->assertSee('name="availability"', false)
             ->assertDontSee('class="card stack"')
             // Other pages keep the " · Learn to Drive" tab suffix.
-            ->assertSee('<title>Upcoming classes · Learn to Drive</title>', false);
+            ->assertSee('<title>Available courses · Learn to Drive</title>', false);
     }
 }

@@ -1,7 +1,7 @@
 @extends('learner.layout')
-@section('title', __('Upcoming classes'))
+@section('title', __('Available courses'))
 @section('content')
-<div class="page-heading"><h1>{{ __('Upcoming classes') }}</h1><p>{{ __('Book a course with a car and instructor together. Each course is one driving session: the time shown is when it starts and ends in Nepal time, and the price is for that one session.') }}</p></div>
+<div class="page-heading"><h1>{{ __('Available courses') }}</h1><p>{{ __('Book a course with a car and instructor together. Each course is one driving session: the time shown is when it starts and ends in Nepal time, and the price is for that one session.') }}</p></div>
 <p>{{ __(config('schools.payments_enabled') ? 'Online payment is available from My driving bookings after confirming your course.' : 'Arrange payment directly with the school after booking.') }}</p>
 @if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View courses from all schools') }}</a></p>@endif
 @auth<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endauth
@@ -30,6 +30,6 @@
     @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrlWithQuery(['lesson' => $lesson->id]).'#lesson-'.$lesson->id]) }}">{{ __('Sign in to book this course') }}</a>@endauth
     </div>
 </article>
-@empty<section class="card"><p>{{ __('No course times are available. Try another date or transmission.') }}</p></section>@endforelse</div>
+@empty<section class="card">@if(collect(['school','transmission','date','car','instructor','availability'])->contains(fn ($key) => request()->filled($key)))<p>{{ __('No course times are available. Try another date or transmission.') }}</p>@else<p>{{ __('No upcoming courses are available right now') }}</p><p><a class="button" href="{{ route('learn.private-lessons') }}">{{ __('Request a private session') }}</a></p>@endif</section>@endforelse</div>
 {{ $lessons->links('pagination::simple-default') }}
 @endsection

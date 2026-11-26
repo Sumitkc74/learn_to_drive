@@ -97,4 +97,40 @@ class LessonBookingReturnTest extends TestCase
         $this->assertSame(1, substr_count(
             $this->get(route('learn.lessons', ['lesson' => $first->id]))->assertOk()->getContent(), '<details open>'));
     }
+
+    public function test_empty_list_without_filters_offers_a_private_session(): void
+    {
+        // No lessons at all in the database: the guest sees the new
+        // no-courses copy and the private-session option, not the
+        // filter advice.
+        $this->get(route('learn.lessons'))->assertOk()
+            ->assertSee('Available courses')
+            ->assertSee('No upcoming courses are available right now')
+            ->assertSee('Request a private session')
+            ->assertSee('href="'.route('learn.private-lessons').'"', false)
+            ->assertDontSee('No course times are available. Try another date or transmission.');
+    }
+
+    public function test_empty_list_with_a_filter_keeps_the_old_copy(): void
+    {
+        // Fixtures only offer Automatic cars, so a Manual filter lists
+        // nothing — and the empty state keeps the filter advice with no
+        // private-session link.
+        [$school, $first, $second, $learner] = $this->fixtures();
+        $this->get(route('learn.lessons', ['transmission' => 'Manual']))->assertOk()
+            ->assertSee('No course times are available. Try another date or transmission.')
+            ->assertDontSee('No upcoming courses are available right now')
+            ->assertDontSee('Request a private session');
+    }
+
+    public function test_lesson_param_does_not_count_as_a_filter(): void
+    {
+        // The course-return lesson id is not a list filter: with no
+        // lessons at all, ?lesson=<id> still shows the no-courses copy
+        // and the private-session option.
+        $this->get(route('learn.lessons', ['lesson' => 5]))->assertOk()
+            ->assertSee('No upcoming courses are available right now')
+            ->assertSee('Request a private session')
+            ->assertDontSee('No course times are available. Try another date or transmission.');
+    }
 }

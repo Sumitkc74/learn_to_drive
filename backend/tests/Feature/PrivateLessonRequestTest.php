@@ -289,8 +289,8 @@ class PrivateLessonRequestTest extends TestCase
         // are inside the school dialogs, pre-filtered to that school.
         $response->assertDontSee('href="' . route('learn.private-lessons') . '"', false);
         $response->assertSee('href="' . route('learn.private-lessons', ['school' => $school->id]) . '"', false);
-        // The Upcoming classes page itself is untouched: still lists classes.
-        $this->get(route('learn.lessons'))->assertOk()->assertSee('Upcoming classes');
+        // The Available courses page itself is untouched: still lists classes.
+        $this->get(route('learn.lessons'))->assertOk()->assertSee('Available courses');
     }
 
     public function test_owner_sees_school_requests_read_only(): void

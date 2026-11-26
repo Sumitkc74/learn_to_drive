@@ -1130,5 +1130,9 @@
   "You're teaching this course.": "तपाईं यो कोर्स सिकाइरहनुभएको छ।",
   "Sign in to book this course.": "यो कोर्स बुक गर्न साइन इन गर्नुहोस्।",
   "Sign in to request this session.": "यो सत्र अनुरोध गर्न साइन इन गर्नुहोस्।",
-  "Sign in to see your bookings.": "मेरा ड्राइभिङ बुकिङहरू हेर्न साइन इन गर्नुहोस्।"
+  "Sign in to see your bookings.": "मेरा ड्राइभिङ बुकिङहरू हेर्न साइन इन गर्नुहोस्।",
+  "No upcoming courses are available right now": "हाल कुनै आगामी कोर्सहरू उपलब्ध छैनन्।",
+  "Available courses": "उपलब्ध कोर्सहरू",
+  "View available courses": "उपलब्ध कोर्सहरू हेर्नुहोस्",
+  "A lesson on your waitlist is available. Open available courses to book it.": "तपाईंको प्रतीक्षा सूचीको पाठ उपलब्ध छ। बुक गर्न उपलब्ध कोर्सहरू खोल्नुहोस्।"
 }

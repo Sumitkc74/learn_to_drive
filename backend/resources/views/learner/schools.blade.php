@@ -25,7 +25,7 @@
         </div>
         <div class="school-row-actions">
             <button type="button" class="button small" data-open-school-dialog="school-{{ $school->id }}">{{ __('View details') }}</button>
-            <a class="button small secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a>
+            <a class="button small secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('View available courses') }}</a>
         </div>
     </li>
 @endforeach
@@ -54,7 +54,7 @@
         @endforeach
     </div>
     @endif
-    <p><a class="button" href="{{ route('learn.private-lessons', ['school' => $school->id]) }}">{{ __('Request a private session') }}</a> <a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
+    <p><a class="button" href="{{ route('learn.private-lessons', ['school' => $school->id]) }}">{{ __('Request a private session') }}</a> <a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('View available courses') }}</a></p>
 </dialog>
 @endforeach
 {{ $schools->links('pagination::simple-default') }}
