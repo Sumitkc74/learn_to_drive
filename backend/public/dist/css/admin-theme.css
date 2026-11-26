@@ -1438,6 +1438,16 @@ body.ltd-body {
     outline-offset: 2px;
 }
 
+/* Explicit focus ring for the sidebar logo link, so its outline is
+   unmistakable even if the global rule is ever missed. */
+.ltd-sidebar__brand:focus-visible {
+    outline: 3px solid var(--yellow);
+    outline-offset: 2px;
+}
+.ltd-body.ltd-theme-dark .ltd-sidebar__brand:focus-visible {
+    outline-color: #ffde17;
+}
+
 /* Global breadcrumb (rendered once in the admin layout, above the page). */
 .ltd-global-breadcrumb {
     margin: 0 0 1rem;

@@ -91,6 +91,23 @@ class AdminAccessibilityTest extends TestCase
         $this->assertAccessibleHtml($response->getContent(), 'edit-user');
     }
 
+    public function test_sidebar_brand_link_has_explicit_focus_visible_rule(): void
+    {
+        // Static stylesheet assertion only: it proves the rule exists in
+        // the shipped CSS, not that a browser renders it. The global
+        // .ltd-body :focus-visible rule should already cover the logo
+        // link, but a live check found no visible outline on it, so the
+        // brand gets its own explicit rule.
+        $css = file_get_contents(public_path('dist/css/admin-theme.css'));
+        $this->assertNotFalse($css, 'admin-theme.css could not be read');
+
+        $this->assertMatchesRegularExpression(
+            '/\.ltd-sidebar__brand:focus-visible\s*\{[^}]*outline\s*:/',
+            $css,
+            'admin-theme.css must give the sidebar logo link an explicit :focus-visible outline'
+        );
+    }
+
     private function assertAccessibleHtml(string $html, string $page): void
     {
         // Exactly one h1, first heading on the page, levels never skipped.
