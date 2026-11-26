@@ -155,7 +155,7 @@ class PrivateDrivingLessonTest extends TestCase
     {
         [$teacher, $school, $car, $slot] = $this->offering();
         $this->get(route('learn.schools'))->assertOk()
-            ->assertSee('Book a private driving lesson')
+            ->assertSee('Request a private session')
             // The redundant top-level button is gone: no unfiltered
             // "Upcoming classes" link on the page.
             ->assertDontSee('<a class="button secondary" href="'.route('learn.lessons').'">Upcoming classes</a>', false)
@@ -168,12 +168,12 @@ class PrivateDrivingLessonTest extends TestCase
         [$teacher, $school, $car, $slot] = $this->offering();
         $this->get(route('learn.schools'))->assertOk()
             // The dialog keeps both action links…
-            ->assertSee('Book a private driving lesson')
+            ->assertSee('Request a private session')
             ->assertSee('<a class="button secondary" href="'.route('learn.lessons', ['school' => $school->id]).'">Show upcoming classes</a>', false)
             // …but no longer renders the school's lessons inline: the
             // lessons page is the one place that lists them.
             ->assertDontSee('Upcoming lessons')
-            ->assertDontSee('Book this lesson')
+            ->assertDontSee('Book this course')
             ->assertDontSee('No upcoming lessons from this school yet.');
     }
 

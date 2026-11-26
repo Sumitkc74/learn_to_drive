@@ -2,7 +2,7 @@
 @section('title', __('My vehicles and lesson times'))
 @section('content')
 <div class="page-heading"><h1>{{ __('My vehicles and lesson times') }}</h1><a href="{{ route('learn.school.dashboard') }}">{{ __('My school') }}</a></div>
-<p>{{ __('Publish a private lesson with your car, available time, price and meeting point. All entered times are Nepal time. Confirmed bookings appear below.') }}</p>
+<p>{{ __('Publish a course with your car, available time, price and meeting point. All entered times are Nepal time. Confirmed bookings appear below.') }}</p>
 <section class="card"><h2>{{ __('My vehicles') }}</h2>@foreach($vehicles as $vehicle)<p>{{ $vehicle->name }} · {{ __($vehicle->transmission) }} · {{ $vehicle->registration }} · {{ $vehicle->school->name }}</p>@endforeach
 <details @if($errors->has('registration')) open @endif><summary>{{ __('Add vehicle') }}</summary>
 <form method="post" action="{{ route('learn.instructor.vehicles') }}" class="stack">@csrf
@@ -23,7 +23,7 @@
     <button class="button">{{ __('Publish lesson') }}</button>
 </form></section>
 @endif
-@if($requests->isNotEmpty())<h2>{{ __('Private lesson requests') }}</h2>
+@if($requests->isNotEmpty())<h2>{{ __('Private session requests') }}</h2>
 @foreach($requests as $req)<article class="card">
     <p><strong>{{ $req->learner->name }}</strong> · {{ $req->school->name }} · {{ $req->vehicle->name }} · {{ $req->vehicle->registration }}</p>
     <p>{{ $req->starts_at->copy()->timezone('Asia/Kathmandu')->format('d M Y H:i') }} · {{ $req->duration_minutes }} {{ __('minutes') }} · {{ $req->meeting_point }}</p>
@@ -46,6 +46,6 @@
     @elseif($lesson->bookings->isNotEmpty())@foreach($lesson->bookings as $booking)<p>{{ __('Booked') }}: {{ $booking->learner->name }} · {{ $booking->learner->email }}</p>@endforeach
     @else<p>{{ __('Available') }}</p>@endif
     @if(!$lesson->cancelled && $lesson->starts_at->isFuture())<details><summary>{{ __('Cancel lesson') }}</summary><p>{{ __('This also cancels its booking. Contact the learner if they have booked.') }}</p><form method="post" action="{{ route('learn.instructor.lessons.cancel', $lesson->id) }}">@csrf @method('DELETE')<button class="button">{{ __('Confirm cancellation') }}</button></form></details>@endif
-</article>@empty<p>{{ __('No lesson times published yet.') }}</p>@endforelse
+</article>@empty<p>{{ __('No course times published yet.') }}</p>@endforelse
 {{ $lessons->links('pagination::simple-default') }}
 @endsection

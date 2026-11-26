@@ -1,9 +1,9 @@
 @extends('learner.layout')
 @section('title', __('Upcoming classes'))
 @section('content')
-<div class="page-heading"><h1>{{ __('Upcoming classes') }}</h1><p>{{ __('Book a car and instructor together for a private lesson. Choose an available time, review the price and confirm your booking.') }}</p></div>
-<p>{{ __(config('schools.payments_enabled') ? 'Online payment is available from My driving bookings after confirming your lesson.' : 'Arrange payment directly with the school after booking.') }}</p>
-@if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View lessons from all schools') }}</a></p>@endif
+<div class="page-heading"><h1>{{ __('Upcoming classes') }}</h1><p>{{ __('Book a course with a car and instructor together. Each course is one driving session: the time shown is when it starts and ends in Nepal time, and the price is for that one session.') }}</p></div>
+<p>{{ __(config('schools.payments_enabled') ? 'Online payment is available from My driving bookings after confirming your course.' : 'Arrange payment directly with the school after booking.') }}</p>
+@if($school)<h2>{{ $school->name }}</h2><p><a href="{{ route('learn.lessons') }}">{{ __('View courses from all schools') }}</a></p>@endif
 @auth<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endauth
 <form method="get" class="filters">
     <label>{{ __('Institute') }}<select name="school"><option value="">{{ __('All institutes') }}</option>@foreach($schools as $s)<option value="{{ $s->id }}" @selected(request('school') == $s->id)>{{ $s->name }}</option>@endforeach</select></label>
@@ -22,12 +22,12 @@
     <p>{{ __('Waitlist alerts do not reserve a slot. Confirm a booking when one becomes available.') }}</p>
     <form method="post" action="{{ route('learn.lessons.waitlist',$lesson->id) }}">@csrf<input type="hidden" name="action" value="{{ $waiting->has($lesson->id)?'leave':'join' }}"><button class="button">{{ $waiting->has($lesson->id)?__('Leave waitlist'):__('Join waitlist') }}</button></form>
     @else
-    <details><summary>{{ __('Book this lesson') }}</summary><p>{{ __('Confirm this time and price before booking. You can cancel before the lesson starts.') }}</p>
-    <form method="post" action="{{ route('learn.lessons.book', $lesson->id) }}">@csrf<button class="button">{{ __('Confirm booking') }}</button></form></details>
+    <details><summary>{{ __('Book this course') }}</summary><p>{{ __('Confirm this course time and price before booking. The price covers this one session with the listed car and instructor. You can cancel before the course starts.') }}</p>
+    <form method="post" action="{{ route('learn.lessons.book', $lesson->id) }}">@csrf<button class="button">{{ __('Confirm course booking') }}</button></form></details>
     @endif
-    @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to book') }}</a>@endauth
+    @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to book this course') }}</a>@endauth
     </div>
 </article>
-@empty<section class="card"><p>{{ __('No lesson times are available. Try another date or transmission.') }}</p></section>@endforelse</div>
+@empty<section class="card"><p>{{ __('No course times are available. Try another date or transmission.') }}</p></section>@endforelse</div>
 {{ $lessons->links('pagination::simple-default') }}
 @endsection

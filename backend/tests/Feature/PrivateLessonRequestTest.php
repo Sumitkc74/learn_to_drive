@@ -49,8 +49,8 @@ class PrivateLessonRequestTest extends TestCase
             ->assertSee($teacher->name)->assertSee($car->name)->assertDontSee($car->registration)
             ->assertSee('9:00 AM')
             // …and the sign-in action instead of the request form.
-            ->assertSee('Sign in to request this lesson')
-            ->assertDontSee('Request this lesson')
+            ->assertSee('Sign in to request this session')
+            ->assertDontSee('Request this session')
             ->assertDontSee('name="starts_at"', false);
         $this->post(route('learn.private-lessons.store'), $this->payload())->assertRedirect(route('learn.login'));
     }
@@ -129,7 +129,7 @@ class PrivateLessonRequestTest extends TestCase
             ->assertSee('name="starts_at" value="' . $day . 'T' . $time . '"', false)
             ->assertSee('name="duration" value="90"', false)
             ->assertSee('name="meeting_point" value="School gate"', false)
-            ->assertSee('Request this lesson');
+            ->assertSee('Request this session');
         $this->actingAs($learner)->post(route('learn.private-lessons.store'), [
             'driving_school_id' => (string) $school->id, 'instructor_id' => (string) $teacher->id,
             'lesson_vehicle_id' => (string) $car->id, 'starts_at' => $day . 'T' . $time,
@@ -217,7 +217,7 @@ class PrivateLessonRequestTest extends TestCase
         $learner = User::factory()->create(['is_active' => true]);
         $request = $this->requestFor($offering, $learner);
         $this->actingAs($teacher)->get(route('learn.instructor.lessons'))->assertOk()
-            ->assertSee('Private lesson requests')->assertSee($learner->name)->assertSee('School reception');
+            ->assertSee('Private session requests')->assertSee($learner->name)->assertSee('School reception');
         $this->actingAs($teacher)->post(route('learn.instructor.private-lesson-requests.accept', $request), ['price_npr' => '1500'])
             ->assertSessionHasNoErrors();
         $this->assertSame('Accepted', $request->fresh()->status);
@@ -301,6 +301,6 @@ class PrivateLessonRequestTest extends TestCase
         $learner = User::factory()->create(['is_active' => true]);
         $this->requestFor($offering, $learner);
         $this->actingAs($owner)->get(route('learn.school.partner', $school))->assertOk()
-            ->assertSee('Private lesson requests')->assertSee($learner->name)->assertSee($teacher->name);
+            ->assertSee('Private session requests')->assertSee($learner->name)->assertSee($teacher->name);
     }
 }

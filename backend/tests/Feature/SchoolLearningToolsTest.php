@@ -26,7 +26,7 @@ class SchoolLearningToolsTest extends TestCase {
         $this->assertSame($slots[1]->id,$b->fresh()->driving_lesson_id);$this->assertSame('Paid',$p->fresh()->status);
         $this->assertDatabaseHas('lesson_booking_changes',['lesson_booking_id'=>$b->id,'from_lesson_id'=>$slots[0]->id,'to_lesson_id'=>$slots[1]->id]);
         $this->assertDatabaseHas('lesson_waitlist',['user_id'=>$other->id,'status'=>'Notified']);
-        $this->assertDatabaseHas('school_notifications',['user_id'=>$other->id,'message'=>'A lesson on your waitlist is available. Open private lessons to book it.']);
+        $this->assertDatabaseHas('school_notifications',['user_id'=>$other->id,'message'=>'A lesson on your waitlist is available. Open upcoming classes to book it.']);
         $this->actingAs($other)->post(route('learn.lessons.book',$slots[0]->id))->assertSessionHasNoErrors();
         $this->assertDatabaseMissing('lesson_waitlist',['user_id'=>$other->id]);
     }

@@ -1,7 +1,7 @@
 @extends('learner.layout')
-@section('title', __('Book a private driving lesson'))
+@section('title', __('Request a private session'))
 @section('content')
-<div class="page-heading"><h1>{{ __('Book a private driving lesson') }}</h1></div>
+<div class="page-heading"><h1>{{ __('Request a private session') }}</h1></div>
 <p>{{ __('Choose an instructor and vehicle, then request a time. The instructor sets the price when they accept.') }}</p>
 <form method="get" action="{{ route('learn.private-lessons') }}" class="filters">
     <label>{{ __('School') }}<select name="school"><option value="">{{ __('All schools') }}</option>@foreach($schools as $s)<option value="{{ $s->id }}" @selected($school && $school->id === $s->id)>{{ $s->name }}</option>@endforeach</select></label>
@@ -59,23 +59,23 @@
         <input type="hidden" name="duration" value="{{ $duration }}">
         <input type="hidden" name="meeting_point" value="{{ $meetingPoint }}">
         <label>{{ __('Note (optional)') }}<input type="text" name="note" maxlength="1000" value="{{ old('note') }}"></label>
-        <div><button class="button">{{ __('Request this lesson') }}</button></div>
+        <div><button class="button">{{ __('Request this session') }}</button></div>
     </form>
     @else
     <p class="muted">{{ __('Pick a day and a time above to request.') }}</p>
     @endif
 @else
-    <p><a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to request this lesson') }}</a></p>
+    <p><a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to request this session') }}</a></p>
 @endauth
 </section>
 @else
 <p class="muted">{{ __('Choose a school and instructor above to pick a day and time.') }}</p>
 @guest
-<p><a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to request this lesson') }}</a></p>
+<p><a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to request this session') }}</a></p>
 @endguest
 @endif
 @auth
-<h2>{{ __('My private lesson requests') }}</h2>
+<h2>{{ __('My private session requests') }}</h2>
 @forelse($myRequests as $req)<article class="card">
     <p><strong>{{ $req->school->name }} · {{ $req->instructor->name }} · {{ $req->vehicle->name }} · {{ $req->vehicle->registration }}</strong></p>
     <p>{{ $req->starts_at->copy()->timezone('Asia/Kathmandu')->format('d M Y H:i') }} · {{ $req->duration_minutes }} {{ __('minutes') }} · {{ $req->meeting_point }}</p>
@@ -83,7 +83,7 @@
     <p><strong>{{ __($req->status) }}</strong>@if($req->status === 'Declined' && $req->decline_reason) — {{ $req->decline_reason }}@endif</p>
     @if($req->status === 'Accepted' && $req->lesson)<p><a href="{{ route('learn.lessons.bookings') }}">{{ __('My driving bookings') }}</a></p>@endif
     @if($req->status === 'Pending')<form method="post" action="{{ route('learn.private-lessons.cancel', $req->id) }}">@csrf<button>{{ __('Cancel request') }}</button></form>@endif
-</article>@empty<p>{{ __('You have no private lesson requests yet.') }}</p>@endforelse
+</article>@empty<p>{{ __('You have no private session requests yet.') }}</p>@endforelse
 {{ $myRequests->links('pagination::simple-default') }}
 @endauth
 @endsection

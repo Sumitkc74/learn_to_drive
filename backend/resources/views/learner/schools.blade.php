@@ -54,7 +54,7 @@
         @endforeach
     </div>
     @endif
-    <p><a class="button" href="{{ route('learn.private-lessons', ['school' => $school->id]) }}">{{ __('Book a private driving lesson') }}</a> <a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
+    <p><a class="button" href="{{ route('learn.private-lessons', ['school' => $school->id]) }}">{{ __('Request a private session') }}</a> <a class="button secondary" href="{{ route('learn.lessons', ['school' => $school->id]) }}">{{ __('Show upcoming classes') }}</a></p>
 </dialog>
 @endforeach
 {{ $schools->links('pagination::simple-default') }}

@@ -42,7 +42,7 @@ class BookingToolsController extends Controller {
             abort_unless(!$next->cancelled && $next->starts_at->isFuture() && DrivingLesson::availableProvider()->whereKey($next->id)->exists(),422);
             abort_if($next->vehicle->instructor_id===$r->user()->id,403);
             abort_unless($old->vehicle->driving_school_id===$next->vehicle->driving_school_id && $old->price_npr===$next->price_npr,422);
-            if($next->bookings()->where('status','Booked')->exists()) throw ValidationException::withMessages(['lesson_id'=>__('This lesson is no longer available.')]);
+            if($next->bookings()->where('status','Booked')->exists()) throw ValidationException::withMessages(['lesson_id'=>__('This course is no longer available.')]);
             if(LessonBooking::where('learner_id',$r->user()->id)->where('status','Booked')->where('id','!=',$record->id)->whereHas('lesson',fn($q)=>$q->overlapping($next->starts_at,$next->ends_at))->exists()
                 || DB::table('school_class_sessions as s')->join('school_batch_members as m','m.school_batch_id','=','s.school_batch_id')->where('m.user_id',$r->user()->id)->where('s.cancelled',false)->where('s.starts_at','<',$next->ends_at)->where('s.ends_at','>',$next->starts_at)->exists())
                 throw ValidationException::withMessages(['lesson_id'=>__('You already have a booking at this time.')]);

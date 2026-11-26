@@ -107,10 +107,10 @@ class LessonController extends Controller
                 'price_npr' => (int) $data['price_npr'], 'meeting_point' => $record->meeting_point]);
             LessonBooking::create(['driving_lesson_id' => $lesson->id, 'active_lesson_id' => $lesson->id, 'learner_id' => $record->learner_id]);
             $record->update(['status' => 'Accepted', 'driving_lesson_id' => $lesson->id]);
-            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private lesson request was accepted. View My driving bookings.');
-            \App\Services\SchoolNotifications::send($record->instructor_id, 'You accepted a private lesson request.');
+            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private session request was accepted. View My driving bookings.');
+            \App\Services\SchoolNotifications::send($record->instructor_id, 'You accepted a private session request.');
         });
-        return back()->with('success', __('Private lesson request accepted.'));
+        return back()->with('success', __('Private session request accepted.'));
     }
 
     public function declineRequest(Request $request, int $privateRequest)
@@ -119,9 +119,9 @@ class LessonController extends Controller
         DB::transaction(function () use ($request, $data, $privateRequest) {
             $record = $this->pendingRequest($request, $privateRequest);
             $record->update(['status' => 'Declined', 'decline_reason' => $data['decline_reason'] ?? null]);
-            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private lesson request was declined.');
+            \App\Services\SchoolNotifications::send($record->learner_id, 'Your private session request was declined.');
         });
-        return back()->with('success', __('Private lesson request declined.'));
+        return back()->with('success', __('Private session request declined.'));
     }
 
     public function cancel(Request $request, int $lesson)

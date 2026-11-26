@@ -111,7 +111,7 @@ class PrivateLessonController extends Controller
             }
             if (PrivateLessonRequest::where('instructor_id', $instructor->id)->where('status', 'Pending')->get()
                     ->contains(fn ($r) => $r->starts_at < $end && $r->endsAt() > $start)) {
-                throw ValidationException::withMessages(['starts_at' => __('This instructor already has a private lesson request at this time.')]);
+                throw ValidationException::withMessages(['starts_at' => __('This instructor already has a private session request at this time.')]);
             }
             if (LessonBooking::where('learner_id', $request->user()->id)->where('status', 'Booked')
                     ->whereHas('lesson', fn ($q) => $q->overlapping($start, $end))->exists()
@@ -128,7 +128,7 @@ class PrivateLessonController extends Controller
                 'lesson_vehicle_id' => $vehicle->id, 'starts_at' => $start, 'duration_minutes' => (int) $data['duration'],
                 'meeting_point' => $data['meeting_point'], 'note' => $data['note'] ?? null,
             ]);
-            \App\Services\SchoolNotifications::send($instructor->id, 'A learner requested a private driving lesson. Check your lesson schedule.');
+            \App\Services\SchoolNotifications::send($instructor->id, 'A learner requested a private session. Check your lesson schedule.');
             return $record;
         });
         return redirect()->route('learn.private-lessons')->with('success', __('Request sent.'));
@@ -139,6 +139,6 @@ class PrivateLessonController extends Controller
         $record = PrivateLessonRequest::where('learner_id', $request->user()->id)->findOrFail($privateRequest);
         abort_unless($record->status === 'Pending', 422);
         $record->update(['status' => 'Cancelled']);
-        return back()->with('success', __('Private lesson request cancelled.'));
+        return back()->with('success', __('Private session request cancelled.'));
     }
 }

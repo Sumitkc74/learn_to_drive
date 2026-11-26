@@ -48,7 +48,7 @@ class DrivingLessonController extends Controller
             $slot = DrivingLesson::availableProvider()->lockForUpdate()->findOrFail($lesson);
             abort_if($slot->vehicle->instructor_id === $request->user()->id, 403);
             if ($slot->cancelled || !$slot->starts_at->isFuture() || $slot->bookings()->where('status', 'Booked')->exists()) {
-                throw ValidationException::withMessages(['lesson' => __('This lesson is no longer available.')]);
+                throw ValidationException::withMessages(['lesson' => __('This course is no longer available.')]);
             }
             if (LessonBooking::where('learner_id', $request->user()->id)->where('status', 'Booked')
                 ->whereHas('lesson', fn ($q) => $q->overlapping($slot->starts_at, $slot->ends_at))->exists()) {
