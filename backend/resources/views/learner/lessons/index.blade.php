@@ -18,7 +18,9 @@
 <article class="card lesson-row">{{-- The public listing shows the car, not its plate: test-looking registrations read as fake data to visitors. --}}@include('learner.lessons.details', ['hideVehicleRegistration' => true])
     <div class="lesson-action">
     @auth
-    @if(request('availability')==='booked')
+    @if(auth()->user()->id === $lesson->vehicle->instructor_id)
+    <p>{{ __('You\'re teaching this course.') }}</p>
+    @elseif(request('availability')==='booked')
     <p>{{ __('Waitlist alerts do not reserve a slot. Confirm a booking when one becomes available.') }}</p>
     <form method="post" action="{{ route('learn.lessons.waitlist',$lesson->id) }}">@csrf<input type="hidden" name="action" value="{{ $waiting->has($lesson->id)?'leave':'join' }}"><button class="button">{{ $waiting->has($lesson->id)?__('Leave waitlist'):__('Join waitlist') }}</button></form>
     @else

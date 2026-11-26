@@ -13,7 +13,7 @@ class BookingToolsController extends Controller {
             $slot=DrivingLesson::whereKey($lesson)->lockForUpdate()->firstOrFail();
             if($d['action']==='leave') {DB::table('lesson_waitlist')->where('driving_lesson_id',$lesson)->where('user_id',$r->user()->id)->delete();return;}
             abort_unless(DrivingLesson::availableProvider()->whereKey($lesson)->exists() && !$slot->cancelled && $slot->starts_at->isFuture(),422);
-            abort_if($slot->vehicle->instructor_id===$r->user()->id,403);
+            if($slot->vehicle->instructor_id===$r->user()->id) throw ValidationException::withMessages(['lesson'=>__('You can\'t join the waitlist for a lesson you\'re teaching.')]);
             abort_unless($slot->bookings()->where('status','Booked')->exists(),422);
             abort_if($slot->bookings()->where('status','Booked')->where('learner_id',$r->user()->id)->exists(),422);
             DB::table('lesson_waitlist')->updateOrInsert(['driving_lesson_id'=>$lesson,'user_id'=>$r->user()->id],['status'=>'Waiting','created_at'=>now(),'updated_at'=>now()]);
@@ -40,7 +40,7 @@ class BookingToolsController extends Controller {
             $record=LessonBooking::whereKey($record->id)->lockForUpdate()->firstOrFail();
             abort_unless($old && $next && $old->id!==$next->id && $record->driving_lesson_id===$old->id && $record->status==='Booked' && $old->starts_at->isFuture(),422);
             abort_unless(!$next->cancelled && $next->starts_at->isFuture() && DrivingLesson::availableProvider()->whereKey($next->id)->exists(),422);
-            abort_if($next->vehicle->instructor_id===$r->user()->id,403);
+            if($next->vehicle->instructor_id===$r->user()->id) throw ValidationException::withMessages(['lesson_id'=>__('You can\'t reschedule to a lesson you\'re teaching.')]);
             abort_unless($old->vehicle->driving_school_id===$next->vehicle->driving_school_id && $old->price_npr===$next->price_npr,422);
             if($next->bookings()->where('status','Booked')->exists()) throw ValidationException::withMessages(['lesson_id'=>__('This course is no longer available.')]);
             if(LessonBooking::where('learner_id',$r->user()->id)->where('status','Booked')->where('id','!=',$record->id)->whereHas('lesson',fn($q)=>$q->overlapping($next->starts_at,$next->ends_at))->exists()

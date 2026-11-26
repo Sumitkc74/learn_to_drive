@@ -1123,5 +1123,9 @@
   "A lesson on your waitlist is available. Open upcoming classes to book it.": "तपाईंको प्रतीक्षा सूचीको पाठ उपलब्ध छ। बुक गर्न आगामी कक्षाहरू खोल्नुहोस्।",
   "Sign in to message the admin team and track their replies.": "एडमिन टोलीलाई सन्देश पठाउन र उनीहरूको जवाफ हेर्न साइन इन गर्नुहोस्।",
   "Sign in to report this content.": "यो सामग्री रिपोर्ट गर्न साइन इन गर्नुहोस्।",
-  "No course times published yet.": "कुनै कोर्स समय प्रकाशित गरिएको छैन।"
+  "No course times published yet.": "कुनै कोर्स समय प्रकाशित गरिएको छैन।",
+  "You can't book a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठ तपाईं आफैं बुक गर्न सक्नुहुन्न।",
+  "You can't join the waitlist for a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठको प्रतीक्षा सूचीमा तपाईं सामेल हुन सक्नुहुन्न।",
+  "You can't reschedule to a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठमा तपाईं बुकिङ सार्न सक्नुहुन्न।",
+  "You're teaching this course.": "तपाईं यो कोर्स सिकाइरहनुभएको छ।"
 }

@@ -2,6 +2,7 @@
 namespace Tests\Feature;
 
 use App\Models\{DrivingLesson, DrivingSchool, LessonBooking, LessonVehicle, PrivateLessonRequest, SchoolMembership, User};
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -302,5 +303,68 @@ class PrivateLessonRequestTest extends TestCase
         $this->requestFor($offering, $learner);
         $this->actingAs($owner)->get(route('learn.school.partner', $school))->assertOk()
             ->assertSee('Private session requests')->assertSee($learner->name)->assertSee($teacher->name);
+    }
+
+    // The test database stores a lesson's wall time as UTC, so a lesson
+    // meant to run at a Nepal wall time is built from that wall time
+    // first and then converted to UTC.
+    private function lessonAt(array $offering, string $day, string $from, string $to): DrivingLesson
+    {
+        [, , $car] = $offering;
+        return DrivingLesson::create(['lesson_vehicle_id' => $car->id,
+            'starts_at' => Carbon::parse($day.' '.$from, 'Asia/Kathmandu')->setTimezone('UTC'),
+            'ends_at' => Carbon::parse($day.' '.$to, 'Asia/Kathmandu')->setTimezone('UTC'),
+            'price_npr' => 1500, 'meeting_point' => 'School gate']);
+    }
+
+    public function test_busy_time_does_not_appear_as_a_chip_but_a_free_time_does(): void
+    {
+        $offering = $this->offering();
+        [$teacher, $school] = $offering;
+        $day = now()->timezone('Asia/Kathmandu')->addDays(2)->toDateString();
+        $otherDay = now()->timezone('Asia/Kathmandu')->addDays(3)->toDateString();
+        // A 09:00 lesson on another day gives the 09:00 chip; it is free on $day.
+        $this->lessonAt($offering, $otherDay, '09:00', '10:00');
+        // A 16:00 lesson on $day gives the 16:00 chip, but the instructor
+        // is teaching then, so it must not be offered for $day.
+        $this->lessonAt($offering, $day, '16:00', '17:00');
+        $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id, 'day' => $day]))->assertOk()
+            ->assertSee('time=09%3A00', false)
+            ->assertDontSee('time=16%3A00', false);
+    }
+
+    public function test_fallback_times_are_offered_when_every_derived_time_is_busy(): void
+    {
+        $offering = $this->offering();
+        [$teacher, $school] = $offering;
+        $day = now()->timezone('Asia/Kathmandu')->addDays(2)->toDateString();
+        $this->lessonAt($offering, $day, '16:00', '17:00');
+        // The only derived time is busy, so the usual daytime slots take
+        // over — filtered the same way, so 16:00 stays out.
+        $this->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id, 'day' => $day]))->assertOk()
+            ->assertDontSee('time=16%3A00', false)
+            ->assertSee('time=09%3A00', false);
+    }
+
+    public function test_busy_selected_time_is_cleared_and_submitting_at_a_busy_time_is_still_rejected(): void
+    {
+        $offering = $this->offering();
+        [$teacher, $school, $car] = $offering;
+        $day = now()->timezone('Asia/Kathmandu')->addDays(2)->toDateString();
+        $this->lessonAt($offering, $day, '16:00', '17:00');
+        $learner = User::factory()->create(['is_active' => true]);
+        // A time picked before the day was chosen is cleared once the day
+        // makes it busy, so the form cannot offer a slot store() rejects.
+        $this->actingAs($learner)->get(route('learn.private-lessons', ['school' => $school->id, 'instructor' => $teacher->id,
+                'vehicle' => $car->id, 'day' => $day, 'time' => '16:00', 'duration' => 60, 'meeting_point' => 'School gate']))->assertOk()
+            ->assertDontSee('name="starts_at"', false)
+            ->assertSee('Pick a day and a time above to request.');
+        // And the store() backstop still rejects the busy slot directly.
+        $this->actingAs($learner)->post(route('learn.private-lessons.store'), $this->payload([
+                'driving_school_id' => (string) $school->id, 'instructor_id' => (string) $teacher->id,
+                'lesson_vehicle_id' => (string) $car->id, 'starts_at' => $day.'T16:00',
+                'duration' => '60', 'meeting_point' => 'School gate',
+            ]))->assertSessionHasErrors(['starts_at' => 'This instructor already has a lesson at this time.']);
+        $this->assertDatabaseCount('private_lesson_requests', 0);
     }
 }

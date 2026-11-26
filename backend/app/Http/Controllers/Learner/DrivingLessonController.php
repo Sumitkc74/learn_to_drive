@@ -46,7 +46,9 @@ class DrivingLessonController extends Controller
             // Serialize this learner's requests, then claim the unique lesson slot.
             User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
             $slot = DrivingLesson::availableProvider()->lockForUpdate()->findOrFail($lesson);
-            abort_if($slot->vehicle->instructor_id === $request->user()->id, 403);
+            if ($slot->vehicle->instructor_id === $request->user()->id) {
+                throw ValidationException::withMessages(['lesson' => __('You can\'t book a lesson you\'re teaching.')]);
+            }
             if ($slot->cancelled || !$slot->starts_at->isFuture() || $slot->bookings()->where('status', 'Booked')->exists()) {
                 throw ValidationException::withMessages(['lesson' => __('This course is no longer available.')]);
             }

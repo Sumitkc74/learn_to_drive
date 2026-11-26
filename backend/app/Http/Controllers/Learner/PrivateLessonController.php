@@ -55,6 +55,29 @@ class PrivateLessonController extends Controller
         }
         $time = $data['time'] ?? null;
         $duration = (int) ($data['duration'] ?? 60);
+        // A time chip must be a time the instructor is actually free:
+        // drop any start time where the proposed slot would overlap one
+        // of their lessons, class sessions, or pending private requests
+        // — the same overlap test store() applies, so a chip never leads
+        // to a rejected request. Only the chosen day can be tested, so
+        // without a day the chips stay as they are. If every derived
+        // time is busy that day, fall back to the usual daytime slots,
+        // filtered the same way.
+        if ($instructor && $day) {
+            $isFree = fn (string $t) => $this->instructorFreeAt($instructor, $day, $t, $duration);
+            $timeChips = array_values(array_filter($timeChips, $isFree));
+            if (empty($timeChips)) {
+                $timeChips = array_values(array_filter(['09:00', '11:00', '13:00', '15:00', '17:00'], $isFree));
+            }
+            if ($day === now()->timezone('Asia/Kathmandu')->toDateString()) {
+                $nowTime = now()->timezone('Asia/Kathmandu')->format('H:i');
+                $timeChips = array_values(array_filter($timeChips, fn ($t) => $t > $nowTime));
+            }
+            // A time picked before the day was chosen may now be busy:
+            // clear it so the summary cannot offer a slot the request
+            // would reject.
+            if ($time && !$isFree($time)) $time = null;
+        }
         // Meeting-point presets: the school's address first, then the
         // instructor's most recent lesson meeting points.
         $meetingPresets = collect();
@@ -71,6 +94,21 @@ class PrivateLessonController extends Controller
             ->with(['school:id,name', 'instructor:id,name', 'vehicle', 'lesson'])->latest('id')->paginate(15) : null;
         return view('learner.private-lessons', compact('schools', 'school', 'instructors', 'instructor', 'vehicles', 'vehicle',
             'dayChips', 'day', 'timeChips', 'time', 'duration', 'meetingPresets', 'meetingPoint', 'canSubmit', 'myRequests'));
+    }
+
+    // True when the instructor has no lesson, class session, or pending
+    // private request overlapping the proposed slot — the same three
+    // overlap checks store() applies before accepting a request.
+    private function instructorFreeAt(User $instructor, string $day, string $time, int $duration): bool
+    {
+        $start = Carbon::parse($day.' '.$time, 'Asia/Kathmandu')->second(0)->utc();
+        $end = $start->copy()->addMinutes($duration);
+        if (DrivingLesson::where('cancelled', false)->whereHas('vehicle', fn ($q) => $q->where('instructor_id', $instructor->id))
+                ->overlapping($start, $end)->exists()) return false;
+        if (DB::table('school_class_sessions as s')->join('school_batches as b', 'b.id', '=', 's.school_batch_id')
+                ->where('b.instructor_id', $instructor->id)->where('s.cancelled', false)->where('s.starts_at', '<', $end)->where('s.ends_at', '>', $start)->exists()) return false;
+        return ! PrivateLessonRequest::where('instructor_id', $instructor->id)->where('status', 'Pending')->get()
+            ->contains(fn ($r) => $r->starts_at < $end && $r->endsAt() > $start);
     }
 
     public function store(Request $request)
