@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Learner;
 use Illuminate\Http\Request;
 use App\Services\AccountMfa;
+use App\Support\LearnerIntendedRedirect;
 use PragmaRX\Google2FA\Google2FA;
 class MfaController extends \App\Http\Controllers\Controller {
     public function setup(Request $request) {
@@ -28,6 +29,7 @@ class MfaController extends \App\Http\Controllers\Controller {
         if(!$mfa->consume($request->user(),$request->code))return back()->withErrors(['code'=>__('Invalid or already used code. Try the next code or a recovery code.')]);
         $request->session()->regenerate();
         $request->session()->put('mfa_verified',AccountMfa::marker($request->user()));
+        if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);
         return redirect()->route($request->user()->role==='Admin'?'adminDashboard':'learn.account');
     }
     public function disable(Request $request,AccountMfa $mfa) {

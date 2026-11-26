@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Learner;
 use App\Models\User;
+use App\Support\LearnerIntendedRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,Hash};
 use Illuminate\Support\Str;
@@ -36,7 +37,9 @@ class GoogleLoginController extends \App\Http\Controllers\Controller {
             if(!$linked->is_active)return redirect()->route('learn.login')->with('error',__('This account is unavailable.'));
             Auth::login($linked);$request->session()->regenerate();$request->session()->forget('mfa_verified');
             $linked->update(['last_login_at'=>now()]);
-            return redirect()->route($linked->mfa_secret?'learn.mfa.challenge':($linked->role==='Admin'?'adminDashboard':'learn.account'));
+            if($linked->mfa_secret)return redirect()->route('learn.mfa.challenge');
+            if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);
+            return redirect()->route($linked->role==='Admin'?'adminDashboard':'learn.account');
         }
         if(User::where('email',$google->getEmail())->exists())return redirect()->route('learn.login')->with('error',__('An account already uses this email. Sign in with your password, then connect Google in Account settings.'));
         $request->session()->put('google_signup',['id'=>$google->getId(),'email'=>$google->getEmail(),'name'=>Str::limit($google->getName() ?: 'Learner',100,''),'expires'=>time()+600]);
@@ -55,6 +58,7 @@ class GoogleLoginController extends \App\Http\Controllers\Controller {
         $user=new User($data+['email'=>$google['email'],'role'=>'User','is_active'=>true,'profileImage'=>'dist/img/avatar.png']);
         $user->password=Hash::make($data['password']);$user->forceFill(['google_id'=>$google['id'],'email_verified_at'=>now()])->save();
         $request->session()->forget('google_signup');Auth::login($user);$request->session()->regenerate();
+        if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);
         return redirect()->route('learn.account')->with('success',__('Your account is ready. You can sign in with Google or your password.'));
     }
     public function disconnect(Request $request) {

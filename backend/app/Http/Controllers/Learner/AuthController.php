@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Learner;
+use App\Support\LearnerIntendedRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,Hash};
 class AuthController extends \App\Http\Controllers\Controller {
@@ -9,25 +10,24 @@ class AuthController extends \App\Http\Controllers\Controller {
         return redirect()->route('learn.account');
     }
     public function loginForm(Request $request){
-        // A "sign in to continue" link (e.g. from the private-lessons page)
-        // passes its destination as ?redirect=; remember it with the normal
-        // intended-URL mechanism so sign-in brings the user back there.
-        $redirect = $request->query('redirect');
-        if (is_string($redirect) && str_starts_with($redirect, url('/learn/private-lessons'))) {
-            $request->session()->put('url.intended', $redirect);
-        }
+        // A "sign in to continue" link (e.g. from the lessons or
+        // private-lessons page) passes its destination as ?redirect=;
+        // remember it with the normal intended-URL mechanism so sign-in
+        // brings the user back there.
+        LearnerIntendedRedirect::store($request, $request->query('redirect'));
         return auth()->check()?$this->dashboard():view('learner.auth',['register'=>false]);
     }
-    public function registerForm(){return auth()->check()?$this->dashboard():view('learner.auth',['register'=>true]);}
+    public function registerForm(Request $request){
+        LearnerIntendedRedirect::store($request, $request->query('redirect'));
+        return auth()->check()?$this->dashboard():view('learner.auth',['register'=>true]);
+    }
     public function login(Request $request){
         $data=$request->validate(['email'=>['required','email'],'password'=>['required','string']]);
         if(!Auth::attempt($data+['is_active'=>true])) return back()->withErrors(['email'=>__('The email or password is incorrect, or this account is unavailable.')])->onlyInput('email');
         $request->session()->regenerate();$request->user()->update(['last_login_at'=>now()]);
         $request->session()->forget('mfa_verified');
         if($request->user()->mfa_secret)return redirect()->route('learn.mfa.challenge');
-        $intended=$request->session()->pull('url.intended');
-        if(is_string($intended) && str_starts_with($intended,url('/learn/verify-email/'))) return redirect()->to($intended);
-        if(is_string($intended) && str_starts_with($intended,url('/learn/private-lessons'))) return redirect()->to($intended);
+        if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);
         return $this->dashboard();
     }
     public function register(Request $request){
@@ -35,6 +35,7 @@ class AuthController extends \App\Http\Controllers\Controller {
             'phoneNumber'=>['required','digits:10'],'password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)],'terms'=>['accepted']]);
         $user=\App\Models\User::create(['name'=>$data['name'],'email'=>$data['email'],'phoneNumber'=>$data['phoneNumber'],'password'=>Hash::make($data['password']),'role'=>'User','profileImage'=>'dist/img/avatar.png','is_active'=>true]);
         Auth::login($user);$request->session()->regenerate();
+        if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);
         // A `premium` flag (e.g. from the Premium page) offers Premium once
         // on the home page instead of sending the new user back to Premium.
         if($request->boolean('premium')) return redirect()->route('learn.home')->with('premium_offer',true)->with('success',__('Your account is ready. You can now upgrade to Premium.'));

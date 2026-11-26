@@ -25,7 +25,7 @@
     <details><summary>{{ __('Book this lesson') }}</summary><p>{{ __('Confirm this time and price before booking. You can cancel before the lesson starts.') }}</p>
     <form method="post" action="{{ route('learn.lessons.book', $lesson->id) }}">@csrf<button class="button">{{ __('Confirm booking') }}</button></form></details>
     @endif
-    @else<a class="button" href="{{ route('learn.login') }}">{{ __('Sign in to book') }}</a>@endauth
+    @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to book') }}</a>@endauth
     </div>
 </article>
 @empty<section class="card"><p>{{ __('No lesson times are available. Try another date or transmission.') }}</p></section>@endforelse</div>
