@@ -78,4 +78,33 @@ class SupportReportSignInTest extends TestCase
             LearnerIntendedRedirect::subtitleFor(url('/learn/report/question/1')));
         $this->assertNull(LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons')));
     }
+
+    public function test_course_and_session_subtitles(): void
+    {
+        $this->assertSame('Sign in to request this session.',
+            LearnerIntendedRedirect::subtitleFor(url('/learn/private-lessons')));
+        $this->assertSame('Sign in to request this session.',
+            LearnerIntendedRedirect::subtitleFor(url('/learn/private-lessons').'?school=2&instructor=3'));
+        $this->assertSame('Sign in to book this course.',
+            LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons').'?lesson=5'));
+        $this->assertSame('Sign in to see your bookings.',
+            LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons/bookings')));
+        $this->assertNull(LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons')));
+        $this->assertNull(LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons').'?school=2'));
+        // The lesson flag must come from the query string, not from a
+        // substring anywhere in the URL.
+        $this->assertNull(LearnerIntendedRedirect::subtitleFor(url('/learn/driving-lessons').'/lesson/5'));
+
+        // End to end: the bookings page bounces a guest to sign-in with
+        // the bookings subtitle, and a plain course list keeps the
+        // generic line.
+        $this->get(route('learn.lessons.bookings'))->assertRedirect(route('learn.login'));
+        $this->get(route('learn.login'))->assertOk()->assertSee('Sign in to see your bookings.');
+        $this->get(route('learn.login', ['redirect' => url('/learn/private-lessons')]))->assertOk()
+            ->assertSee('Sign in to request this session.');
+        $this->get(route('learn.login', ['redirect' => url('/learn/driving-lessons').'?lesson=5']))->assertOk()
+            ->assertSee('Sign in to book this course.');
+        $this->get(route('learn.login', ['redirect' => url('/learn/driving-lessons')]))->assertOk()
+            ->assertSee('Sign in to continue practising.');
+    }
 }

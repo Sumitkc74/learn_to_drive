@@ -15,7 +15,7 @@
     <button class="button">{{ __('Search') }}</button> <a href="{{ route('learn.lessons', $school ? ['school' => $school->id] : []) }}">{{ __('Clear') }}</a>
 </form>
 <div class="lesson-list">@forelse($lessons as $lesson)
-<article class="card lesson-row">{{-- The public listing shows the car, not its plate: test-looking registrations read as fake data to visitors. --}}@include('learner.lessons.details', ['hideVehicleRegistration' => true])
+<article class="card lesson-row" id="lesson-{{ $lesson->id }}">{{-- The public listing shows the car, not its plate: test-looking registrations read as fake data to visitors. --}}@include('learner.lessons.details', ['hideVehicleRegistration' => true])
     <div class="lesson-action">
     @auth
     @if(auth()->user()->id === $lesson->vehicle->instructor_id)
@@ -24,10 +24,10 @@
     <p>{{ __('Waitlist alerts do not reserve a slot. Confirm a booking when one becomes available.') }}</p>
     <form method="post" action="{{ route('learn.lessons.waitlist',$lesson->id) }}">@csrf<input type="hidden" name="action" value="{{ $waiting->has($lesson->id)?'leave':'join' }}"><button class="button">{{ $waiting->has($lesson->id)?__('Leave waitlist'):__('Join waitlist') }}</button></form>
     @else
-    <details><summary>{{ __('Book this course') }}</summary><p>{{ __('Confirm this course time and price before booking. The price covers this one session with the listed car and instructor. You can cancel before the course starts.') }}</p>
+    <details{{ ($openLessonId ?? null) === $lesson->id ? ' open' : '' }}><summary>{{ __('Book this course') }}</summary><p>{{ __('Confirm this course time and price before booking. The price covers this one session with the listed car and instructor. You can cancel before the course starts.') }}</p>
     <form method="post" action="{{ route('learn.lessons.book', $lesson->id) }}">@csrf<button class="button">{{ __('Confirm course booking') }}</button></form></details>
     @endif
-    @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrl()]) }}">{{ __('Sign in to book this course') }}</a>@endauth
+    @else<a class="button" href="{{ route('learn.login', ['redirect' => request()->fullUrlWithQuery(['lesson' => $lesson->id]).'#lesson-'.$lesson->id]) }}">{{ __('Sign in to book this course') }}</a>@endauth
     </div>
 </article>
 @empty<section class="card"><p>{{ __('No course times are available. Try another date or transmission.') }}</p></section>@endforelse</div>

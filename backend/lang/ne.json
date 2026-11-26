@@ -1127,5 +1127,8 @@
   "You can't book a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठ तपाईं आफैं बुक गर्न सक्नुहुन्न।",
   "You can't join the waitlist for a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठको प्रतीक्षा सूचीमा तपाईं सामेल हुन सक्नुहुन्न।",
   "You can't reschedule to a lesson you're teaching.": "तपाईंले सिकाउनुहुने पाठमा तपाईं बुकिङ सार्न सक्नुहुन्न।",
-  "You're teaching this course.": "तपाईं यो कोर्स सिकाइरहनुभएको छ।"
+  "You're teaching this course.": "तपाईं यो कोर्स सिकाइरहनुभएको छ।",
+  "Sign in to book this course.": "यो कोर्स बुक गर्न साइन इन गर्नुहोस्।",
+  "Sign in to request this session.": "यो सत्र अनुरोध गर्न साइन इन गर्नुहोस्।",
+  "Sign in to see your bookings.": "मेरा ड्राइभिङ बुकिङहरू हेर्न साइन इन गर्नुहोस्।"
 }

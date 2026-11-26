@@ -36,13 +36,23 @@ class LearnerIntendedRedirect
     // Contextual sign-in subtitle for a stored destination, as the English
     // translation key (the view translates it). Null means the generic line.
     // Support covers /learn/support and ticket details; report covers the
-    // content-report forms. Admin routes never match: they live under
+    // content-report forms. A private-session return explains the request;
+    // a bookings return explains the bookings list; a course return with a
+    // lesson id explains the booking. A plain course list (no lesson id)
+    // stays generic. Admin routes never match: they live under
     // /admin/support, not under this app's /learn/support URL.
     public static function subtitleFor(mixed $url): ?string
     {
         if (! is_string($url) || $url === '') return null;
         if (str_starts_with($url, url('/learn/report/'))) return 'Sign in to report this content.';
         if (str_starts_with($url, url('/learn/support'))) return 'Sign in to message the admin team and track their replies.';
+        if (str_starts_with($url, url('/learn/private-lessons'))) return 'Sign in to request this session.';
+        if (str_starts_with($url, url('/learn/driving-lessons/bookings'))) return 'Sign in to see your bookings.';
+        if (str_starts_with($url, url('/learn/driving-lessons'))) {
+            $query = [];
+            parse_str(parse_url($url, PHP_URL_QUERY) ?? '', $query);
+            if (isset($query['lesson'])) return 'Sign in to book this course.';
+        }
         return null;
     }
 }

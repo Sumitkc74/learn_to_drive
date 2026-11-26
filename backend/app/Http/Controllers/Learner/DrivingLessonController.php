@@ -29,7 +29,11 @@ class DrivingLessonController extends Controller
                 $q->where('starts_at', '>=', $start)->where('starts_at', '<', $start->copy()->addDay());
             })->with(['vehicle.school.media', 'vehicle.instructor'])->orderBy('starts_at')->paginate(12)->withQueryString();
         $waiting=$request->user()?\Illuminate\Support\Facades\DB::table('lesson_waitlist')->where('user_id',$request->user()->id)->whereIn('driving_lesson_id',$lessons->pluck('id'))->pluck('status','driving_lesson_id'):collect();
-        return view('learner.lessons.index', compact('lessons', 'school', 'schools', 'waiting'));
+        // A guest returning from sign-in (the sign-in link carries lesson=<id>)
+        // lands with this card's confirmation open. Not a validated filter:
+        // an absent, invalid, or unmatched id simply opens nothing.
+        $openLessonId = $request->integer('lesson') ?: null;
+        return view('learner.lessons.index', compact('lessons', 'school', 'schools', 'waiting', 'openLessonId'));
     }
 
     public function bookings(Request $request)

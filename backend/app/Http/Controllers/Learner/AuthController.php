@@ -15,10 +15,11 @@ class AuthController extends \App\Http\Controllers\Controller {
         // remember it with the normal intended-URL mechanism so sign-in
         // brings the user back there.
         LearnerIntendedRedirect::store($request, $request->query('redirect'));
-        // The sign-in page explains itself: a guest bounced from support or
-        // a report form (auth middleware stored url.intended) sees why
-        // sign-in is needed there instead of the generic line. Read the
-        // stored destination without pulling it — login() still needs it.
+        // The sign-in page explains itself: a guest bounced from support,
+        // a report form, a course, or a private session (auth middleware
+        // stored url.intended) sees why sign-in is needed there instead of
+        // the generic line. Read the stored destination without pulling
+        // it — login() still needs it.
         $subtitle = LearnerIntendedRedirect::subtitleFor($request->session()->get('url.intended'));
         return auth()->check()?$this->dashboard():view('learner.auth',['register'=>false, 'subtitle' => $subtitle]);
     }
