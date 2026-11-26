@@ -106,6 +106,21 @@ class AdminAccessibilityTest extends TestCase
             $css,
             'admin-theme.css must give the sidebar logo link an explicit :focus-visible outline'
         );
+
+        // The sidebar clips overflow and the brand sits flush against its
+        // edges, so only the outline's bottom edge renders live. The inset
+        // shadow is the ring that always renders, in both themes.
+        $this->assertMatchesRegularExpression(
+            '/\.ltd-sidebar__brand:focus-visible\s*\{[^}]*box-shadow\s*:\s*inset 0 0 0 3px var\(--yellow\)/',
+            $css,
+            'admin-theme.css must give the sidebar logo link an inset focus ring'
+        );
+
+        $this->assertMatchesRegularExpression(
+            '/\.ltd-body\.ltd-theme-dark\s+\.ltd-sidebar__brand:focus-visible\s*\{[^}]*box-shadow\s*:\s*inset 0 0 0 3px #ffde17/',
+            $css,
+            'admin-theme.css must give the sidebar logo link an inset focus ring in the dark theme'
+        );
     }
 
     private function assertAccessibleHtml(string $html, string $page): void
