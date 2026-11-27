@@ -1641,3 +1641,27 @@ body.ltd-body {
 .ltd-body.ltd-theme-dark .text-muted {
     color: #9ca3af !important;
 }
+
+/* --- Dark-theme fixes for the flipped --charcoal variables ---
+   In the dark theme --charcoal / --charcoal-deep flip to near-white
+   (#f5f7fa / #f9fafb) so they read as light text on dark surfaces.
+   Every rule that pairs a yellow surface with var(--charcoal-deep)
+   as its glyph/text color therefore renders near-white on yellow
+   (~1.2:1), and the add-form intro gradient turns near-white under
+   its hardcoded white text. These overrides restore the dark #2a2a2a
+   glyph/text on yellow and the dark intro gradient, so the
+   dark-theme result matches the light theme exactly. */
+.ltd-body.ltd-theme-dark .ltd-topbar__theme-toggle:hover,
+.ltd-body.ltd-theme-dark .ltd-topbar__logout:hover,
+.ltd-body.ltd-theme-dark .ltd-stat-card__icon,
+.ltd-body.ltd-theme-dark .ltd-filter-panel__summary-meta strong,
+.ltd-body.ltd-theme-dark .ltd-creator__avatar,
+.ltd-body.ltd-theme-dark .ltd-form-card__intro i,
+.ltd-body.ltd-theme-dark .ltd-management-card__icon,
+.ltd-body.ltd-theme-dark .ltd-settings-card__heading > i,
+.ltd-body.ltd-theme-dark .ltd-quick-action:hover {
+    color: #2a2a2a;
+}
+.ltd-body.ltd-theme-dark .ltd-form-card__intro {
+    background: linear-gradient(135deg, #2a2a2a, #3b3b3b);
+}

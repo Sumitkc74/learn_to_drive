@@ -123,6 +123,78 @@ class AdminAccessibilityTest extends TestCase
         );
     }
 
+    public function test_dark_theme_form_card_intro_stays_readable(): void
+    {
+        // Regression: in the dark theme --charcoal-deep flips to
+        // near-white, so the add-form intro gradient (built from
+        // --charcoal-deep / --charcoal) turned near-white under its
+        // hardcoded white text, and every yellow surface paired with
+        // var(--charcoal-deep) rendered a near-white glyph on yellow
+        // (~1.2:1). A live dark-theme check caught the intro on the
+        // Add Question page; the shared form-card component is used by
+        // every admin add-form, so all of them were affected.
+        $css = file_get_contents(public_path('dist/css/admin-theme.css'));
+        $this->assertNotFalse($css, 'admin-theme.css could not be read');
+
+        // The intro keeps its dark gradient in the dark theme, using
+        // fixed dark colors instead of the flipped variables.
+        $this->assertMatchesRegularExpression(
+            '/\.ltd-body\.ltd-theme-dark\s+\.ltd-form-card__intro\s*\{[^}]*background\s*:\s*linear-gradient\(135deg,\s*#2a2a2a,\s*#3b3b3b\)/',
+            $css,
+            'admin-theme.css must keep the add-form intro gradient dark in the dark theme'
+        );
+
+        // Every yellow surface that pairs with var(--charcoal-deep)
+        // gets its dark glyph/text color back in the dark theme.
+        foreach ([
+            '\.ltd-topbar__theme-toggle:hover',
+            '\.ltd-topbar__logout:hover',
+            '\.ltd-stat-card__icon',
+            '\.ltd-filter-panel__summary-meta strong',
+            '\.ltd-creator__avatar',
+            '\.ltd-form-card__intro i',
+            '\.ltd-management-card__icon',
+            '\.ltd-settings-card__heading > i',
+            '\.ltd-quick-action:hover',
+        ] as $selector) {
+            $this->assertMatchesRegularExpression(
+                '/\.ltd-body\.ltd-theme-dark\s+' . $selector . '[^{]*\{[^}]*color\s*:\s*#2a2a2a/',
+                $css,
+                "admin-theme.css must restore the dark glyph color for {$selector} in the dark theme"
+            );
+        }
+
+        // The fixed colors themselves pass WCAG 2.1 AA: white intro
+        // text on each gradient stop, the 72%-white subtitle blended
+        // over the darkest stop (#c3c3c3), and the dark glyph on yellow.
+        $this->assertGreaterThanOrEqual(4.5, self::contrastRatio('#ffffff', '#2a2a2a'));
+        $this->assertGreaterThanOrEqual(4.5, self::contrastRatio('#ffffff', '#3b3b3b'));
+        $this->assertGreaterThanOrEqual(4.5, self::contrastRatio('#c3c3c3', '#2a2a2a'));
+        $this->assertGreaterThanOrEqual(4.5, self::contrastRatio('#2a2a2a', '#ffde17'));
+    }
+
+    private static function contrastRatio(string $foreground, string $background): float
+    {
+        $luminance = function (string $hex): float {
+            $hex = ltrim($hex, '#');
+            $channels = array_map(
+                fn (string $pair) => hexdec($pair) / 255,
+                str_split($hex, 2)
+            );
+            $linear = array_map(
+                fn (float $c) => $c <= 0.04045 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4,
+                $channels
+            );
+
+            return 0.2126 * $linear[0] + 0.7152 * $linear[1] + 0.0722 * $linear[2];
+        };
+
+        $lighter = max($luminance($foreground), $luminance($background));
+        $darker = min($luminance($foreground), $luminance($background));
+
+        return ($lighter + 0.05) / ($darker + 0.05);
+    }
+
     private function assertAccessibleHtml(string $html, string $page): void
     {
         // Exactly one h1, first heading on the page, levels never skipped.
