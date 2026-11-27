@@ -80,6 +80,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/backups', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups');
     Route::post('/admin/backups', [\App\Http\Controllers\Admin\BackupController::class, 'create'])->middleware('throttle:2,10')->name('backups.create');
     Route::post('/admin/backups/{id}/verify', [\App\Http\Controllers\Admin\BackupController::class, 'verify'])->middleware('throttle:5,10')->name('backups.verify');
+    Route::get('/admin/backups/{id}/download', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->middleware('throttle:5,10')->name('backups.download');
     Route::get('/admin/content-versions/{type}/{id}', [\App\Http\Controllers\Admin\ContentVersionController::class, 'index'])->whereNumber('id')->name('contentVersions');
     Route::post('/admin/content-versions/{type}/{id}/{version}/restore', [\App\Http\Controllers\Admin\ContentVersionController::class, 'restore'])->whereNumber('id')->whereNumber('version')->name('contentVersions.restore');
     Route::get('/admin/review-operations', [\App\Http\Controllers\Admin\ReviewOperationsController::class, 'index'])->name('reviewOperations');

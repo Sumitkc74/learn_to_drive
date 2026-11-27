@@ -108,6 +108,21 @@ class LocalBackup {
     private function quoteMysqlIdentifier(string $name): string {
         return '`'.str_replace('`','``',$name).'`';
     }
+    /**
+     * Path of a complete, checksum-verified backup archive, or null when
+     * the id is invalid, the files are missing, or the checksum fails.
+     * Only Created/Verified archives are downloadable: a Failed create
+     * may leave a partial zip behind.
+     */
+    public function downloadPath(string $id): ?string {
+        if(!Str::isUuid($id)) return null;
+        $root=$this->root();$metadata=$root.'/'.$id.'.json';$path=$root.'/'.$id.'.zip';
+        if(!is_file($metadata) || !is_file($path)) return null;
+        $info=json_decode(file_get_contents($metadata),true);
+        if(!is_array($info) || !in_array($info['status'] ?? null,['Created','Verified'],true)) return null;
+        if(!isset($info['sha256']) || !hash_equals($info['sha256'],hash_file('sha256',$path))) return null;
+        return $path;
+    }
     public function verify(string $id): array {
         try { return $this->verifyArchive($id); }
         catch (\Throwable $e) {
