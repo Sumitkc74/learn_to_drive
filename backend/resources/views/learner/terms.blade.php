@@ -1,7 +1,7 @@
 @extends('learner.layout')
 @section('title',__('Terms and Conditions'))
 @section('content')
-<div class="page-heading"><p class="eyebrow">{{ __('THE FINE PRINT, IN PLAIN WORDS') }}</p><h1>{{ __('Terms and Conditions') }}</h1><p class="lead">{{ __('These terms explain how Learn to Drive works and what we expect from each other. By creating an account, you agree to them.') }}</p></div>
+<div class="page-heading"><p class="eyebrow">{{ __('THE FINE PRINT, IN PLAIN WORDS') }}</p><h1>{{ __('Terms and Conditions') }}</h1><p class="lead">{{ __('These terms explain how Learn to Drive works and what we expect from each other. By creating an account, you agree to them.') }}</p><p>{{ __('Our Privacy Policy explains what data we collect and how to ask for it to be corrected or deleted.') }} <a href="{{ route('learn.privacy') }}">{{ __('Read the Privacy Policy') }}</a></p></div>
 <div class="card"><div class="prose">
 <h3>{{ __('1. What this service is') }}</h3>
 <p>{{ __('Learn to Drive is a study app for Nepal’s driving licence exam. It offers a learning library, practice questions, mock exams, driving-school discovery and lesson booking, and an optional Premium plan with a study chatbot and revision modules.') }}</p>
@@ -9,8 +9,9 @@
 <p>{{ __('Our questions, signs and explanations are study aids. They are not official Department of Transport Management material. Exam rules, fees and requirements change; always check the current official notices before you apply or sit an exam.') }}</p>
 <h3>{{ __('3. Your account') }}</h3>
 <p>{{ __('Give accurate details when you register, keep your password safe, and do not share your account. One account per person. You are responsible for what happens under your account.') }}</p>
+<p>{{ __('You must be at least 16 years old to create an account. In Nepal, the minimum licence age is 16 for Category A (motorcycle) and Category K (scooter or moped), 18 for Category B (car, jeep, or van), and 21 for heavy vehicles.') }}</p>
 <h3>{{ __('4. Premium') }}</h3>
-<p>{{ __('Premium is a one-time payment, made through the checkout options shown on the Premium page, that unlocks the study chatbot and revision modules. There is no automatic renewal. If something goes wrong with a payment, contact support and we will look into a refund.') }}</p>
+<p>{{ __('Premium is a one-time payment of Rs 500 for lifetime access that unlocks the study chatbot and revision modules. Online checkout is not available yet, so no payment is taken right now. When checkout opens, you will pay through the checkout options shown on the Premium page. There is no automatic renewal. If something goes wrong with a payment, contact support and we will look into a refund.') }}</p>
 <h3>{{ __('5. School lessons') }}</h3>
 <p>{{ __('Lesson times, prices and availability are set by the driving school, not by us. Booking a lesson is an arrangement between you and the school; we cannot guarantee a time slot or a vehicle.') }}</p>
 <h3>{{ __('6. Acceptable use') }}</h3>

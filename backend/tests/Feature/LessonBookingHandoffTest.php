@@ -74,7 +74,7 @@ class LessonBookingHandoffTest extends TestCase
         $this->get(route('learn.register'))->assertOk();
         $this->post(route('learn.register'), ['name' => 'New Learner', 'email' => 'new-learner@example.test',
             'phoneNumber' => '9800000000', 'password' => 'password-123', 'password_confirmation' => 'password-123',
-            'terms' => '1'])->assertRedirect($lessonsUrl);
+            'terms' => '1', 'age' => '1'])->assertRedirect($lessonsUrl);
     }
 
     public function test_mfa_challenge_returns_to_lessons_page(): void
@@ -113,7 +113,7 @@ class LessonBookingHandoffTest extends TestCase
         $this->withSession(['url.intended' => $lessonsUrl]);
         $this->get(route('learn.google.callback'))->assertRedirect(route('learn.google.finish'));
         $this->post(route('learn.google.finish'), ['name' => 'Learner', 'phoneNumber' => '9800000000',
-            'password' => 'password-123', 'password_confirmation' => 'password-123', 'terms' => '1'])
+            'password' => 'password-123', 'password_confirmation' => 'password-123', 'terms' => '1', 'age' => '1'])
             ->assertRedirect($lessonsUrl);
     }
 }

@@ -14,10 +14,10 @@ class TermsAgreementTest extends TestCase {
         $this->withSession(['google_flow'=>['expires'=>time()+600,'link'=>null]]);
     }
     private function googleFinishPayload(): array {
-        return ['name'=>'Learner','phoneNumber'=>'9800000000','password'=>'password-123','password_confirmation'=>'password-123'];
+        return ['name'=>'Learner','phoneNumber'=>'9800000000','password'=>'password-123','password_confirmation'=>'password-123','age'=>'1'];
     }
     private function registration(string $email): array {
-        return ['name'=>'New Learner','email'=>$email,'phoneNumber'=>'9800000001','password'=>'Password123','password_confirmation'=>'Password123'];
+        return ['name'=>'New Learner','email'=>$email,'phoneNumber'=>'9800000001','password'=>'Password123','password_confirmation'=>'Password123','age'=>'1'];
     }
     public function test_registration_without_terms_fails_and_creates_no_user(): void {
         $this->post(route('learn.register'),$this->registration('no-terms@example.com'))

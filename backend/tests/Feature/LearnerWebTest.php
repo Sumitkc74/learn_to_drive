@@ -18,7 +18,7 @@ class LearnerWebTest extends TestCase {
         $this->get('/learn/account')->assertRedirect(route('learn.login'));
     }
     public function test_registration_cannot_choose_admin_role_and_login_works() {
-        $this->post('/learn/register',['name'=>'Learner','email'=>'learner@example.test','phoneNumber'=>'9812345678','password'=>'safe-password','password_confirmation'=>'safe-password','terms'=>'1','role'=>'Admin'])->assertRedirect(route('learn.account'));
+        $this->post('/learn/register',['name'=>'Learner','email'=>'learner@example.test','phoneNumber'=>'9812345678','password'=>'safe-password','password_confirmation'=>'safe-password','terms'=>'1','age'=>'1','role'=>'Admin'])->assertRedirect(route('learn.account'));
         $user=User::where('email','learner@example.test')->firstOrFail();$this->assertSame('User',$user->role);
         $this->post('/learn/logout')->assertRedirect('/');
         $this->post('/learn/login',['email'=>$user->email,'password'=>'safe-password'])->assertRedirect(route('learn.account'));

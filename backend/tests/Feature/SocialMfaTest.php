@@ -48,7 +48,7 @@ class SocialMfaTest extends TestCase {
         $this->google('google-new','google@example.test');
         $this->get(route('learn.google.callback'))->assertRedirect(route('learn.google.finish'));
         $this->get(route('learn.google.finish'))->assertOk();
-        $this->post(route('learn.google.finish'),['name'=>'Learner','phoneNumber'=>'9800000000','password'=>'password-123','password_confirmation'=>'password-123','terms'=>'1'])->assertRedirect(route('learn.account'));
+        $this->post(route('learn.google.finish'),['name'=>'Learner','phoneNumber'=>'9800000000','password'=>'password-123','password_confirmation'=>'password-123','terms'=>'1','age'=>'1'])->assertRedirect(route('learn.account'));
         $user=User::where('email','google@example.test')->firstOrFail();$this->assertTrue($user->hasVerifiedEmail());$this->assertSame('User',$user->role);
         $this->post('/learn/logout');
         $user->forceFill(['mfa_secret'=>(new Google2FA)->generateSecretKey()])->save();

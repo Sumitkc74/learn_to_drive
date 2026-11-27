@@ -9,6 +9,9 @@
 <div class="page-heading"><p class="eyebrow">{{ __('LEARN FROM EVERY MISTAKE') }}</p><h1>{{ __('A little extra support.') }}<br>{{ __('A clearer way forward.') }}</h1><p class="lead">{{ __('Premium brings your difficult topics together and gives you a study assistant to help explain them.') }}</p></div>
 @if($premium)<p class="badge">{{ __('Premium access active') }}</p>@endif
 @endguest
+@unless(config('payments.enabled'))
+<p class="muted">{{ __('Online checkout is not available yet, so no money is taken. When checkout opens, Premium is Rs 500, a one-time payment for lifetime access, with no automatic renewal. If something goes wrong with a payment, contact support and we will look into a refund.') }}</p>
+@endunless
 <p class="muted">{{ __('Students enrolled at an approved driving school get Premium while they are enrolled — no separate payment needed.') }}</p>
 @auth
 <div id="premium-checkout">@include('learner.payment-options')</div>

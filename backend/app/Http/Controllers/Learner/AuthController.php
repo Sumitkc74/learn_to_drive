@@ -38,7 +38,7 @@ class AuthController extends \App\Http\Controllers\Controller {
     }
     public function register(Request $request){
         $data=$request->validate(['name'=>['required','string','max:100'],'email'=>['required','email','max:255','unique:users,email'],
-            'phoneNumber'=>['required','digits:10'],'password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)],'terms'=>['accepted']]);
+            'phoneNumber'=>['required','digits:10'],'password'=>['required','confirmed',\Illuminate\Validation\Rules\Password::min(8)],'terms'=>['accepted'],'age'=>['accepted']]);
         $user=\App\Models\User::create(['name'=>$data['name'],'email'=>$data['email'],'phoneNumber'=>$data['phoneNumber'],'password'=>Hash::make($data['password']),'role'=>'User','profileImage'=>'dist/img/avatar.png','is_active'=>true]);
         Auth::login($user);$request->session()->regenerate();
         if($intended=LearnerIntendedRedirect::pull($request))return redirect()->to($intended);

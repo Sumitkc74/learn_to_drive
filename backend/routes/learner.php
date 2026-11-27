@@ -8,6 +8,8 @@ Route::prefix('learn')->name('learn.')->group(function () {
     Route::post('language', [\App\Http\Controllers\Learner\LanguageController::class, 'update'])->name('language');
     Route::get('premium',[\App\Http\Controllers\Learner\PremiumController::class,'index'])->name('premium');
     Route::view('terms','learner.terms')->name('terms');
+    Route::view('privacy','learner.privacy')->name('privacy');
+    Route::view('cookies','learner.cookies')->name('cookies');
     Route::get('auth/google',[\App\Http\Controllers\Learner\GoogleLoginController::class,'redirect'])->middleware('throttle:10,1,google')->name('google');
     Route::get('auth/google/callback',[\App\Http\Controllers\Learner\GoogleLoginController::class,'callback'])->middleware('throttle:10,1,google')->name('google.callback');
     Route::get('auth/google/finish',[\App\Http\Controllers\Learner\GoogleLoginController::class,'finishForm'])->name('google.finish');

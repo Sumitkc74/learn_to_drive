@@ -5,7 +5,7 @@
 <div class="settings-layout">
 <aside class="settings-sidebar">
 <div class="settings-identity"><span class="settings-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($user->name,0,1)) }}</span><strong>{{ $user->name }}</strong><span>{{ __('Member since') }} {{ $user->created_at?->locale(app()->getLocale())->translatedFormat('M Y') }}</span></div>
-<nav aria-label="Account settings sections" class="settings-nav"><a href="#profile-photo">{{ __('Profile photo') }} <span aria-hidden="true">↗</span></a><a href="#personal-details">{{ __('Personal details') }} <span aria-hidden="true">↗</span></a><a href="#password-security">{{ __('Password & security') }} <span aria-hidden="true">↗</span></a><a href="#sign-in-options">{{ __('Connected accounts') }}</a><a href="#two-step-verification">{{ __('Two-step verification') }}</a></nav>
+<nav aria-label="Account settings sections" class="settings-nav"><a href="#profile-photo">{{ __('Profile photo') }} <span aria-hidden="true">↗</span></a><a href="#personal-details">{{ __('Personal details') }} <span aria-hidden="true">↗</span></a><a href="#password-security">{{ __('Password & security') }} <span aria-hidden="true">↗</span></a><a href="#your-data">{{ __('Your data') }}</a><a href="#sign-in-options">{{ __('Connected accounts') }}</a><a href="#two-step-verification">{{ __('Two-step verification') }}</a></nav>
 <p class="settings-note">{{ __('Your learning history stays with your account when you update these details.') }}</p>
 </aside>
 <div class="settings-sections">
@@ -37,6 +37,9 @@
 <div class="settings-fields"><div><label for="new-password">{{ __('New password') }}<input id="new-password" type="password" name="password" required minlength="8" autocomplete="new-password" aria-describedby="password-help"></label><small id="password-help" class="field-help">{{ __('At least 8 characters, different from your current password.') }}</small></div><div><label for="confirm-password">{{ __('Confirm new password') }}<input id="confirm-password" type="password" name="password_confirmation" required minlength="8" autocomplete="new-password"></label><small class="field-help">{{ __('Enter your new password again.') }}</small>
 </div></div>
 <div class="settings-form-footer"><span>{{ __('Use your new password the next time you sign in.') }}</span><button class="button">{{ __('Change password') }}</button></div></form></section>
+<section class="card settings-card" id="your-data" aria-labelledby="your-data-title"><div class="settings-section-heading"><span class="badge">{{ __('PRIVACY') }}</span><h2 id="your-data-title">{{ __('Your data') }}</h2><p>{{ __('See what we collect and ask for changes.') }}</p></div>
+<p>{{ __('Our Privacy Policy explains what data we collect and why.') }} <a href="{{ route('learn.privacy') }}">{{ __('Read the Privacy Policy') }}</a></p>
+<p>{{ __('To ask for your data to be corrected or deleted, open a support ticket and tell us what to change.') }} <a href="{{ route('learn.support') }}">{{ __('Open a support ticket') }}</a></p></section>
 @include('learner.security-options')
 </div></div>
 @endsection

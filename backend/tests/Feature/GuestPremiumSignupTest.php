@@ -9,7 +9,7 @@ class GuestPremiumSignupTest extends TestCase {
         config(['payments.enabled'=>true,'payments.live'=>false,'payments.amount_paisa'=>49900,'payments.days'=>30,'payments.khalti_key'=>'test-key','payments.esewa_code'=>'TEST','payments.esewa_secret'=>'test-secret']);
     }
     private function registration(string $email, bool $premium=false): array {
-        $data=['name'=>'New Learner','email'=>$email,'phoneNumber'=>'9800000001','password'=>'Password123','password_confirmation'=>'Password123','terms'=>'1'];
+        $data=['name'=>'New Learner','email'=>$email,'phoneNumber'=>'9800000001','password'=>'Password123','password_confirmation'=>'Password123','terms'=>'1','age'=>'1'];
         if($premium) $data['premium']='1';
         return $data;
     }
