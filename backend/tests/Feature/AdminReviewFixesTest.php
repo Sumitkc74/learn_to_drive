@@ -84,12 +84,28 @@ class AdminReviewFixesTest extends TestCase
 
     public function test_dashboard_degrades_when_a_table_is_missing(): void
     {
+        // Postgres aborts the whole transaction on the first failed
+        // statement, so a missing table poisons every later query while
+        // this test runs inside RefreshDatabase's transaction — the
+        // dashboard can never degrade gracefully in that setup. A live
+        // request runs autocommit (no open transaction), so each panel
+        // fails independently and the safe() guard works there, exactly
+        // as this test proves on sqlite.
+        if (DB::getDriverName() === 'pgsql') {
+            $this->markTestSkipped('Missing-table degradation cannot be simulated inside a Postgres test transaction.');
+        }
+
         // A missing column cannot be reproduced on the sqlite test DB:
         // SQLite's double-quoted-string fallback turns a quoted missing
         // column into a string literal instead of an error, so the query
         // returns rows instead of throwing (live MySQL uses backticks and
         // would throw). A missing table does throw, so it proves the same
         // resilience guard: one failing panel degrades instead of 500ing.
+        // Postgres refuses to drop a table other tables reference, so
+        // drop the two dependents (payments, booking changes) first.
+        // SQLite and MySQL accept the same order.
+        Schema::drop('school_lesson_payments');
+        Schema::drop('lesson_booking_changes');
         Schema::drop('lesson_bookings');
 
         $this->actingAs($this->admin())->get(route('adminDashboard'))
@@ -115,7 +131,10 @@ class AdminReviewFixesTest extends TestCase
         $this->actingAs($this->admin())->post(route('backups.create'))->assertRedirect();
         $verified = collect(app(LocalBackup::class)->entries())->firstWhere('status', 'Verified');
         $this->assertNotNull($verified, 'Expected a verified backup entry.');
-        $this->assertTrue($verified['restore_verified'] ?? false);
+        // Only the sqlite snapshot is test-restored; MySQL and Postgres
+        // dumps are verified by structure, so restore_verified is false
+        // on those drivers by design.
+        $this->assertSame(DB::getDriverName() === 'sqlite', $verified['restore_verified'] ?? false);
         $this->actingAs($this->admin())->get(route('backups'))->assertOk();
     }
 
@@ -148,6 +167,42 @@ class AdminReviewFixesTest extends TestCase
         $zip2->addFromString('manifest.json', json_encode($manifest2));
         $zip2->close();
         file_put_contents($root.'/'.$id2.'.json', json_encode(['id' => $id2, 'created_at' => now()->toIso8601String(), 'status' => 'Created', 'verified_at' => null, 'driver' => 'mysql', 'sha256' => hash_file('sha256', $zipPath2)]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('missing table media');
+        $backup->verify($id2);
+    }
+
+    public function test_postgres_style_backup_verifies_by_structure(): void
+    {
+        $backup = app(LocalBackup::class);
+        $root = $backup->root();
+        $id = (string) Str::uuid();
+        // pg_dump quotes identifiers only when it must: one quoted, one bare.
+        $sql = "-- dump\nCREATE TABLE public.\"users\" (\n    id integer\n);\nCREATE TABLE public.media (\n    id integer\n);\n";
+        $zipPath = $root.'/'.$id.'.zip';
+        $zip = new ZipArchive();
+        $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::EXCL);
+        $zip->addFromString('database.sql', $sql);
+        $manifest = ['database.sql' => hash('sha256', $sql), 'database_tables' => ['users', 'media'], 'database_rows' => ['users' => 0, 'media' => 0]];
+        $zip->addFromString('manifest.json', json_encode($manifest));
+        $zip->close();
+        file_put_contents($root.'/'.$id.'.json', json_encode(['id' => $id, 'created_at' => now()->toIso8601String(), 'status' => 'Created', 'verified_at' => null, 'driver' => 'pgsql', 'sha256' => hash_file('sha256', $zipPath)]));
+
+        $info = $backup->verify($id);
+        $this->assertSame('Verified', $info['status']);
+        $this->assertFalse($info['restore_verified']);
+
+        $id2 = (string) Str::uuid();
+        $incomplete = "-- dump\nCREATE TABLE public.users (\n    id integer\n);\n";
+        $zipPath2 = $root.'/'.$id2.'.zip';
+        $zip2 = new ZipArchive();
+        $zip2->open($zipPath2, ZipArchive::CREATE | ZipArchive::EXCL);
+        $zip2->addFromString('database.sql', $incomplete);
+        $manifest2 = ['database.sql' => hash('sha256', $incomplete), 'database_tables' => ['users', 'media'], 'database_rows' => ['users' => 0, 'media' => 0]];
+        $zip2->addFromString('manifest.json', json_encode($manifest2));
+        $zip2->close();
+        file_put_contents($root.'/'.$id2.'.json', json_encode(['id' => $id2, 'created_at' => now()->toIso8601String(), 'status' => 'Created', 'verified_at' => null, 'driver' => 'pgsql', 'sha256' => hash_file('sha256', $zipPath2)]));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('missing table media');

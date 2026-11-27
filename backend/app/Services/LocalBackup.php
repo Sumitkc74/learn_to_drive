@@ -3,6 +3,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\{DB,Storage};
 use Illuminate\Support\Str;
 use RuntimeException;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 class LocalBackup {
     public function root(): string { $root=storage_path('app/private/backups'); if(!is_dir($root)) mkdir($root,0700,true); return $root; }
@@ -13,8 +14,8 @@ class LocalBackup {
     public function create(): array {
         if(!class_exists(ZipArchive::class)) throw new RuntimeException('PHP ZIP extension is required.');
         $driver=DB::connection()->getDriverName();
-        if(!in_array($driver,['sqlite','mysql'],true)) throw new RuntimeException('This backup tool supports SQLite and MySQL deployments. Use a database-native backup for other engines.');
-        $id=(string)Str::uuid();$root=$this->root();$dbFile=$driver==='mysql' ? $id.'.sql' : $id.'.sqlite';$dbPath=$root.'/'.$dbFile;$zipPath=$root.'/'.$id.'.zip';
+        if(!in_array($driver,['sqlite','mysql','pgsql'],true)) throw new RuntimeException('This backup tool supports SQLite, MySQL and Postgres deployments. Use a database-native backup for other engines.');
+        $id=(string)Str::uuid();$root=$this->root();$dbFile=in_array($driver,['mysql','pgsql'],true) ? $id.'.sql' : $id.'.sqlite';$dbPath=$root.'/'.$dbFile;$zipPath=$root.'/'.$id.'.zip';
         $info=['id'=>$id,'created_at'=>now()->toIso8601String(),'status'=>'Creating','verified_at'=>null,'driver'=>$driver];
         file_put_contents($root.'/'.$id.'.json',json_encode($info));
         $zip=new ZipArchive();
@@ -26,12 +27,17 @@ class LocalBackup {
                 $manifest['database.sql']=hash_file('sha256',$dbPath);
                 $manifest['database_tables']=array_keys($dumped);
                 $manifest['database_rows']=$dumped;
+            } elseif($driver==='pgsql') {
+                $dumped=$this->dumpPostgres($dbPath);
+                $manifest['database.sql']=hash_file('sha256',$dbPath);
+                $manifest['database_tables']=array_keys($dumped);
+                $manifest['database_rows']=$dumped;
             } else {
                 $version=$pdo->query('PRAGMA data_version')->fetchColumn();
                 $pdo->exec('VACUUM INTO '.$pdo->quote($dbPath));
             }
             if($zip->open($zipPath,ZipArchive::CREATE|ZipArchive::EXCL)!==true) throw new RuntimeException('Could not create backup archive.');
-            if($driver==='mysql') { $zip->addFile($dbPath,'database.sql'); }
+            if(in_array($driver,['mysql','pgsql'],true)) { $zip->addFile($dbPath,'database.sql'); }
             else {
                 $manifest['database.sqlite']=hash_file('sha256',$dbPath);$zip->addFile($dbPath,'database.sqlite');
             }
@@ -109,6 +115,46 @@ class LocalBackup {
         return '`'.str_replace('`','``',$name).'`';
     }
     /**
+     * Postgres dump via pg_dump (plain format, public schema only, no
+     * owner/privilege/comment statements so the file restores anywhere).
+     * Returns table => row count, stored in the manifest for verification.
+     * The password travels in the child process environment (PGPASSWORD),
+     * never on the command line, and is never logged. Connection values
+     * come from the active connection's resolved config, so a DATABASE_URL
+     * is honoured too. pg_dump runs as a separate process, so it only
+     * sees committed data: callers inside a test transaction must commit
+     * first (see AdminReviewFixesTest).
+     */
+    private function dumpPostgres(string $path): array {
+        $connection=DB::connection();
+        $host=(string)($connection->getConfig('host') ?? '127.0.0.1');
+        $port=(string)($connection->getConfig('port') ?? '5432');
+        $database=(string)($connection->getConfig('database') ?? '');
+        $username=(string)($connection->getConfig('username') ?? '');
+        $password=(string)($connection->getConfig('password') ?? '');
+        $sslmode=(string)($connection->getConfig('sslmode') ?? 'prefer');
+        if($database==='' || $username==='') throw new RuntimeException('Postgres backup needs a configured database and username.');
+        $pdo=$connection->getPdo();
+        $tables=$pdo->query("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")->fetchAll(\PDO::FETCH_COLUMN);
+        $rows=[];
+        foreach($tables as $table) $rows[$table]=(int)$pdo->query('SELECT COUNT(*) FROM '.$this->quotePostgresIdentifier($table))->fetchColumn();
+        $handle=fopen($path,'wb');
+        if($handle===false) throw new RuntimeException('Could not create backup file.');
+        $process=new Process(['pg_dump','--no-owner','--no-privileges','--no-comments','--schema=public','--format=plain','-w','--host='.$host,'--port='.$port,'--username='.$username,'--dbname='.$database],null,['PGPASSWORD'=>$password,'PGSSLMODE'=>$sslmode]);
+        $process->setTimeout(300);
+        try {
+            $process->run(function ($type,$buffer) use ($handle) { if($type===Process::OUT) fwrite($handle,$buffer); });
+        } catch(\Throwable $e) {
+            throw new RuntimeException('pg_dump failed: '.$e->getMessage(),0,$e);
+        } finally { fclose($handle); }
+        if(!$process->isSuccessful()) throw new RuntimeException('pg_dump failed: '.trim($process->getErrorOutput() ?: 'pg_dump exited with code '.$process->getExitCode()));
+        if(!is_file($path) || filesize($path)===0) throw new RuntimeException('pg_dump produced an empty backup file.');
+        return $rows;
+    }
+    private function quotePostgresIdentifier(string $name): string {
+        return '"'.str_replace('"','""',$name).'"';
+    }
+    /**
      * Path of a complete, checksum-verified backup archive, or null when
      * the id is invalid, the files are missing, or the checksum fails.
      * Only Created/Verified archives are downloadable: a Failed create
@@ -154,14 +200,22 @@ class LocalBackup {
                 if(!hash_equals($hash,hash_final($ctx))) throw new RuntimeException('Backup file checksum mismatch.');
             }
             if(isset($manifest['database.sql'])) {
-                // No MySQL server is available to test-restore into, so a
-                // MySQL dump is verified by structure: every dumped table
-                // must have its CREATE TABLE in the file. The manifest
-                // hash check above already proves the archive is intact.
+                // No MySQL/Postgres server is available to test-restore
+                // into, so a SQL dump is verified by structure: every
+                // dumped table must have its CREATE TABLE in the file. The
+                // manifest hash check above already proves the archive is
+                // intact. pg_dump quotes identifiers only when it must,
+                // so the table name may or may not be quoted.
                 $sql=$zip->getFromName('database.sql');
                 if(!is_string($sql) || $sql==='') throw new RuntimeException('Backup database dump is empty.');
                 foreach($manifest['database_tables'] ?? [] as $table) {
-                    if(!str_contains($sql,'CREATE TABLE `'.$table.'`')) throw new RuntimeException('Backup dump is missing table '.$table.'.');
+                    if(($info['driver'] ?? null)==='pgsql') {
+                        // pg_dump quotes identifiers only when it must.
+                        $found=preg_match('/CREATE TABLE public\."?'.preg_quote($table,'/').'"? \(/',$sql)===1;
+                    } else {
+                        $found=str_contains($sql,'CREATE TABLE `'.$table.'`');
+                    }
+                    if(!$found) throw new RuntimeException('Backup dump is missing table '.$table.'.');
                 }
                 $info['restore_verified']=false;
             } else {

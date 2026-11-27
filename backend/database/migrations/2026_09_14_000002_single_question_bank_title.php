@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\{DB, Schema};
 return new class extends Migration {
     public function up(): void
     {
+        $wrapped = DB::connection()->getQueryGrammar()->wrap('nepaliName');
         DB::table('exam_papers')->where('language', 'Nepali')->whereNotNull('nepaliName')
-            ->whereRaw("TRIM(nepaliName) <> ''")->update(['name' => DB::raw('nepaliName')]);
+            ->whereRaw("TRIM({$wrapped}) <> ''")->update(['name' => DB::raw($wrapped)]);
         Schema::table('exam_papers', fn (Blueprint $table) => $table->dropColumn('nepaliName'));
     }
     public function down(): void

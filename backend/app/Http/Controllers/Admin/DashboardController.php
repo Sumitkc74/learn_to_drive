@@ -93,7 +93,7 @@ class DashboardController extends Controller
         $signupCounts = $this->safe(fn () => $months->map(fn ($month) => User::where('created_at', '>=', $month)->where('created_at', '<', $month->copy()->addMonth())->count()), collect([null, null, null, null, null, null]));
         $recentActivity = $this->safe(fn () => AuditLog::with('actor')->latest()->take(8)->get(), collect());
         $mostMissed = $this->safe(fn () => $this->mostMissedQuestions($cached['misses']), collect());
-        $reviewWorkload = $this->safe(fn () => PdfQuestionImport::where('status', 'Pending')->selectRaw('COUNT(*) AS pending, COALESCE(SUM(needs_answer),0) AS answers, COALESCE(SUM(needs_diagram),0) AS diagrams, COALESCE(SUM(is_ocr),0) AS ocr')->first(), (object) ['pending' => null, 'answers' => null, 'diagrams' => null, 'ocr' => null]);
+        $reviewWorkload = $this->safe(fn () => PdfQuestionImport::where('status', 'Pending')->selectRaw('COUNT(*) AS pending, COALESCE(SUM(CASE WHEN needs_answer THEN 1 ELSE 0 END),0) AS answers, COALESCE(SUM(CASE WHEN needs_diagram THEN 1 ELSE 0 END),0) AS diagrams, COALESCE(SUM(CASE WHEN is_ocr THEN 1 ELSE 0 END),0) AS ocr')->first(), (object) ['pending' => null, 'answers' => null, 'diagrams' => null, 'ocr' => null]);
         $reviewBanks = $this->safe(fn () => PdfQuestionImport::where('status', 'Pending')->select('learning_content_import_id')->selectRaw('COUNT(*) AS pending')->groupBy('learning_content_import_id')->orderByDesc('pending')->limit(6)->with('resource:id,title')->get(), collect());
         $extractionIssues = $this->safe(fn () => PdfExtractionRun::whereIn('status', ['Queued', 'Running', 'Failed'])->with('resource:id,title')->latest('id')->limit(5)->get(), collect());
 

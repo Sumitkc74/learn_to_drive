@@ -20,13 +20,13 @@ WORKDIR /var/www/html
 # Render because config/pdf-tools.php defaults to a `python` binary
 # that does not exist in this image.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git unzip curl libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
-    libonig-dev libxml2-dev libicu-dev libexif-dev \
+    git unzip curl postgresql-client libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
+    libonig-dev libxml2-dev libicu-dev libexif-dev libpq-dev \
     python3 python3-venv python3-dev build-essential pkg-config \
     libtesseract-dev libleptonica-dev tesseract-ocr tesseract-ocr-eng tesseract-ocr-nep \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
-        pdo_mysql mbstring zip gd exif bcmath intl xml curl fileinfo \
+        pdo_mysql pdo_pgsql mbstring zip gd exif bcmath intl xml curl fileinfo \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 

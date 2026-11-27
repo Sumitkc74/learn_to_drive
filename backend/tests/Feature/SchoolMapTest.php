@@ -14,7 +14,7 @@ class SchoolMapTest extends TestCase
 
     public function test_public_map_only_lists_approved_schools_and_public_details(): void
     {
-        DrivingSchool::create(['name' => 'Mapped Academy', 'status' => 'Approved', 'address' => 'Kathmandu', 'phone' => '9800000002', 'latitude' => 27.7, 'longitude' => 85.3, 'email' => 'private@example.com']);
+        $mapped = DrivingSchool::create(['name' => 'Mapped Academy', 'status' => 'Approved', 'address' => 'Kathmandu', 'phone' => '9800000002', 'latitude' => 27.7, 'longitude' => 85.3, 'email' => 'private@example.com']);
         DrivingSchool::create(['name' => 'Unmapped Academy', 'status' => 'Approved']);
         DrivingSchool::create(['name' => 'Pending Academy', 'status' => 'Pending', 'latitude' => 27, 'longitude' => 85]);
         DrivingSchool::create(['name' => 'Suspended Academy', 'status' => 'Suspended']);
@@ -33,8 +33,8 @@ class SchoolMapTest extends TestCase
         $this->assertStringNotContainsString('Suspended Academy', $content);
         // Each card links to its dialog and to its filtered classes page.
         $this->assertStringContainsString('View details', $list);
-        $this->assertStringContainsString('data-open-school-dialog="school-1"', $list);
-        $this->assertStringContainsString(route('learn.lessons', ['school' => 1]), $list);
+        $this->assertStringContainsString('data-open-school-dialog="school-'.$mapped->id.'"', $list);
+        $this->assertStringContainsString(route('learn.lessons', ['school' => $mapped->id]), $list);
         // The details live inside the dialog, not in the list.
         $this->assertStringContainsString('Kathmandu', $dialogs);
         $this->assertStringContainsString('private@example.com', $dialogs);

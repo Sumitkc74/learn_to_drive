@@ -112,7 +112,7 @@ class AdminDataContext
         $students = DB::table('school_memberships as m')->join('users as u', 'u.id', '=', 'm.user_id')
             ->where('m.role', 'Student')->select('m.driving_school_id')
             ->selectRaw('COUNT(DISTINCT m.user_id) AS students')
-            ->selectRaw('COUNT(DISTINCT CASE WHEN u.is_active = 1 THEN m.user_id END) AS active_students')
+            ->selectRaw('COUNT(DISTINCT CASE WHEN u.is_active THEN m.user_id END) AS active_students')
             ->groupBy('m.driving_school_id');
         $ranking = DB::table('driving_schools as s')->leftJoinSub($students, 'enrollment', 's.id', '=', 'enrollment.driving_school_id')
             ->where('s.status', 'Approved')->select('s.id', 's.name')

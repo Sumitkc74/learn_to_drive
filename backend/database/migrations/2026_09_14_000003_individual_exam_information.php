@@ -31,7 +31,8 @@ return new class extends Migration {
                 }
             }
         });
-        DB::table('exam_information')->where('language', 'Nepali')->whereNotNull('nepaliName')->whereRaw("TRIM(nepaliName) <> ''")->update(['name' => DB::raw('nepaliName')]);
+        $wrapped = DB::connection()->getQueryGrammar()->wrap('nepaliName');
+        DB::table('exam_information')->where('language', 'Nepali')->whereNotNull('nepaliName')->whereRaw("TRIM({$wrapped}) <> ''")->update(['name' => DB::raw($wrapped)]);
         Schema::table('exam_information', fn (Blueprint $table) => $table->dropColumn(['englishFile', 'nepaliFile', 'nepaliName']));
     }
     public function down(): void

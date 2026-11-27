@@ -16,7 +16,7 @@ class ContentAiScreeningTest extends TestCase {
         Http::fake(['*'=>Http::response(['usageMetadata'=>['totalTokenCount'=>23],'candidates'=>[['finishReason'=>'STOP','content'=>['parts'=>[['text'=>json_encode(['verdict'=>'Ready','summary'=>'Review dates','issues'=>[]])]]]]]])]);
         app(ContentAiScreening::class)->screen($record);
         $this->assertSame('Ready',$record->fresh()->ai_status);
-        $this->assertSame(23,\Illuminate\Support\Facades\DB::table('content_ai_usage')->sum('tokens'));
+        $this->assertSame(23, (int) \Illuminate\Support\Facades\DB::table('content_ai_usage')->sum('tokens'));
     }
     public function test_screening_uses_flash_lite_while_chat_and_translation_stay_on_flash(): void {
         config(['pdf-translation.gemini_key'=>'fake','pdf-translation.gemini_model'=>'gemini-3.5-flash','premium.chat_model'=>'gemini-3.5-flash','content-screening.daily_limit'=>100]);

@@ -62,7 +62,7 @@ class PdfQuestionController extends Controller
         abort_unless($resource->kind === 'question-bank-document', 404);
         $filters = CandidateReviewQuery::filters($request);
         $query = PdfQuestionImport::where('learning_content_import_id', $resource->id);
-        $summary = (clone $query)->selectRaw('COALESCE(SUM(needs_answer), 0) AS answer, COALESCE(SUM(needs_diagram), 0) AS diagram')->first();
+        $summary = (clone $query)->selectRaw('COALESCE(SUM(CASE WHEN needs_answer THEN 1 ELSE 0 END), 0) AS answer, COALESCE(SUM(CASE WHEN needs_diagram THEN 1 ELSE 0 END), 0) AS diagram')->first();
         $counts = ['answer' => (int) $summary->answer, 'diagram' => (int) $summary->diagram];
         $items = CandidateReviewQuery::query($resource->id, $filters)->select(['id', 'learning_content_import_id', 'page', 'number', 'status', 'payload'])->orderBy('page')->orderBy('number')->orderBy('id')->paginate(20)->withQueryString();
 

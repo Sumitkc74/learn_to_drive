@@ -38,7 +38,16 @@ class AuditDatabaseDuplicates extends Command
             $numeric = ['testNumber', 'driving_school_id', 'user_id', 'lesson_vehicle_id', 'active_lesson_id', 'content_id'];
             foreach ($columns as $column) {
                 $wrapped = $grammar->wrap($column);
-                $expression = in_array($column, $numeric, true) ? $wrapped : "LOWER(TRIM($wrapped))";
+                // Only text columns can be case/whitespace-normalised.
+                // getColumnType() returns the NATIVE type name (varchar,
+                // character varying, mediumtext...), not the abstract
+                // type, so match on the name: anything with char/text in
+                // it is text. Postgres has no btrim() for timestamps (and
+                // no sum()/comparison on booleans), so every other type
+                // compares raw.
+                $type = strtolower($schema->getColumnType($table, $column));
+                $isText = str_contains($type, 'char') || str_contains($type, 'text') || $type === 'string';
+                $expression = (in_array($column, $numeric, true) || !$isText) ? $wrapped : "LOWER(TRIM($wrapped))";
                 $query->selectRaw($expression)->groupByRaw($expression);
                 // Null address is comparable, but absent identities are not duplicates.
                 if ($column !== 'address') $query->whereNotNull($column);
